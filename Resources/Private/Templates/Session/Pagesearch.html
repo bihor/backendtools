@@ -1,0 +1,219 @@
+{namespace ex=Fixpunkt\Backendtools\ViewHelpers}
+<f:layout name="Default" />
+<f:section name="content">
+<style>
+.f3-widget-paginator { padding-left:0; }
+.f3-widget-paginator li { display:inline-block; }
+</style>
+<h1>Links to a specific page</h1>
+<f:flashMessages />
+<f:form action="pagesearch" class="form-inline">
+<p>Search any content element that contains a link to this page:</p>
+<div class="row"><div class="col-md-6">
+
+<div style="margin: 10px 0;">Show only 
+  <label class="checkbox-inline">
+	<f:form.radio name="my_c" value="1" checked="{my_c} == 1" /> not visible &nbsp; or
+  </label>
+  <label class="checkbox-inline">
+	<f:form.radio name="my_c" value="2" checked="{my_c} == 2" /> visible &nbsp; or
+  </label>
+  <label class="checkbox-inline">
+	<f:form.radio name="my_c" value="0" checked="{my_c} == 0" /> all ... content elements.
+  </label>
+</div>
+<div style="margin: 10px 0;">Show only 
+  <label class="checkbox-inline">
+	<f:form.radio name="my_p" value="1" checked="{my_p} == 1" /> not visible &nbsp; or
+  </label>
+  <label class="checkbox-inline">
+	<f:form.radio name="my_p" value="2" checked="{my_p} == 2" /> visible &nbsp; or
+  </label>
+  <label class="checkbox-inline">
+	<f:form.radio name="my_p" value="0" checked="{my_p} == 0" /> all ... pages.
+  </label>
+</div>
+
+</div><div class="col-md-6">
+
+<div style="margin: 10px 0;">Find links with this target ID (UID of a page): 
+ <f:form.textfield name="linksto" value="{linksto}" size="5" /> (e.g. 1)<br />
+ <label class="checkbox-inline">
+  <f:form.checkbox name="exttoo" value="1" checked="{exttoo} == 1" /> search in some extensions too (e.g. news, tt_news, camaliga)
+ </label>
+</div>
+<div style="margin: 10px 0;">Elements per page:
+	<f:form.textfield name="my_page" value="{my_page}" size="5" /> &nbsp;
+</div>
+
+</div></div>
+
+<f:form.submit value="search" name="search" class="btn btn-default" />
+</f:form>
+
+<f:if condition="{pages -> f:count()} > 0">
+<f:then>
+<f:widget.paginate objects="{pages}" as="paginatedpages" configuration="{settings.pagebrowser}">
+<table class="table">
+<thead>
+	<tr>
+		<th colspan="4" style="text-align:center;background-color:#cfc;">Content element</th>
+		<th colspan="4" style="text-align:center;background-color:#ccf;">Page</th>
+	</tr>
+	<tr>
+		<th>uid</th>
+		<th>lang.</th>
+		<th>deleted / hidden</th>
+		<th>header</th>
+		<th>uid</th>
+		<th>deleted / hidden</th>
+		<th>title</th>
+	</tr>
+</thead>
+<tbody>
+	<f:for each="{paginatedpages}" as="page" iteration="iterator">
+		<tr{f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
+			<td>
+				<ex:editLink action="edit" table="tt_content" uid="{page.uid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=pagesearch">
+      				<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-open.svg" width="16" height="16">
+      			</ex:editLink>
+      			{page.uid}
+      		</td>
+			<td>{page.sys_language_uid}</td>
+			<td><f:if condition="{page.ttdeleted} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if> / 
+				<f:if condition="{page.tthidden} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
+			<td>{page.header}</td>
+			<td>
+				<ex:editLink action="edit" table="pages" uid="{page.pid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=pagesearch">
+      				<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-open.svg" width="16" height="16">
+      			</ex:editLink>
+      			<a href="/index.php?id={page.pid}&L={page.sys_language_uid}&no_cache=1" target="extern">
+      				<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-view.svg" width="16" height="16">
+      			</a>
+				{page.pid}
+			</td>
+			<td><f:if condition="{page.pdeleted} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if> / 
+				<f:if condition="{page.phidden} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
+			<td>{page.title}</td>
+		</tr>
+	</f:for>
+</tbody>
+</table>
+</f:widget.paginate>
+	<p>{pages -> f:count()} content element(s) with links to the UID {linksto} found.</p>
+</f:then>
+<f:else>
+	<p>0 content elements found!</p>
+</f:else>
+</f:if>
+
+<f:if condition="{exttoo} == 1">
+	<f:if condition="{tt_news -> f:count()} > 0">
+	<f:then>
+	<br>
+	<table class="table">
+	<thead>
+		<tr>
+			<th colspan="5" style="text-align:center;background-color:#fcc;">tt_news</th>
+		</tr>
+		<tr>
+			<th>pid</th>
+			<th>uid</th>
+			<th>lang.</th>
+			<th>deleted / hidden</th>
+			<th>title</th>
+		</tr>
+	</thead>
+	<tbody>
+		<f:for each="{tt_news}" as="page" iteration="iterator">
+			<tr{f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
+				<td>{page.pid}</td>
+				<td>{page.uid}</td>
+				<td>{page.sys_language_uid}</td>
+				<td><f:if condition="{page.deleted} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if> / 
+					<f:if condition="{page.hidden} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
+				<td>{page.title}</td>
+			</tr>
+		</f:for>
+	</tbody>
+	</table>
+		<p>{tt_news -> f:count()} tt_news entrie(s) with links to the UID {linksto} found.</p>
+	</f:then>
+	<f:else>
+		<p>0 tt_news entries found.</p>
+	</f:else>
+	</f:if>
+	
+	<f:if condition="{news -> f:count()} > 0">
+	<f:then>
+	<br>
+	<table class="table">
+	<thead>
+		<tr>
+			<th colspan="5" style="text-align:center;background-color:#fcc;">news</th>
+		</tr>
+		<tr>
+			<th>pid</th>
+			<th>uid</th>
+			<th>lang.</th>
+			<th>deleted / hidden</th>
+			<th>title</th>
+		</tr>
+	</thead>
+	<tbody>
+		<f:for each="{news}" as="page" iteration="iterator">
+			<tr{f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
+				<td>{page.pid}</td>
+				<td>{page.uid}</td>
+				<td>{page.sys_language_uid}</td>
+				<td><f:if condition="{page.deleted} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if> / 
+					<f:if condition="{page.hidden} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
+				<td>{page.title}</td>
+			</tr>
+		</f:for>
+	</tbody>
+	</table>
+		<p>{news -> f:count()} news entrie(s) with links to the UID {linksto} found.</p>
+	</f:then>
+	<f:else>
+		<p>0 news entries found.</p>
+	</f:else>
+	</f:if>
+	
+	<f:if condition="{camaliga -> f:count()} > 0">
+	<f:then>
+	<br>
+	<table class="table">
+	<thead>
+		<tr>
+			<th colspan="5" style="text-align:center;background-color:#fcc;">camaliga</th>
+		</tr>
+		<tr>
+			<th>pid</th>
+			<th>uid</th>
+			<th>lang.</th>
+			<th>deleted / hidden</th>
+			<th>title</th>
+		</tr>
+	</thead>
+	<tbody>
+		<f:for each="{camaliga}" as="page" iteration="iterator">
+			<tr{f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
+				<td>{page.pid}</td>
+				<td>{page.uid}</td>
+				<td>{page.sys_language_uid}</td>
+				<td><f:if condition="{page.deleted} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if> / 
+					<f:if condition="{page.hidden} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
+				<td>{page.title}</td>
+			</tr>
+		</f:for>
+	</tbody>
+	</table>
+		<p>{camaliga -> f:count()} camaliga entrie(s) with links to the UID {linksto} found.</p>
+	</f:then>
+	<f:else>
+		<p>0 camaliga entries found.</p>
+	</f:else>
+	</f:if>
+</f:if>
+</f:section>

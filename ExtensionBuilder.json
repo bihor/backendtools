@@ -1,0 +1,177 @@
+{
+    "modules": [
+        {
+            "config": {
+                "position": [
+                    271,
+                    95
+                ]
+            },
+            "name": "New Model Object",
+            "value": {
+                "actionGroup": {
+                    "_default0_list": true,
+                    "_default1_show": false,
+                    "_default2_new_create": false,
+                    "_default3_edit_update": false,
+                    "_default4_delete": false,
+                    "customActions": [
+                        "filedeletion",
+                        "unzip",
+                        "images",
+                        "pagesearch"
+                    ]
+                },
+                "name": "Session",
+                "objectsettings": {
+                    "addDeletedField": false,
+                    "addHiddenField": false,
+                    "addStarttimeEndtimeFields": false,
+                    "aggregateRoot": false,
+                    "categorizable": false,
+                    "description": "",
+                    "mapToTable": "",
+                    "parentClass": "",
+                    "sorting": false,
+                    "type": "Entity",
+                    "uid": "62957004049"
+                },
+                "propertyGroup": {
+                    "properties": [
+                        {
+                            "allowedFileTypes": "",
+                            "maxItems": "1",
+                            "propertyDescription": "Key (action)",
+                            "propertyIsExcludeField": false,
+                            "propertyIsRequired": true,
+                            "propertyName": "action",
+                            "propertyType": "String",
+                            "uid": "443711816834"
+                        },
+                        {
+                            "allowedFileTypes": "",
+                            "maxItems": "1",
+                            "propertyDescription": "Value 1",
+                            "propertyIsExcludeField": false,
+                            "propertyIsRequired": false,
+                            "propertyName": "value1",
+                            "propertyType": "Integer",
+                            "uid": "584638663704"
+                        },
+                        {
+                            "allowedFileTypes": "",
+                            "maxItems": "1",
+                            "propertyDescription": "Value 2",
+                            "propertyIsExcludeField": false,
+                            "propertyIsRequired": false,
+                            "propertyName": "value2",
+                            "propertyType": "Integer",
+                            "uid": "1057066845078"
+                        },
+                        {
+                            "allowedFileTypes": "",
+                            "maxItems": "1",
+                            "propertyDescription": "Value 3",
+                            "propertyIsExcludeField": false,
+                            "propertyIsRequired": false,
+                            "propertyName": "value3",
+                            "propertyType": "Integer",
+                            "uid": "1339505180737"
+                        },
+                        {
+                            "allowedFileTypes": "",
+                            "maxItems": "1",
+                            "propertyDescription": "Value 4",
+                            "propertyIsExcludeField": false,
+                            "propertyIsRequired": false,
+                            "propertyName": "value4",
+                            "propertyType": "String",
+                            "uid": "840418159337"
+                        },
+                        {
+                            "allowedFileTypes": "",
+                            "maxItems": "1",
+                            "propertyDescription": "Value 5",
+                            "propertyIsExcludeField": false,
+                            "propertyIsRequired": false,
+                            "propertyName": "value5",
+                            "propertyType": "String",
+                            "uid": "1388293506201"
+                        },
+                        {
+                            "allowedFileTypes": "",
+                            "maxItems": "1",
+                            "propertyDescription": "Value 6",
+                            "propertyIsExcludeField": false,
+                            "propertyIsRequired": false,
+                            "propertyName": "value6",
+                            "propertyType": "String",
+                            "uid": "506170671153"
+                        }
+                    ]
+                },
+                "relationGroup": {
+                    "relations": [
+                        {
+                            "foreignRelationClass": "\\TYPO3\\CMS\\Extbase\\Domain\\Model\\BackendUser",
+                            "lazyLoading": false,
+                            "propertyIsExcludeField": false,
+                            "relationDescription": "",
+                            "relationName": "beuser",
+                            "relationType": "zeroToOne",
+                            "relationWire": "",
+                            "uid": "275421163997"
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "properties": {
+        "backendModules": [
+            {
+                "actions": {
+                    "controllerActionCombinations": ""
+                },
+                "description": "Some admin tools",
+                "key": "mod1",
+                "mainModule": "tools",
+                "name": "Extension & file tools",
+                "tabLabel": "Extension & file tools"
+            }
+        ],
+        "description": "5 admin tools for extensions, files, images and links: extensionlist, filedeletion, images with no title, unzip and linklist.",
+        "emConf": {
+            "category": "module",
+            "custom_category": "",
+            "dependsOn": "typo3 => 7.6.0-7.6.99\n",
+            "disableLocalization": true,
+            "disableVersioning": true,
+            "skipGenerateDocumentationTemplate": false,
+            "sourceLanguage": "en",
+            "state": "stable",
+            "targetVersion": "7.6.0-7.6.99",
+            "version": "0.3.0"
+        },
+        "extensionKey": "backendtools",
+        "name": "Backend tools",
+        "originalExtensionKey": "backendtools",
+        "originalVendorName": "Fixpunkt",
+        "persons": [
+            {
+                "company": "fixpunkt werbeagentur gmbh",
+                "email": "k.gusbeth@fixpunkt.com",
+                "name": "Kurt Gusbeth",
+                "role": "Developer"
+            }
+        ],
+        "plugins": [],
+        "vendorName": "Fixpunkt"
+    },
+    "wires": [],
+    "log": {
+        "last_modified": "2016-06-15 03:56",
+        "extension_builder_version": "7.6.0",
+        "be_user": " (2)"
+    }
+}

@@ -1,0 +1,14 @@
+<f:layout name="Default" />
+<f:section name="content">
+<h1>Unzip a file in the fileadmin-folder</h1>
+<f:flashMessages />
+<f:form action="unzip">
+<div style="margin: 10px 0;">
+	<p><strong>Choose a file...</strong> from here (relative path and file name):</p>
+	fileadmin/ <f:form.textfield name="zipfile" value="{zipfile}" size="50" />
+</div>
+<f:form.submit name="extractme" value="Extract this file in the same folder" class="btn btn-primary" />
+</f:form>
+<br>
+<p><strong>{message}</strong></p>
+</f:section>

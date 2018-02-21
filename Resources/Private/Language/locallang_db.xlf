@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages" date="2016-06-15T15:56:47Z" product-name="backendtools">
+		<header/>
+		<body>
+			<trans-unit id="tx_backendtools_domain_model_session">
+				<source>Session</source>
+			</trans-unit>
+			<trans-unit id="tx_backendtools_domain_model_session.action">
+				<source>Action</source>
+			</trans-unit>
+			<trans-unit id="tx_backendtools_domain_model_session.value1">
+				<source>Value1</source>
+			</trans-unit>
+			<trans-unit id="tx_backendtools_domain_model_session.value2">
+				<source>Value2</source>
+			</trans-unit>
+			<trans-unit id="tx_backendtools_domain_model_session.value3">
+				<source>Value3</source>
+			</trans-unit>
+			<trans-unit id="tx_backendtools_domain_model_session.value4">
+				<source>Value4</source>
+			</trans-unit>
+			<trans-unit id="tx_backendtools_domain_model_session.value5">
+				<source>Value5</source>
+			</trans-unit>
+			<trans-unit id="tx_backendtools_domain_model_session.value6">
+				<source>Value6</source>
+			</trans-unit>
+			<trans-unit id="tx_backendtools_domain_model_session.pageel">
+				<source>Elements per page</source>
+			</trans-unit>
+			<trans-unit id="tx_backendtools_domain_model_session.beuser">
+				<source>Beuser</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

@@ -1,0 +1,40 @@
+<f:be.container
+includeRequireJsModules="{ 0: 'bootstrap', 1: 'TYPO3/CMS/Backend/ContextHelp', 2: 'TYPO3/CMS/Backend/DocumentHeader', 3: 'TYPO3/CMS/Backend/SplitButtons', 4: 'TYPO3/CMS/Lang/Lang' }"
+loadExtJsTheme="0" loadJQuery="1"
+>
+	<div class="typo3-fullDoc">
+		<div id="typo3-docheader">
+			<div class="typo3-docheader-functions">
+				<div class="left">
+					<f:be.buttons.csh />
+					<f:be.menus.actionMenu>
+						<f:be.menus.actionMenuItem label="Menu: please choose..." controller="" action="list" />
+						<f:be.menus.actionMenuItem label="Show pages that use (specific) extensions" controller="" action="list" />
+						<f:be.menus.actionMenuItem label="Show pages that links to a specific page" controller="" action="pagesearch" />
+						<f:be.menus.actionMenuItem label="Show images without title- or alt-text" controller="" action="images" />
+						<f:be.menus.actionMenuItem label="Unzip a file in the fileadmin-folder" controller="" action="unzip" />
+						<f:be.menus.actionMenuItem label="Delete unused files in the uploads-folder" controller="" action="filedeletion" />
+					</f:be.menus.actionMenu>
+				</div>
+				<div class="right">
+					<f:be.pagePath />
+					<f:be.pageInfo />
+				</div>
+			</div>
+			<div class="typo3-docheader-buttons">
+				<div class="left">
+
+				</div>
+				<div class="right">
+					<f:be.buttons.shortcut />
+				</div>
+			</div>
+		</div>
+		<div id="typo3-docbody">
+			<div id="typo3-inner-docbody">
+				<f:flashMessages />
+				<f:render section="content" />
+			</div>
+		</div>
+	</div>
+</f:be.container>

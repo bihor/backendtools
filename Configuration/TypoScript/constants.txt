@@ -1,0 +1,14 @@
+module.tx_backendtools_mod1 {
+	view {
+		# cat=module.tx_backendtools_mod1/file; type=string; label=Path to template root (BE)
+		templateRootPath = EXT:backendtools/Resources/Private/Templates/
+		# cat=module.tx_backendtools_mod1/file; type=string; label=Path to template partials (BE)
+		partialRootPath = EXT:backendtools/Resources/Private/Partials/
+		# cat=module.tx_backendtools_mod1/file; type=string; label=Path to template layouts (BE)
+		layoutRootPath = EXT:backendtools/Resources/Private/Layouts/
+	}
+	persistence {
+		# cat=module.tx_backendtools_mod1//a; type=string; label=Default storage PID
+		storagePid =
+	}
+}

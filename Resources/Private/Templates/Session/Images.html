@@ -1,0 +1,114 @@
+{namespace ex=Fixpunkt\Backendtools\ViewHelpers}
+<f:layout name="Default" />
+<f:section name="content">
+<style>
+.f3-widget-paginator { padding-left:0; }
+.f3-widget-paginator li { display:inline-block; }
+</style>
+<h1>Find images without title- or alt-text</h1>
+<f:flashMessages />
+<f:form action="images" class="form-inline">
+<div class="row"><div class="col-md-8">
+<div style="margin: 10px 0;">Show images 
+  <label class="checkbox-inline">
+	<f:form.radio name="img_without" value="1" checked="{img_without} == 1" /> without alt-tag &nbsp; or
+  </label>
+  <label class="checkbox-inline">
+	<f:form.radio name="img_without" value="2" checked="{img_without} == 2" /> without title-tag &nbsp; or
+  </label>
+  <label class="checkbox-inline">
+	<f:form.radio name="img_without" value="4" checked="{img_without} == 4" /> with alt-tag &nbsp; or
+  </label>
+  <label class="checkbox-inline">
+	<f:form.radio name="img_without" value="5" checked="{img_without} == 5" /> with title-tag.
+  </label>
+</div>
+
+</div><div class="col-md-4">
+
+<div style="margin: 10px 0;">Elements per page:
+	<f:form.textfield name="my_page" value="{my_page}" size="5" /> &nbsp;
+</div>
+
+</div></div>
+<f:form.submit value="search" name="search" class="btn btn-default" />
+<br><br>
+
+<f:if condition="{images -> f:count()} > 0">
+<f:then>
+<f:widget.paginate objects="{images}" as="paginatedimages" configuration="{settings.pagebrowser}">
+<table class="table">
+<thead>
+	<tr>
+		<th colspan="3" style="text-align:center;background-color:#cfc;">sys_file</th>
+		<th colspan="4" style="text-align:center;background-color:#ccf;">sys_file_metadata</th>
+		<th colspan="2" style="text-align:center;background-color:#fcc;">sys_file_reference</th>
+		<th colspan="3" style="text-align:center;background-color:#fcf;">tt_content</th>
+	</tr>
+	<tr>
+		<th>uid</th>
+		<th>name</th>
+		<th>size</th>
+		<th>width</th>
+		<th>height</th>
+		<th>title</th>
+		<th>alt</th>
+		<th>title</th>
+		<th>alt</th>
+		<th>lang</th>
+		<th>uid</th>
+		<th>pid</th>
+	</tr>
+</thead>
+<tbody>
+	<f:for each="{paginatedimages}" as="image" iteration="iterator">
+		<tr{f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
+			<td>{image.uid}</td>
+			<td>{image.name}</td>
+			<td>{image.size}</td>
+			<td>{image.meta_width}</td>
+			<td>{image.meta_height}</td>
+			<td>{image.meta_title}</td>
+			<td>{image.meta_alt}</td>
+			<td>{image.ref_title}</td>
+			<td>{image.ref_alt}</td>
+			<td>{image.tt_lang}</td>
+			<td><f:if condition="{image.cid} > 0">
+				{image.cid}
+				<ex:editLink action="edit" table="tt_content" uid="{image.cid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=images">
+      				<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-open.svg" width="16" height="16">
+      			</ex:editLink>
+			</f:if></td>
+			<td><f:if condition="{image.tt_pid} > 0">
+				{image.tt_pid} 
+				<a href="{image.domain}/index.php?id={image.tt_pid}&L={image.tt_lang}&no_cache=1" target="extern">
+					<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-view.svg" width="16" height="16">
+				</a>
+			</f:if></td>
+		</tr>
+	</f:for>
+</tbody>
+</table>
+</f:widget.paginate>
+
+<f:if condition="{count} > 0">
+	<p class="bg-success">{count} replacement(s) done.</p>
+</f:if>
+<p>{images -> f:count()} image(s) found.</p>
+<br>
+
+<f:if condition="{img_without} == 1">
+	<f:form.submit value="Replace empty alt-tag (with the title-tag or image name) in sys_file_metadata" name="replace_empty_alt" class="btn btn-primary" />
+</f:if>
+<f:if condition="{img_without} == 2">
+	<f:form.submit value="Replace empty title-tag (with the alt-tag or image name) in sys_file_metadata" name="replace_empty_meta" class="btn btn-primary" />
+</f:if>
+
+</f:then>
+<f:else>
+	<p>0 images found!</p>
+</f:else>
+</f:if>
+
+</f:form>
+</f:section>
