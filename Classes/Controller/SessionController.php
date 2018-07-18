@@ -143,6 +143,9 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	} else {
     		$this->settings['pagebrowser']['itemsPerPage'] = $my_page;
     	}
+    	if ($this->request->hasArgument('my_outp')) {
+    		$my_outp = intval($this->request->getArgument('my_outp'));		// output
+    	} else $my_outp = 0;
     	
     	if ($new) {
     		$this->sessionRepository->add($default);
@@ -220,6 +223,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     			$root = array_pop($pageRep->getRootLine($row['pid']));
     			$row['root'] = $root['uid'];
     			$row['domain'] = $domains[$root['uid']];
+    			$row['csvtitle'] = str_replace(';', ',', str_replace('"', '', $row['title']));
     			$pages[] = $row;
     		}
     	}
@@ -233,6 +237,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	$this->view->assign('my_exclude', $my_exclude);
     	$this->view->assign('my_flexform', $my_flexform);
     	$this->view->assign('my_page', $my_page);
+    	$this->view->assign('my_outp', $my_outp);
     	$this->view->assign('rows', $rows);
     	$this->view->assign('pages', $pages);
     	$this->view->assign('settings', $this->settings);

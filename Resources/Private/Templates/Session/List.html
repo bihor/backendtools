@@ -55,6 +55,14 @@
 <div style="margin: 10px 0;">Elements per page:
 	<f:form.textfield name="my_page" value="{my_page}" size="5" /> &nbsp;
 </div>
+<div style="margin: 10px 0;">Output: 
+  <label class="checkbox-inline">
+	<f:form.radio name="my_outp" value="0" checked="{my_outp} == 0" /> HTML &nbsp; or
+  </label>
+  <label class="checkbox-inline">
+	<f:form.radio name="my_outp" value="1" checked="{my_outp} == 1" /> CSV
+  </label>
+</div>
 
 </div></div>
 
@@ -63,6 +71,16 @@
 
 <f:if condition="{rows} > 0">
 <f:then>
+<f:if condition="{my_outp} == 1">
+<f:then>
+<textarea name="dummy">
+Content element;;;;;;;;Page;;
+uid;deleted;hidden;header;lang.;CType;list tyle;FlexForm actions;uid;deleted;hidden;title
+<f:for each="{pages}" as="page" iteration="iterator">{page.uid};{page.ttdeleted};{page.tthidden};{page.header};{page.sys_language_uid};{page.CType};{page.list_type};<f:format.raw>{page.actions}</f:format.raw>;{page.pid};{page.pdeleted};{page.phidden};{page.csvtitle}
+</f:for>
+</textarea>
+</f:then>
+<f:else>
 <f:widget.paginate objects="{pages}" as="paginatedpages" configuration="{settings.pagebrowser}">
 <table class="table">
 <thead>
@@ -116,6 +134,8 @@
 </tbody>
 </table>
 </f:widget.paginate>
+</f:else>
+</f:if>
 	<p>{pages -> f:count()} element(s) found!</p>
 </f:then>
 <f:else>
