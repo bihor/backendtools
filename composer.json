@@ -1,0 +1,33 @@
+{
+	"name" : "fixpunkt/backendtools",
+	"type" : "typo3-cms-extension",
+	"description" : "5 admin tools for extensions, files, images and links: extensionlist, filedeletion, images with no title, unzip and linklist.",
+	"authors" : [{
+			"name" : "Kurt Gusbeth",
+			"role" : "Developer"
+		}
+	],
+	"version" : "1.3.0",
+	"require" : {
+		"typo3/cms-core" : "^9.5"
+	},
+	"autoload" : {
+		"psr-4" : {
+			"Fixpunkt\\Backendtools\\" : "Classes"
+		}
+	},
+	"autoload-dev" : {
+		"psr-4" : {
+			"Fixpunkt\\Backendtools\\Tests\\" : "Tests"
+		}
+	},
+	"replace" : {
+		"backendtools" : "self.version",
+		"typo3-ter/backendtools" : "self.version"
+	},
+	"homepage" : "https://www.fixpunkt.com/webentwicklung/typo3/typo3-extensions/",
+	"support" : {
+		"email" : "info@quizpalme.de"
+	},
+	"license" : "GPL-3.0+"
+}

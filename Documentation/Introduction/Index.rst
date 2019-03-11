@@ -17,7 +17,7 @@ Introduction
 What does it do?
 ----------------
 
-This extension provides some useful tools in the “Admin tools” section in the backend of TYPO3. Currently it contains 5 tools for extensions, files, images and links.
+This extension provides some usefull tools in the “Admin tools” section of the backend of TYPO3. Currently it contains 5 tools for extensions, files, images and links.
 
 Tool 1: shows you all pages where you use extensions. You can see where you use which extension. You can search for non-extensions too, e.g. if you set Ctype='mailform'.
 
@@ -29,16 +29,24 @@ Tool 4: helps you to find pages that link to another page. You can find any cont
 
 Tool 5: helps you to find images with no title- oder alternative-text. This tool can set that values for you too.
 
+.. important::
+
+   If you are using TYPO3 9, then you will need the extension typo3db_legacy too!
+
 .. _screenshots:
 
 Screenshots
 -----------
 
-One screenshot from the backend module.
+Two screenshot from the backend module.
 
-.. figure:: ../Images/backendtools.jpg
-   :width: 888px
-   :alt: Backendtools 1
+.. figure:: ../Images/backendtools1.jpg
+   :width: 712px
+   :alt: Resized Screenshot 1 of the Backendtools
+
+.. figure:: ../Images/backendtools2.jpg
+   :width: 700px
+   :alt: Resized Screenshot 2 of the Backendtools
 
 .. _made-in:
 

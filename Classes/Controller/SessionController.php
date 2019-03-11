@@ -93,7 +93,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
  		$result = $this->sessionRepository->findByAction('list', $GLOBALS['BE_USER']->user['uid']);
  		if ($result->count() == 0) {
  			$new = TRUE;
- 			$default = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('Fixpunkt\Backendtools\Domain\Model\Session');
+ 			$default = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
  			$default->setAction('list');
  			$default->setValue1(0);
  			$default->setValue2(0);
@@ -194,8 +194,6 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	//echo $where;
     	
     	$pages = array();
-    	$index = array();
-    	$vals = array();
     	$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
     			'tt.uid,tt.pid,tt.deleted AS ttdeleted,tt.hidden AS tthidden,tt.header,tt.sys_language_uid, tt.CType,tt.list_type,tt.pi_flexform, pages.title,pages.deleted AS pdeleted,pages.hidden AS phidden',
     			'tt_content tt, pages',
@@ -255,7 +253,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	$result = $this->sessionRepository->findByAction('filedeletion', $GLOBALS['BE_USER']->user['uid']);
     	if ($result->count() == 0) {
     		$new = TRUE;
-    		$default = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('Fixpunkt\Backendtools\Domain\Model\Session');
+    		$default = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
     		$default->setAction('filedeletion');
     		$default->setValue1(0);
     		$default->setValue2(0);
@@ -305,7 +303,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	if ($delfile) {
     		$total=0;
     		$success=0;
-    		$filename = PATH_site . 'fileadmin/' . $delfile;
+    		$filename = \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/' . 'fileadmin/' . $delfile;
     		if (is_file($filename) && file_exists($filename)) {
     			if ($method_no) $content .= 'This is the file content:<br />';
     			$filecontent = fopen($filename,"r");
@@ -353,7 +351,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	$result = $this->sessionRepository->findByAction('images', $GLOBALS['BE_USER']->user['uid']);
     	if ($result->count() == 0) {
     		$new = TRUE;
-    		$default = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('Fixpunkt\Backendtools\Domain\Model\Session');
+    		$default = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
     		$default->setAction('images');
     		$default->setValue1(0);
     	} else {
@@ -453,7 +451,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	else $zipfile = '';
     	    	 
     	if ($this->request->hasArgument('zipfile')) {
-    		$filename = PATH_site . 'fileadmin/' . $zipfile;
+    		$filename = \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/' . 'fileadmin/' . $zipfile;
     		if (is_file($filename) && file_exists($filename)) {
     			$pathinfo = pathinfo($filename); 
     			$content = $this->unzip($filename, $pathinfo['dirname'] . '/');
@@ -478,7 +476,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	$result = $this->sessionRepository->findByAction('pagesearch', $GLOBALS['BE_USER']->user['uid']);
     	if ($result->count() == 0) {
     		$new = TRUE;
-    		$default = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('Fixpunkt\Backendtools\Domain\Model\Session');
+    		$default = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
     		$default->setAction('pagesearch');
     		$default->setValue1(0);
     	} else {
@@ -535,9 +533,6 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	if ($linkto_uid > 0) {
     		$pages = $this->getPageLinks($my_c, $my_p, $linkto_uid);
     		if ($exttoo) {
-	    		if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('tt_news')) {
-	    			$tt_news = $this->getTTNewsLinks($my_c, $my_p, $linkto_uid);
-	    		}
     			if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('news')) {
     				$news = $this->getNewsLinks($my_c, $my_p, $linkto_uid);
     			}
@@ -552,7 +547,6 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	$this->view->assign('linksto', $linksto);
     	$this->view->assign('exttoo', $exttoo);
     	$this->view->assign('pages', $pages);
-    	$this->view->assign('rows', $rows);
     	$this->view->assign('news', $news);
     	$this->view->assign('tt_news', $tt_news);
     	$this->view->assign('camaliga', $camaliga);
@@ -582,7 +576,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
                        $result = "Error in extracting file on server.";
                     } else {
 	                    $zip_obj->close();
-						$result = 'The zip-file was unziped to ' . $zip_extract_path . '/';
+						$result = 'The zip-file was unziped to ' . $zip_extract_path;
                     }
                 } else {
                     $result = "Error in open file";
@@ -707,7 +701,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 	 */
 	function getPageLinks($my_c, $my_p, $linkto_uid) {
 		$finalArray = array();
-		$where = "(tt.bodytext LIKE '%<link $linkto_uid %' OR tt.bodytext LIKE '%id=$linkto_uid\"%' OR tt.header_link=$linkto_uid)";
+		$where = "(tt.bodytext LIKE '%\"t3://page?uid=".$linkto_uid."\"%' OR tt.header_link='t3://page?uid=".$linkto_uid."' OR tt.header_link LIKE 't3://page?uid=".$linkto_uid." %')";
 		// OR tt.image_link=$linkto_uid)";
 		if ($my_c==1) $where .= ' AND (tt.deleted=1 OR tt.hidden=1)';
 		else if ($my_c==2) $where .= ' AND tt.deleted=0 AND tt.hidden=0';
@@ -728,7 +722,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 		}
     	$GLOBALS['TYPO3_DB']->sql_free_result($res);
     	
-		$where = "ref.link=$linkto_uid";
+    	$where = "(ref.link='t3://page?uid=".$linkto_uid."' OR ref.link LIKE 't3://page?uid=".$linkto_uid." %')";
 		if ($my_c==1) $where .= ' AND (tt.deleted=1 OR tt.hidden=1)';
 		else if ($my_c==2) $where .= ' AND tt.deleted=0 AND tt.hidden=0';
 		if ($my_p==1) $where .= ' AND (pages.deleted=1 OR pages.hidden=1)';
@@ -751,37 +745,6 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 	}
 
 	/**
-	 * Finde tt_news mit Links zu einer gesuchten Seite
-	 *
-	 * @param   integer	$my_c: content hidden?
-	 * @param	integer	$my_p: page hidden?
-	 * @param	integer	$linkto_uid: gesuchte uid
-	 *
-	 * @return  array     Content-Elemente
-	 */
-	function getTTNewsLinks($my_c, $my_p, $linkto_uid) {
-		$finalArray = array();
-		$where = "(bodytext LIKE '%<link $linkto_uid %' OR bodytext LIKE '%id=$linkto_uid\"%' OR links=$linkto_uid)";
-    	if ($my_c==1) $where .= ' AND (deleted=1 OR hidden=1)';
-    	else if ($my_c==2) $where .= ' AND deleted=0 AND hidden=0';
-    	$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-    				'uid,pid,deleted,hidden,title,sys_language_uid',
-    				'tt_news',
-    				$where,
-    				'',
-    				'pid ASC,tstamp DESC',
-    				'');
-		$rows = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
-    	if ($rows>0) {
-    		while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)){
-    			$finalArray[] = $row;
-    		}
-	   	}
-    	$GLOBALS['TYPO3_DB']->sql_free_result($res);
-		return $finalArray;
-	}
-
-	/**
 	 * Finde news mit Links zu einer gesuchten Seite
 	 *
 	 * @param   integer	$my_c: content hidden?
@@ -792,7 +755,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 	 */
 	function getNewsLinks($my_c, $my_p, $linkto_uid) {
 		$finalArray = array();
-		$where = "(bodytext LIKE '%<link $linkto_uid %' OR bodytext LIKE '%id=$linkto_uid\"%' OR internalurl='$linkto_uid')";
+		$where = "(bodytext LIKE '%\"t3://page?uid=".$linkto_uid."\"%' OR internalurl='t3://page?uid=".$linkto_uid."' OR internalurl LIKE 't3://page?uid=".$linkto_uid." %')";
 		if ($my_c==1) $where .= ' AND (deleted=1 OR hidden=1)';
 		else if ($my_c==2) $where .= ' AND deleted=0 AND hidden=0';
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
@@ -812,7 +775,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	$GLOBALS['TYPO3_DB']->sql_free_result($res);
     	
 		// images links
-		$where = "ref.link=$linkto_uid";
+    	$where = "(ref.link='t3://page?uid=".$linkto_uid."' OR ref.link LIKE 't3://page?uid=".$linkto_uid." %')";
 		if ($my_c==1) $where .= ' AND (news.deleted=1 OR news.hidden=1)';
 		else if ($my_c==2) $where .= ' AND news.deleted=0 AND news.hidden=0';
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
@@ -832,7 +795,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	$GLOBALS['TYPO3_DB']->sql_free_result($res);
     	
 		// related links
-    	$where = "tx_news_domain_model_link.uri=$linkto_uid";
+    	$where = "(tx_news_domain_model_link.uri='t3://page?uid=".$linkto_uid."' OR tx_news_domain_model_link.uri LIKE 't3://page?uid=".$linkto_uid." %')";
     	if ($my_c==1) $where .= ' AND (news.deleted=1 OR news.hidden=1)';
     	else if ($my_c==2) $where .= ' AND news.deleted=0 AND news.hidden=0';
     	$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
@@ -864,7 +827,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 	 */
 	function getCamaligaLinks($my_c, $my_p, $linkto_uid) {
 		$finalArray = array();
-		$where = "(longdesc LIKE '%<link $linkto_uid %' OR longdesc LIKE '%id=$linkto_uid\"%' OR link=$linkto_uid)";
+		$where = "(longdesc LIKE '%\"t3://page?uid=".$linkto_uid."\"%' OR link='t3://page?uid=".$linkto_uid."' OR link LIKE 't3://page?uid=".$linkto_uid." %')";
 		if ($my_c==1) $where .= ' AND (deleted=1 OR hidden=1)';
 		else if ($my_c==2) $where .= ' AND deleted=0 AND hidden=0';
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
