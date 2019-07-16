@@ -71,71 +71,70 @@
 
 <f:if condition="{rows} > 0">
 <f:then>
-<f:if condition="{my_outp} == 1">
-<f:then>
-<textarea name="dummy">
+	<f:if condition="{my_outp} == 1">
+	<f:then>
+		<textarea name="dummy" rows="12" cols="120">
 Content element;;;;;;;;Page;;
 uid;deleted;hidden;header;lang.;CType;list tyle;FlexForm actions;uid;deleted;hidden;title
-<f:for each="{pages}" as="page" iteration="iterator">{page.uid};{page.ttdeleted};{page.tthidden};{page.header};{page.sys_language_uid};{page.CType};{page.list_type};<f:format.raw>{page.actions}</f:format.raw>;{page.pid};{page.pdeleted};{page.phidden};{page.csvtitle}
-</f:for>
-</textarea>
-</f:then>
-<f:else>
-<f:widget.paginate objects="{pages}" as="paginatedpages" configuration="{settings.pagebrowser}">
-<table class="table">
-<thead>
-	<tr>
-		<th colspan="7" style="text-align:center;background-color:#cfc;">Content element</th>
-		<th colspan="4" style="text-align:center;background-color:#ccf;">Page</th>
-	</tr>
-	<tr>
-		<th>uid</th>
-		<th>deleted / hidden</th>
-		<th>header</th>
-		<th>lang.</th>
-		<th>CType</th>
-		<th>list tyle</th>
-		<th>FlexForm actions</th>
-		<th>uid</th>
-		<th>deleted / hidden</th>
-		<th>title</th>
-	</tr>
-</thead>
-<tbody>
-	<f:for each="{paginatedpages}" as="page" iteration="iterator">
-		<tr{f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
-			<td>
-				<ex:editLink action="edit" table="tt_content" uid="{page.uid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=list">
-      				<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-open.svg" width="16" height="16">
-      			</ex:editLink>
-				{page.uid}
-			</td>
-			<td><f:if condition="{page.ttdeleted} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if> / 
-				<f:if condition="{page.tthidden} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
-			<td>{page.header}</td>
-			<td>{page.sys_language_uid}</td>
-			<td>{page.CType}</td>
-			<td>{page.list_type}</td>
-			<td><f:format.raw>{page.actions}</f:format.raw></td>
-			<td>
-				<ex:editLink action="edit" table="pages" uid="{page.pid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=list">
-      				<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-open.svg" width="16" height="16">
-      			</ex:editLink>
-      			<a href="{page.domain}/index.php?id={page.pid}&L={page.sys_language_uid}&no_cache=1" target="extern">
-      				<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-view.svg" width="16" height="16">
-      			</a>
-				{page.pid}
-			</td>
-			<td><f:if condition="{page.pdeleted} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if> / 
-				<f:if condition="{page.phidden} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
-			<td>{page.title}</td>
-		</tr>
-	</f:for>
-</tbody>
-</table>
-</f:widget.paginate>
-</f:else>
-</f:if>
+<f:for each="{pages}" as="page" iteration="iterator">{page.uid};{page.ttdeleted};{page.tthidden};"{page.csvheader}";{page.sys_language_uid};{page.CType};{page.list_type};<f:format.raw>{page.actions}</f:format.raw>;{page.pid};{page.pdeleted};{page.phidden};"{page.csvtitle}"
+</f:for></textarea>
+	</f:then>
+	<f:else>
+		<f:widget.paginate objects="{pages}" as="paginatedpages" configuration="{settings.pagebrowser}">
+		<table class="table">
+		<thead>
+			<tr>
+				<th colspan="7" style="text-align:center;background-color:#cfc;">Content element</th>
+				<th colspan="4" style="text-align:center;background-color:#ccf;">Page</th>
+			</tr>
+			<tr>
+				<th>uid</th>
+				<th>deleted / hidden</th>
+				<th>header</th>
+				<th>lang.</th>
+				<th>CType</th>
+				<th>list tyle</th>
+				<th>FlexForm actions</th>
+				<th>uid</th>
+				<th>deleted / hidden</th>
+				<th>title</th>
+			</tr>
+		</thead>
+		<tbody>
+			<f:for each="{paginatedpages}" as="page" iteration="iterator">
+				<tr{f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
+					<td>
+						<ex:editLink action="edit" table="tt_content" uid="{page.uid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=list">
+		      				<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-open.svg" width="16" height="16">
+		      			</ex:editLink>
+						{page.uid}
+					</td>
+					<td><f:if condition="{page.ttdeleted} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if> / 
+						<f:if condition="{page.tthidden} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
+					<td>{page.header}</td>
+					<td>{page.sys_language_uid}</td>
+					<td>{page.CType}</td>
+					<td>{page.list_type}</td>
+					<td><f:format.raw>{page.actions}</f:format.raw></td>
+					<td>
+						<ex:editLink action="edit" table="pages" uid="{page.pid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=list">
+		      				<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-open.svg" width="16" height="16">
+		      			</ex:editLink>
+		      			<a href="{page.domain}/index.php?id={page.pid}&L={page.sys_language_uid}&no_cache=1" target="extern">
+		      				<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-view.svg" width="16" height="16">
+		      			</a>
+						{page.pid}
+					</td>
+					<td><f:if condition="{page.pdeleted} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if> / 
+						<f:if condition="{page.phidden} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
+					<td>{page.title}</td>
+				</tr>
+			</f:for>
+		</tbody>
+		</table>
+		</f:widget.paginate>
+	</f:else>
+	</f:if>
 	<p>{pages -> f:count()} element(s) found!</p>
 </f:then>
 <f:else>

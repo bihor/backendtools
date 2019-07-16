@@ -221,7 +221,8 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     			$root = array_pop($pageRep->getRootLine($row['pid']));
     			$row['root'] = $root['uid'];
     			$row['domain'] = $domains[$root['uid']];
-    			$row['csvtitle'] = str_replace(';', ',', str_replace('"', '', $row['title']));
+    			$row['csvheader'] = str_replace('"', '', $row['header']);
+    			$row['csvtitle'] = str_replace('"', '', $row['title']);
     			$pages[] = $row;
     		}
     	}
