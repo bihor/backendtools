@@ -12,7 +12,7 @@
 
 $EM_CONF[$_EXTKEY] = array (
   'title' => 'Backend tools',
-  'description' => '5 admin tools for extensions, files, images and links: extensionlist, filedeletion, images with no title, unzip and linklist.',
+  'description' => '6 admin tools for extensions, redirects, files, images and links: extensionlist, redirects import, filedeletion, images with no title, unzip and linklist. Still depends on typo3db_legacy.',
   'category' => 'module',
 	'author' => 'Kurt Gusbeth',
 	'author_company' => 'fixpunkt werbeagentur gmbh',
@@ -21,12 +21,12 @@ $EM_CONF[$_EXTKEY] = array (
   'uploadfolder' => false,
   'createDirs' => '',
   'clearCacheOnLoad' => false,
-  'version' => '1.3.1',
+  'version' => '1.3.2',
   'constraints' => 
   array (
-    'depends' => 
-    array (
-      'typo3' => '9.5.0-9.5.99',
+    'depends' => array (
+        'typo3' => '9.5.0-9.5.99',
+    	'typo3db_legacy' => '1.0.0-1.9.99',
     ),
   ),
 );

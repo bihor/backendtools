@@ -27,6 +27,8 @@ namespace Fixpunkt\Backendtools\Controller;
  ***************************************************************/
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Domain\Repository\BackendUserRepository;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 /**
  * SessionController
@@ -50,36 +52,6 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 		$this->sessionRepository = $sessionRepository;
 	}
 	
-	private function getDomains() {
-		$domains = array();
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-				'pid, domainName, redirectTo',
-				'sys_domain',
-				'hidden=0',
-				'',
-				'sorting DESC',
-				'');
-		$rows = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
-		if ($rows>0) {							// DB entries found?
-			while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)){
-				if ($row['redirectTo']) {
-					$domain = $row['redirectTo'];
-				} else {
-					$domain = $row['domainName'];
-				}
-				if (substr($domain, 0, 4) != 'http') {
-					$domain = 'http://' . $domain;
-				}
-				if (substr($domain, -1) == '/') {
-					$domain = substr($domain, 0, -1);
-				}
-				$domains[$row['pid']] = $domain;
-			}
-		}
-		$GLOBALS['TYPO3_DB']->sql_free_result($res);
-		return $domains;
-	}
-	
     /**
      * action list
      *
@@ -87,13 +59,14 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
      */
     public function listAction()
     {
-    	$pageRep = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
+    	$beuser_id = $GLOBALS['BE_USER']->user['uid']; 
+    	$pageRep = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
     	$domains = $this->getDomains();
     	
- 		$result = $this->sessionRepository->findByAction('list', $GLOBALS['BE_USER']->user['uid']);
+    	$result = $this->sessionRepository->findByAction('list', $beuser_id);
  		if ($result->count() == 0) {
  			$new = TRUE;
- 			$default = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
+ 			$default = GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
  			$default->setAction('list');
  			$default->setValue1(0);
  			$default->setValue2(0);
@@ -148,14 +121,18 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	} else $my_outp = 0;
     	
     	if ($new) {
+    		$objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+    		$backendUserRepository = $objectManager->get(BackendUserRepository::class);
+    		/** @var \TYPO3\CMS\Extbase\Domain\Model\BackendUser $user */
+    		$user = $backendUserRepository->findByUid($beuser_id);
+    		$default->setBeuser($user);
     		$this->sessionRepository->add($default);
-    		$persistenceManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
+    		$persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
     		$persistenceManager->persistAll();
-    		$def_uid = $default->getUid();
-    		$beuser_id = $GLOBALS['BE_USER']->user['uid']; 
+    	/*	$def_uid = $default->getUid();
     		// leider komme ich nicht an das beuser-obj dran, also muss die beuser-uid per update hinzugefügt werden..
     		$update = array('beuser' => $beuser_id);
-    		$success = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_backendtools_domain_model_session', 'uid='.$def_uid, $update);
+    		$success = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_backendtools_domain_model_session', 'uid='.$def_uid, $update);*/
     	} else { 
     		$this->sessionRepository->update($default);
     	}
@@ -251,10 +228,11 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
      */
     public function filedeletionAction()
     {
-    	$result = $this->sessionRepository->findByAction('filedeletion', $GLOBALS['BE_USER']->user['uid']);
+    	$beuser_id = $GLOBALS['BE_USER']->user['uid'];
+    	$result = $this->sessionRepository->findByAction('filedeletion', $beuser_id);
     	if ($result->count() == 0) {
     		$new = TRUE;
-    		$default = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
+    		$default = GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
     		$default->setAction('filedeletion');
     		$default->setValue1(0);
     		$default->setValue2(0);
@@ -285,14 +263,18 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	
 
     	if ($new) {
+    		$objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+    		$backendUserRepository = $objectManager->get(BackendUserRepository::class);
+    		/** @var \TYPO3\CMS\Extbase\Domain\Model\BackendUser $user */
+    		$user = $backendUserRepository->findByUid($beuser_id);
+    		$default->setBeuser($user);
     		$this->sessionRepository->add($default);
-    		$persistenceManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
+    		$persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
     		$persistenceManager->persistAll();
-    		$def_uid = $default->getUid();
-    		$beuser_id = $GLOBALS['BE_USER']->user['uid'];
+    		/*$def_uid = $default->getUid();
     		// leider komme ich nicht an das beuser-obj dran, also muss die beuser-uid per update hinzugefügt werden..
     		$update = array('beuser' => $beuser_id);
-    		$success = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_backendtools_domain_model_session', 'uid='.$def_uid, $update);
+    		$success = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_backendtools_domain_model_session', 'uid='.$def_uid, $update);*/
     	} else {
     		$this->sessionRepository->update($default);
     	}
@@ -306,7 +288,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     		$success=0;
     		$filename = \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/' . 'fileadmin/' . $delfile;
     		if (is_file($filename) && file_exists($filename)) {
-    			if ($method_no) $content .= 'This is the file content:<br />';
+    			if (!$method) $content .= "This is the file content:<br />\n";
     			$filecontent = fopen($filename,"r");
     			while (!feof($filecontent)) {
     				$row = trim(fgets($filecontent));
@@ -349,10 +331,11 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
      */
     public function imagesAction()
     {
-    	$result = $this->sessionRepository->findByAction('images', $GLOBALS['BE_USER']->user['uid']);
+    	$beuser_id = $GLOBALS['BE_USER']->user['uid']; 
+    	$result = $this->sessionRepository->findByAction('images', $beuser_id);
     	if ($result->count() == 0) {
     		$new = TRUE;
-    		$default = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
+    		$default = GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
     		$default->setAction('images');
     		$default->setValue1(0);
     	} else {
@@ -383,14 +366,18 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     		$finalArray = array();
     	
    		if ($new) {
+   			$objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+   			$backendUserRepository = $objectManager->get(BackendUserRepository::class);
+   			/** @var \TYPO3\CMS\Extbase\Domain\Model\BackendUser $user */
+   			$user = $backendUserRepository->findByUid($beuser_id);
+   			$default->setBeuser($user);
    			$this->sessionRepository->add($default);
-    		$persistenceManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
-    		$persistenceManager->persistAll();
-    		$def_uid = $default->getUid();
-    		$beuser_id = $GLOBALS['BE_USER']->user['uid']; 
+   			$persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
+   			$persistenceManager->persistAll();
+    		/*$def_uid = $default->getUid();
     		// leider komme ich nicht an das beuser-obj dran, also muss die beuser-uid per update hinzugefügt werden..
     		$update = array('beuser' => $beuser_id);
-    		$success = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_backendtools_domain_model_session', 'uid='.$def_uid, $update);
+    		$success = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_backendtools_domain_model_session', 'uid='.$def_uid, $update);*/
    		} else
 			$this->sessionRepository->update($default);
     			
@@ -474,10 +461,11 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
      */
     public function pagesearchAction()
     {
-    	$result = $this->sessionRepository->findByAction('pagesearch', $GLOBALS['BE_USER']->user['uid']);
+    	$beuser_id = $GLOBALS['BE_USER']->user['uid']; 
+    	$result = $this->sessionRepository->findByAction('pagesearch', $beuser_id);
     	if ($result->count() == 0) {
     		$new = TRUE;
-    		$default = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
+    		$default = GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
     		$default->setAction('pagesearch');
     		$default->setValue1(0);
     	} else {
@@ -516,14 +504,18 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	}
     	
     	if ($new) {
+    		$objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+    		$backendUserRepository = $objectManager->get(BackendUserRepository::class);
+    		/** @var \TYPO3\CMS\Extbase\Domain\Model\BackendUser $user */
+    		$user = $backendUserRepository->findByUid($beuser_id);
+    		$default->setBeuser($user);
     		$this->sessionRepository->add($default);
-    		$persistenceManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
+    		$persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
     		$persistenceManager->persistAll();
-    		$def_uid = $default->getUid();
-    		$beuser_id = $GLOBALS['BE_USER']->user['uid']; 
+    		/*$def_uid = $default->getUid();
     		// leider komme ich nicht an das beuser-obj dran, also muss die beuser-uid per update hinzugefügt werden..
     		$update = array('beuser' => $beuser_id);
-    		$success = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_backendtools_domain_model_session', 'uid='.$def_uid, $update);
+    		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_backendtools_domain_model_session', 'uid='.$def_uid, $update);*/
     	} else
     		$this->sessionRepository->update($default);
     	
@@ -554,7 +546,123 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	$this->view->assign('my_page', $my_page);
     	$this->view->assign('settings', $this->settings);
     }
-
+    
+    /**
+     * action redirects
+     *
+     * @return void
+     */
+    public function redirectsAction()
+    {
+    	$beuser_id = $GLOBALS['BE_USER']->user['uid'];
+    	$result = $this->sessionRepository->findByAction('redirects', $beuser_id);
+    	if ($result->count() == 0) {
+    		$new = TRUE;
+    		$default = GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
+    		$default->setAction('redirects');
+    		$default->setValue1(0);
+    		$default->setValue2(0);
+    		$default->setValue3(0);
+    		$default->setValue4('');
+    		$default->setValue5('0');
+    		$default->setValue6('301');
+    	} else {
+    		$new = FALSE;
+    		$default = $result[0];
+    	}
+    	
+    	if ($this->request->hasArgument('method')) {
+    		$method = intval($this->request->getArgument('method'));
+    		$default->setValue1($method);
+    	} else $method = $default->getValue1();
+    	if ($this->request->hasArgument('regex')) {
+    		$regex = intval($this->request->getArgument('regex'));
+    		$default->setValue2($regex);
+    	} else $regex = $default->getValue2();
+    	if ($this->request->hasArgument('convert')) {
+    		$convert = $this->request->getArgument('convert');
+    		$default->setValue5($convert);
+    	} else $convert = $default->getValue5();
+    	if ($this->request->hasArgument('defaultstatuscode')) {
+    		$defaultstatuscode = $this->request->getArgument('defaultstatuscode');
+    		$default->setValue6($defaultstatuscode);
+    	} else $defaultstatuscode = $default->getValue6();
+    	if ($this->request->hasArgument('impfile')) {
+    		$impfile = $this->request->getArgument('impfile');
+    	} else $impfile = '';
+    	
+    	
+    	if ($new) {
+    		$objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+    		$backendUserRepository = $objectManager->get(BackendUserRepository::class);
+    		/** @var \TYPO3\CMS\Extbase\Domain\Model\BackendUser $user */
+    		$user = $backendUserRepository->findByUid($beuser_id);
+    		$default->setBeuser($user);
+    		$this->sessionRepository->add($default);
+    		$persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
+    		$persistenceManager->persistAll();
+    	} else {
+    		$this->sessionRepository->update($default);
+    	}
+    	
+    	$content = '';
+    	
+    	if ($impfile) {
+    		$total=0;
+    		$success=0;
+    		$regexp = ($regex) ? 1 : 0;
+    		$treffer = [];
+    		$rewrites = [];
+    		$filename = \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/' . 'fileadmin/' . $impfile;
+    		if (is_file($filename) && file_exists($filename)) {
+    			$content .= "This is the result of the file content:<br /><table>\n";
+    			$filecontent = fopen($filename,"r");
+    			while (!feof($filecontent)) {
+    				$row = trim(fgets($filecontent));
+    				if ($convert == 'iso') $row = utf8_decode ( $row );
+    				if ($convert == 'utf8') $row = utf8_encode ( $row );
+    				$row = preg_replace('/[ ]{2,}|[\t]/', ' ', trim($row));	// tab und/oder mehrere Spaces zu einem Space umwandeln
+    				$rewrites = explode(' ', $row);
+    				preg_match('/R=(\d+)/', $rewrites[3], $treffer);
+    				$statuscode = $treffer[1];
+    				if (!$statuscode) $statuscode = intval($defaultstatuscode);
+    				if ($rewrites[1] && substr($rewrites[1], 0, 2) != '^/') {
+    					$rewrites[1] = '^/' . substr($rewrites[1], 1);	// ein / wird am Anfang benötigt
+    				}
+    				if ($rewrites[1] && $regexp) {
+    					$rewrites[1] = '#' . $rewrites[1] . '#';		// TYPO3 will das so
+    				}
+    				if ($method && $rewrites[1] && $rewrites[2] && (strlen($rewrites[1])>2)) {
+    					if ($this->sessionRepository->addRedirect($rewrites[1], $rewrites[2], $regexp, $statuscode, $beuser_id)) {
+    						$content .= '<tr><td>' . $rewrites[1] . '</td><td style="color:#00ff00;"> to </td><td>' . $rewrites[2] . '</td><td>' . $statuscode . "</td></tr>\n";
+    						$success++;
+    					} else {
+    						$content .= '<tr><td>' . $rewrites[1] . '</td><td style="color:#ff0000;"> did not worked </td><td>' . $rewrites[2] . '</td><td>' . $statuscode . "</td></tr>\n";
+    					}
+    				} else if ($method) {
+    					$content .= '<tr><td>' . $rewrites[1] . '</td><td style="color:#ff0000;"> does not goes to </td><td>' . $rewrites[2] . '</td><td>' . $statuscode . "</td></tr>\n";
+    				} else {
+    					$content .= '<tr><td>' . $rewrites[1] . '</td><td style="color:#00ff00;"> to </td><td>' . $rewrites[2] . '</td><td>' . $statuscode . "</td></tr>\n";
+    					$success++;
+    				}
+    				$total++;
+    			}
+    			fclose ($filecontent);
+    			$content .= "</table><br />$success/$total lines ";
+    			$content .= ($method) ? 'added.' : 'accepted.';
+    		} else {
+    			$content .= 'Note: file not found!!!';
+    		}
+    	}
+    	$this->view->assign('method', $method);
+    	$this->view->assign('regex', $regex);
+    	$this->view->assign('defaultstatuscode', $defaultstatuscode);
+    	$this->view->assign('convert', $convert);
+    	$this->view->assign('impfile', $impfile);
+    	$this->view->assign('message', $content);
+    }
+    
+    
     
     
     /**
@@ -599,7 +707,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
      * @return  array     Bilder
      */
 	function getImagesWithout($img_without) {
-    	$pageRep = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
+    	$pageRep = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
     	$domains = $this->getDomains();
 		$fileArray = array();
 		$fileOrder = array();
@@ -846,5 +954,40 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 		}
     	$GLOBALS['TYPO3_DB']->sql_free_result($res);
 		return $finalArray;
+	}
+	
+	/**
+	 * Get list of domains
+	 *
+	 * @return array
+	 */
+	private function getDomains() {
+		$domains = array();
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
+			'pid, domainName, redirectTo',
+			'sys_domain',
+			'hidden=0',
+			'',
+			'sorting DESC',
+			'');
+		$rows = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
+		if ($rows>0) {							// DB entries found?
+			while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)){
+				if ($row['redirectTo']) {
+					$domain = $row['redirectTo'];
+				} else {
+					$domain = $row['domainName'];
+				}
+				if (substr($domain, 0, 4) != 'http') {
+					$domain = 'http://' . $domain;
+				}
+				if (substr($domain, -1) == '/') {
+					$domain = substr($domain, 0, -1);
+				}
+				$domains[$row['pid']] = $domain;
+			}
+		}
+		$GLOBALS['TYPO3_DB']->sql_free_result($res);
+		return $domains;
 	}
 }

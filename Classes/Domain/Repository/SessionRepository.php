@@ -1,6 +1,9 @@
 <?php
 namespace Fixpunkt\Backendtools\Domain\Repository;
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Database\ConnectionPool;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -46,6 +49,32 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 		$constraints[] = $query->equals('beuser', $beuser);
 		$query->matching($query->logicalAnd($constraints));
 		return $query->execute();
+	}
+	
+	
+	/**
+	 * addRedirect
+	 * @param	string	$from	from link
+	 * @param	string	$to		to link
+	 * @param	int		$regexp	regular expression?
+	 * @param	int		$statuscode	Statuscode, e.g. 301
+	 * @param	int		$createdby	Created by BE-user
+	 */
+	public function addRedirect($from, $to, $regexp, $statuscode, $createdby) {
+		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_redirect');
+		return $queryBuilder
+			->insert('sys_redirect')
+			->values([
+				'source_path' => $from,
+				'target' => $to,
+				'is_regexp' => $regexp,
+				'target_statuscode' => $statuscode,
+				'updatedon' => time(),
+				'createdon' => time(),
+				'createdby' => $createdby,
+				'source_host' => '*'
+			])
+			->execute();
 	}
 }
 ?>

@@ -29,6 +29,8 @@ Tool 4: helps you to find pages that link to another page. You can find any cont
 
 Tool 5: helps you to find images with no title- oder alternative-text. This tool can set that values for you too.
 
+Tool 6: you can import simple redirect rules form your .htaccess to the table sys_redirect.
+
 .. important::
 
    If you are using TYPO3 9, then you will need the extension typo3db_legacy too!

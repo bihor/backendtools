@@ -13,22 +13,20 @@ call_user_func(
 				'mod1', // Submodule key
 				'', // Position
 				[
-					'Session' => 'list, filedeletion, unzip, images, pagesearch',
+					'Session' => 'list, filedeletion, unzip, images, pagesearch, redirects',
 				],
 				[
 					'access' => 'user,group',
 					'icon'   => 'EXT:backendtools/ext_icon.gif',
 					'labels' => 'LLL:EXT:backendtools/Resources/Private/Language/locallang_mod1.xlf',
 				]
-				);
-			
+			);
 		}
 		
 		\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile('backendtools', 'Configuration/TypoScript', 'Backend tools');
 		
 		\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr('tx_backendtools_domain_model_session', 'EXT:backendtools/Resources/Private/Language/locallang_csh_tx_backendtools_domain_model_session.xlf');
 		\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages('tx_backendtools_domain_model_session');
-		
-}
+	}
 );
 ?>

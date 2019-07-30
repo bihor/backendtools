@@ -1,13 +1,13 @@
 {
 	"name" : "fixpunkt/backendtools",
 	"type" : "typo3-cms-extension",
-	"description" : "5 admin tools for extensions, files, images and links: extensionlist, filedeletion, images with no title, unzip and linklist.",
+	"description" : "6 admin tools for extension listing, redirects, unzip, unused files, images with no alt- or title-tag and links.",
 	"authors" : [{
 			"name" : "Kurt Gusbeth",
 			"role" : "Developer"
 		}
 	],
-	"version" : "1.3.1",
+	"version" : "1.3.2",
 	"require" : {
 		"typo3/cms-core" : "^9.5"
 	},
