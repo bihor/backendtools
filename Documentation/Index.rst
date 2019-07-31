@@ -23,7 +23,7 @@ Backend tools
 		en
 
 	:Description:
-		5 admin tools for extensions, files, images and links: extensionlist, filedeletion, images with no title, unzip and linklist.
+		6 admin tools for TYPO3 extension listing, redirects, unzip, unused files, images with no alt- or title-tag and links.
 
 	:Keywords:
 		backend,tools,extensions
