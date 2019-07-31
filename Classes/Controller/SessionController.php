@@ -61,8 +61,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     {
     	$beuser_id = $GLOBALS['BE_USER']->user['uid']; 
     	$pageRep = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
-    	$domains = $this->getDomains();
-    	
+    	$domains = $this->sessionRepository->getDomains();
     	$result = $this->sessionRepository->findByAction('list', $beuser_id);
  		if ($result->count() == 0) {
  			$new = TRUE;
@@ -216,6 +215,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	$this->view->assign('my_outp', $my_outp);
     	$this->view->assign('rows', $rows);
     	$this->view->assign('pages', $pages);
+    	$this->view->assign('domains', $domains);
     	$this->view->assign('settings', $this->settings);
         //$sessions = $this->sessionRepository->findAll();
         //$this->view->assign('sessions', $sessions);
@@ -554,6 +554,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
      */
     public function redirectsAction()
     {
+    	$content = '';
     	$beuser_id = $GLOBALS['BE_USER']->user['uid'];
     	$result = $this->sessionRepository->findByAction('redirects', $beuser_id);
     	if ($result->count() == 0) {
@@ -605,8 +606,6 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     		$this->sessionRepository->update($default);
     	}
     	
-    	$content = '';
-    	
     	if ($impfile) {
     		$total=0;
     		$success=0;
@@ -632,18 +631,20 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     				if ($rewrites[1] && $regexp) {
     					$rewrites[1] = '#' . $rewrites[1] . '#';		// TYPO3 will das so
     				}
-    				if ($method && $rewrites[1] && $rewrites[2] && (strlen($rewrites[1])>2)) {
-    					if ($this->sessionRepository->addRedirect($rewrites[1], $rewrites[2], $regexp, $statuscode, $beuser_id)) {
-    						$content .= '<tr><td>' . $rewrites[1] . '</td><td style="color:#00ff00;"> to </td><td>' . $rewrites[2] . '</td><td>' . $statuscode . "</td></tr>\n";
-    						$success++;
+    				if ($rewrites[1] && $rewrites[2] && (strlen($rewrites[1])>2)) {
+    					if ($method) {
+	    					if ($this->sessionRepository->addRedirect($rewrites[1], $rewrites[2], $regexp, $statuscode, $beuser_id)) {
+	    						$content .= '<tr><td>' . $rewrites[1] . '</td><td style="color:#00ff00;"> to </td><td>' . $rewrites[2] . '</td><td>' . $statuscode . "</td></tr>\n";
+	    						$success++;
+	    					} else {
+	    						$content .= '<tr><td>' . $rewrites[1] . '</td><td style="color:#ff0000;"> did not worked </td><td>' . $rewrites[2] . '</td><td>' . $statuscode . "</td></tr>\n";
+	    					}
     					} else {
-    						$content .= '<tr><td>' . $rewrites[1] . '</td><td style="color:#ff0000;"> did not worked </td><td>' . $rewrites[2] . '</td><td>' . $statuscode . "</td></tr>\n";
+    						$content .= '<tr><td>' . $rewrites[1] . '</td><td> to </td><td>' . $rewrites[2] . '</td><td>' . $statuscode . "</td></tr>\n";
+    						$success++;
     					}
-    				} else if ($method) {
-    					$content .= '<tr><td>' . $rewrites[1] . '</td><td style="color:#ff0000;"> does not goes to </td><td>' . $rewrites[2] . '</td><td>' . $statuscode . "</td></tr>\n";
     				} else {
-    					$content .= '<tr><td>' . $rewrites[1] . '</td><td style="color:#00ff00;"> to </td><td>' . $rewrites[2] . '</td><td>' . $statuscode . "</td></tr>\n";
-    					$success++;
+    					$content .= '<tr><td>' . $rewrites[1] . '</td><td style="color:#ff0000;"> does not goes to </td><td>' . $rewrites[2] . '</td><td>' . $statuscode . "</td></tr>\n";
     				}
     				$total++;
     			}
@@ -708,7 +709,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
      */
 	function getImagesWithout($img_without) {
     	$pageRep = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
-    	$domains = $this->getDomains();
+    	$domains = $this->sessionRepository->getDomains();
 		$fileArray = array();
 		$fileOrder = array();
 		$finalArray = array();
@@ -954,40 +955,5 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 		}
     	$GLOBALS['TYPO3_DB']->sql_free_result($res);
 		return $finalArray;
-	}
-	
-	/**
-	 * Get list of domains
-	 *
-	 * @return array
-	 */
-	private function getDomains() {
-		$domains = array();
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-			'pid, domainName, redirectTo',
-			'sys_domain',
-			'hidden=0',
-			'',
-			'sorting DESC',
-			'');
-		$rows = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
-		if ($rows>0) {							// DB entries found?
-			while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)){
-				if ($row['redirectTo']) {
-					$domain = $row['redirectTo'];
-				} else {
-					$domain = $row['domainName'];
-				}
-				if (substr($domain, 0, 4) != 'http') {
-					$domain = 'http://' . $domain;
-				}
-				if (substr($domain, -1) == '/') {
-					$domain = substr($domain, 0, -1);
-				}
-				$domains[$row['pid']] = $domain;
-			}
-		}
-		$GLOBALS['TYPO3_DB']->sql_free_result($res);
-		return $domains;
 	}
 }

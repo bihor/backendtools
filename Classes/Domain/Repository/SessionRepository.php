@@ -53,6 +53,39 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 	
 	
 	/**
+	 * Get list of domains
+	 *
+	 * @return array
+	 */
+	public function getDomains() {
+		$domains = array();
+		$table = 'sys_domain';
+		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+		$statement = $queryBuilder
+			->select('*')
+			->from($table)
+		//	->where($queryBuilder->expr()->eq('hidden', 0))
+			->orderBy('sorting', 'DESC')
+			->execute();
+		while ($row = $statement->fetch()) {
+			// gibt es nicht mehr:
+			//if ($row['redirectTo']) {
+			//	$domain = $row['redirectTo'];
+			//} else {
+				$domain = $row['domainName'];
+			//}
+			if (substr($domain, 0, 4) != 'http') {
+				$domain = 'http://' . $domain;
+			}
+			if (substr($domain, -1) == '/') {
+				$domain = substr($domain, 0, -1);
+			}
+			$domains[$row['pid']] = $domain;
+		}
+		return $domains;
+	}
+	
+	/**
 	 * addRedirect
 	 * @param	string	$from	from link
 	 * @param	string	$to		to link
