@@ -566,7 +566,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     						$success++;
     					}
     				} else {
-    					$content .= '<tr><td>' . $rewrites[1] . '</td><td style="color:#ff0000;"> does not goes to </td><td>' . $rewrites[2] . '</td><td>' . $statuscode . "</td></tr>\n";
+    					$content .= '<tr><td>' . $rewrites[1] . '</td><td style="color:#ff0000;"> ignored </td><td>' . $rewrites[2] . '</td><td>' . $statuscode . "</td></tr>\n";
     				}
     				$total++;
     			}

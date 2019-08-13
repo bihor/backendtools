@@ -1,6 +1,6 @@
 # backendtools
 
-version 1.3.4
+version 1.3.5
 
 6 admin tools for extensions, redirects, files, images and links:
 extensionlist, import redirects, delete unused files, images with no title, unzip and linklist.
