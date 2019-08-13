@@ -1,11 +1,14 @@
 <?php
 namespace Fixpunkt\Backendtools\Controller;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Domain\Repository\BackendUserRepository;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 /***************************************************************
  *
  *  Copyright notice
  *
- *  (c) 2017 Kurt Gusbeth <k.gusbeth@fixpunkt.com>, fixpunkt werbeagentur gmbh
+ *  (c) 2019 Kurt Gusbeth <k.gusbeth@fixpunkt.com>, fixpunkt werbeagentur gmbh
  *
  *  All rights reserved
  *
@@ -25,10 +28,6 @@ namespace Fixpunkt\Backendtools\Controller;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Domain\Repository\BackendUserRepository;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 /**
  * SessionController
@@ -60,7 +59,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     public function listAction()
     {
     	$beuser_id = $GLOBALS['BE_USER']->user['uid']; 
-    	$pageRep = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
+    	//$pageRep = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
     	$domains = $this->sessionRepository->getDomains();
     	$result = $this->sessionRepository->findByAction('list', $beuser_id);
  		if ($result->count() == 0) {
@@ -73,7 +72,6 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
  			$default->setValue4('');
  			$default->setValue5('');
  			$default->setValue6('');
- 		//	$default->setBeuser($GLOBALS['BE_USER']->user);
  		} else {
  			$new = FALSE;
  			$default = $result[0];
@@ -128,81 +126,11 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     		$this->sessionRepository->add($default);
     		$persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
     		$persistenceManager->persistAll();
-    	/*	$def_uid = $default->getUid();
-    		// leider komme ich nicht an das beuser-obj dran, also muss die beuser-uid per update hinzugefügt werden..
-    		$update = array('beuser' => $beuser_id);
-    		$success = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_backendtools_domain_model_session', 'uid='.$def_uid, $update);*/
     	} else { 
     		$this->sessionRepository->update($default);
     	}
     	
-    	$exclude_ctypes = array(
-    			"html", "list", "text", "image", "textpic", "textmedia", "bullets", "menu",
-    			"search", "mailform", "indexed_search", "login", "header", "rte",
-    			"table", "splash", "uploads", "multimedia", "media", "script",
-    			"shortcut", "div"
-    	);
-    	if ($my_exclude) {
-    		$exclude_ctypes[] = $my_exclude;
-    	}
-    	
-    	// Das Haupt-Where
-    	$where = '';
-    	if ($my_value) {
-    		$my_value = $GLOBALS['TYPO3_DB']->quoteStr($my_value, 'tt_content');
-    		if ($my_type == 2)
-    			$where .= " AND tt.CType LIKE '" . $my_value . "%'";
-    		else if ($my_type == 1)
-   				$where .= " AND tt.list_type LIKE '" . $my_value . "%'";
-    	} else {
-    		$where .= 'AND ((tt.list_type!="" AND tt.list_type!="0") OR tt.CType NOT IN (' . implode(', ', $GLOBALS['TYPO3_DB']->fullQuoteArray($exclude_ctypes, 'tt_content')) . '))';
-    	}
-    	
-    	if ($my_flexform) {
-    		$my_flexform = $GLOBALS['TYPO3_DB']->quoteStr($my_flexform, 'tt_content');
-    		$where .= " AND tt.pi_flexform LIKE '%" . $my_flexform . "%'";
-    	}
-
-    	if ($my_c==1) $where .= ' AND (tt.deleted=1 OR tt.hidden=1)';
-    	else if ($my_c==2) $where .= ' AND tt.deleted=0 AND tt.hidden=0';
-    	if ($my_p==1) $where .= ' AND (pages.deleted=1 OR pages.hidden=1)';
-    	else if ($my_p==2) $where .= ' AND pages.deleted=0 AND pages.hidden=0';
-    	//echo $where;
-    	
-    	$pages = array();
-    	$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-    			'tt.uid,tt.pid,tt.deleted AS ttdeleted,tt.hidden AS tthidden,tt.header,tt.sys_language_uid, tt.CType,tt.list_type,tt.pi_flexform, pages.title,pages.deleted AS pdeleted,pages.hidden AS phidden',
-    			'tt_content tt, pages',
-    			'tt.pid=pages.uid ' . $where,
-    			'',
-    			'tt.pid ASC,tt.sorting',
-    			'');
-    	$rows = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
-    	if ($rows>0) {							// DB entries found?
-    		while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)){
-    			$subject = $row['pi_flexform'];
-    			$pattern = '/<field index="switchableControllerActions">([\n|\r|\t| ]*)<value index="vDEF">(.*)</';
-    			$matches = array();
-    			preg_match($pattern, $subject, $matches);
-    			if ($matches[2]) {
-    				$row['actions'] = str_replace('###', '&gt;', str_replace(';', ', ', str_replace('&gt;', '###', $matches[2])));
-    			} else {
-    				$pattern = '/<field index="what_to_display">([\n|\r|\t| ]*)<value index="vDEF">(.*)</';
-    				$matches = array();
-    				preg_match($pattern, $subject, $matches);
-    				if ($matches[2]) {
-    					$row['actions'] = $matches[2];
-    				}
-    			}
-    			$root = array_pop($pageRep->getRootLine($row['pid']));
-    			$row['root'] = $root['uid'];
-    			$row['domain'] = $domains[$root['uid']];
-    			$row['csvheader'] = str_replace('"', '', $row['header']);
-    			$row['csvtitle'] = str_replace('"', '', $row['title']);
-    			$pages[] = $row;
-    		}
-    	}
-    	$GLOBALS['TYPO3_DB']->sql_free_result($res);
+    	$pages = $this->sessionRepository->getPagesWithExtensions($my_c, $my_p, $my_type, $my_value, $my_flexform, $my_exclude);
     	
     	// Assign
     	$this->view->assign('my_p', $my_p);
@@ -213,12 +141,10 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	$this->view->assign('my_flexform', $my_flexform);
     	$this->view->assign('my_page', $my_page);
     	$this->view->assign('my_outp', $my_outp);
-    	$this->view->assign('rows', $rows);
+    	$this->view->assign('rows', count($pages));
     	$this->view->assign('pages', $pages);
     	$this->view->assign('domains', $domains);
     	$this->view->assign('settings', $this->settings);
-        //$sessions = $this->sessionRepository->findAll();
-        //$this->view->assign('sessions', $sessions);
     }
     
     /**
@@ -271,10 +197,6 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     		$this->sessionRepository->add($default);
     		$persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
     		$persistenceManager->persistAll();
-    		/*$def_uid = $default->getUid();
-    		// leider komme ich nicht an das beuser-obj dran, also muss die beuser-uid per update hinzugefügt werden..
-    		$update = array('beuser' => $beuser_id);
-    		$success = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_backendtools_domain_model_session', 'uid='.$def_uid, $update);*/
     	} else {
     		$this->sessionRepository->update($default);
     	}
