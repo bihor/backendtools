@@ -247,7 +247,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     }
 
     /**
-     * action images
+     * action images: images without alt- or title-tag
      *
      * @return void
      */
@@ -282,10 +282,11 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     		$this->settings['pagebrowser']['itemsPerPage'] = $my_page;
     	}
     	
-    	if ($img_without)
-    		$finalArray = $this->getImagesWithout($img_without);
-    	else
-    		$finalArray = array();
+    	if ($img_without) {
+    		$finalArray = $this->sessionRepository->getImagesWithout($img_without);
+    	} else {
+    		$finalArray = [];
+    	}
     	
    		if ($new) {
    			$objectManager = GeneralUtility::makeInstance(ObjectManager::class);
@@ -623,12 +624,12 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     }
 	
     /**
-     * Bilder ohne Alt- oder Titel-Tag
+     * TODO: Bilder ohne Alt- oder Titel-Tag rauswerfen!!!
      *
-     * @param   integer   Modus
+     * param   integer   Modus
      *
-     * @return  array     Bilder
-     */
+     * return  array     Bilder
+     *
 	function getImagesWithout($img_without) {
     	$pageRep = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
     	$domains = $this->sessionRepository->getDomains();
@@ -707,7 +708,8 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 		}
 		return $finalArray;
 	}
-
+*/
+    
 	/**
 	 * Formats bytes.
 	 *

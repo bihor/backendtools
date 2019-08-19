@@ -185,6 +185,100 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 	}
 	
 	/**
+	 * Bilder ohne Alt- oder Titel-Tag
+	 *
+	 * @param   integer   Modus
+	 *
+	 * @return  array     Bilder
+	 */
+	function getImagesWithout($img_without) {
+		$pageRep = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
+		$domains = $this->getDomains();
+		$fileArray = array();
+		$fileOrder = array();
+		$finalArray = array();
+		
+		// sys_file: get images
+		$table = 'sys_file';
+		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+		$statement = $queryBuilder
+			->select('*')
+			->from($table)
+			->where($queryBuilder->expr()->like('mime_type', '"image%"'))
+			->orderBy('name', 'ASC')
+			->execute();
+		while ($row = $statement->fetch()) {
+			$uid = $row['uid'];
+			$fileOrder[] = $uid;
+			$fileArray[$uid] = $row;
+		}
+		
+		// sys_file_metadata
+		$table = 'sys_file_metadata';
+		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+		$statement = $queryBuilder
+			->select('*')
+			->from($table)
+			->execute();
+		while ($row = $statement->fetch()) {
+			$uid = $row['file'];
+			if ($fileArray[$uid]['uid'] == $uid) {
+				$fileArray[$uid]['meta_title'] = $row['title'];
+				$fileArray[$uid]['meta_alt'] = $row['alternative'];
+				$fileArray[$uid]['meta_width'] = $row['width'];
+				$fileArray[$uid]['meta_height'] = $row['height'];
+			}
+		}
+		
+		// sys_file_reference und tt_content
+		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('tt_content')->createQueryBuilder();
+		$res = $queryBuilder ->select(...[
+			'sys_file_reference.uid',
+			'sys_file_reference.title',
+			'sys_file_reference.alternative',
+			'sys_file_reference.uid_local',
+			'sys_file_reference.uid_foreign',
+			'tt_content.pid AS tt_pid',
+			'tt_content.sys_language_uid AS tt_lang'
+		]) -> from ('sys_file_reference')
+		-> join(
+			'sys_file_reference',
+			'tt_content',
+			'tt_content',
+			$queryBuilder->expr()->eq('sys_file_reference.uid_foreign', $queryBuilder->quoteIdentifier('tt_content.uid'))
+			);
+		$res -> andWhere('sys_file_reference.tablenames="tt_content"');
+		//print_r($queryBuilder->getSQL());
+		$result = $res -> execute();
+		foreach($result as $row) {
+			$uid = $row['uid_local'];
+			if ($fileArray[$uid]['uid'] == $uid) {
+				$fileArray[$uid]['ref_title'] = $row['title'];
+				$fileArray[$uid]['ref_alt'] = $row['alternative'];
+				$fileArray[$uid]['cid'] = $row['uid_foreign'];
+				$fileArray[$uid]['tt_pid'] = $row['tt_pid'];
+				$fileArray[$uid]['tt_lang'] = $row['tt_lang'];
+				//echo "uid $uid <br>\n";
+			}
+		}
+		
+		foreach ($fileOrder as $uid) {
+			$imgArray = $fileArray[$uid];
+			if (((($img_without == 1) || ($img_without == 3)) && (($imgArray['meta_alt']=='') && ($imgArray['ref_alt']==''))) ||
+				((($img_without == 2) || ($img_without == 3)) && (($imgArray['meta_title']=='') && ($imgArray['ref_title']==''))) ||
+				((($img_without == 4) || ($img_without == 6)) && (($imgArray['meta_alt']!='') || ($imgArray['ref_alt']!=''))) ||
+				((($img_without == 5) || ($img_without == 6)) && (($imgArray['meta_title']!='') || ($imgArray['ref_title']!='')))) {
+					// TODO: zu wenig Bilder mit alt!
+					$root = array_pop($pageRep->getRootLine($imgArray['tt_pid']));
+					$imgArray['root'] = $root['uid'];
+					$imgArray['domain'] = $domains[$root['uid']];
+					$finalArray[] = $imgArray;
+				}
+		}
+		return $finalArray;
+	}
+	
+	/**
 	 * Get list of domains
 	 *
 	 * @return array
