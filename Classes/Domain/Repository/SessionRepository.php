@@ -185,7 +185,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 	}
 	
 	/**
-	 * Bilder ohne Alt- oder Titel-Tag
+	 * Bilder ohne Alt- oder Titel-Text
 	 *
 	 * @param   integer   Modus
 	 *
@@ -264,11 +264,12 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 		
 		foreach ($fileOrder as $uid) {
 			$imgArray = $fileArray[$uid];
+			//echo $imgArray['meta_alt'] .'#'. $imgArray['ref_alt'];
 			if (((($img_without == 1) || ($img_without == 3)) && (($imgArray['meta_alt']=='') && ($imgArray['ref_alt']==''))) ||
 				((($img_without == 2) || ($img_without == 3)) && (($imgArray['meta_title']=='') && ($imgArray['ref_title']==''))) ||
 				((($img_without == 4) || ($img_without == 6)) && (($imgArray['meta_alt']!='') || ($imgArray['ref_alt']!=''))) ||
 				((($img_without == 5) || ($img_without == 6)) && (($imgArray['meta_title']!='') || ($imgArray['ref_title']!='')))) {
-					// TODO: zu wenig Bilder mit alt!
+					// TODO: wenn ein Bild mehrfach benutzt wird, wird dies bisher nicht berücksichtigt! Man müsste die uid von sys_file_reference berücksichtigen!
 					$root = array_pop($pageRep->getRootLine($imgArray['tt_pid']));
 					$imgArray['root'] = $root['uid'];
 					$imgArray['domain'] = $domains[$root['uid']];
@@ -276,6 +277,32 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 				}
 		}
 		return $finalArray;
+	}
+	
+	/**
+	 * setAltOrTitle
+	 * @param	int		$uid			uid of sys_file_metadata
+	 * @param	string	$alternative	alt-tag
+	 * @param	string	$title			title-tag
+	 * @return	boolean
+	 */
+	public function setAltOrTitle($uid, $alternative, $title) {
+		if ($alternative) {
+			$field = 'alternative';
+			$value = $alternative;
+		} else {
+			$field = 'title';
+			$value = $title;
+		}
+		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
+		$queryBuilder
+			->update('sys_file_metadata')
+			->where(
+				$queryBuilder->expr()->eq('uid', $uid)
+			)
+			->set($field, $value)
+			->execute();
+		return true;
 	}
 	
 	/**

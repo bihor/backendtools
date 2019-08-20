@@ -319,8 +319,9 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     				else
     					$finalArray[$key]['meta_alt'] = trim(str_replace('_', ' ', $imgArray['name']));
     			}
-    			$update = array('alternative' => $finalArray[$key]['meta_alt']);
-    			$success = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('sys_file_metadata', 'file='.$uid, $update);
+    			//$update = array('alternative' => $finalArray[$key]['meta_alt']);
+    			//$success = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('sys_file_metadata', 'file='.$uid, $update);
+    			$success = $this->sessionRepository->setAltOrTitle($uid, $finalArray[$key]['meta_alt'], '');
     			if ($success) $count++;
     		}
     	} else if (($img_without == 2) && $this->request->hasArgument('replace_empty_meta')) {
@@ -337,8 +338,9 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     				else
     					$finalArray[$key]['meta_title'] = trim(str_replace('_', ' ', $imgArray['name']));
     			}
-    			$update = array('title' => $finalArray[$key]['meta_title']);
-    			$success = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('sys_file_metadata', 'file='.$uid, $update);
+    			//$update = array('title' => $finalArray[$key]['meta_title']);
+    			//$success = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('sys_file_metadata', 'file='.$uid, $update);
+    			$success = $this->sessionRepository->setAltOrTitle($uid, '', $finalArray[$key]['meta_title']);
     			if ($success) $count++;
     		}
     	}
@@ -623,93 +625,6 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	return $result;
     }
 	
-    /**
-     * TODO: Bilder ohne Alt- oder Titel-Tag rauswerfen!!!
-     *
-     * param   integer   Modus
-     *
-     * return  array     Bilder
-     *
-	function getImagesWithout($img_without) {
-    	$pageRep = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
-    	$domains = $this->sessionRepository->getDomains();
-		$fileArray = array();
-		$fileOrder = array();
-		$finalArray = array();
-		
-		// sys_file
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*',
-				'sys_file',
-				'mime_type LIKE "image%"',
-				'',
-				'name ASC',
-				'');
-		$rows = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
-		if ($rows>0) {
-			while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)){
-				$uid = $row['uid'];
-				$fileOrder[] = $uid;
-				$fileArray[$uid] = $row;
-			}
-		}
-		$GLOBALS['TYPO3_DB']->sql_free_result($res);
-		
-		// sys_file_metadata
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*',
-				'sys_file_metadata',
-				'1=1');
-		$rows = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
-		if ($rows>0) {
-			while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)){
-				$uid = $row['file'];
-				if ($fileArray[$uid]['uid'] == $uid) {
-					$fileArray[$uid]['meta_title'] = $row['title'];
-					$fileArray[$uid]['meta_alt'] = $row['alternative'];
-					$fileArray[$uid]['meta_width'] = $row['width'];
-					$fileArray[$uid]['meta_height'] = $row['height'];
-				}
-			}
-		}
-		$GLOBALS['TYPO3_DB']->sql_free_result($res);
-		
-		// sys_file_reference und tt_content
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('sys_file_reference.uid, sys_file_reference.title, sys_file_reference.alternative, uid_local, uid_foreign, 
-					tt_content.pid AS tt_pid, tt_content.sys_language_uid AS tt_lang',
-				'sys_file_reference, tt_content',
-				'sys_file_reference.tablenames="tt_content" AND uid_foreign=tt_content.uid');
-		$rows = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
-		if ($rows>0) {
-			while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)){
-				$uid = $row['uid_local'];
-				if ($fileArray[$uid]['uid'] == $uid) {
-					$fileArray[$uid]['ref_title'] = $row['title'];
-					$fileArray[$uid]['ref_alt'] = $row['alternative'];
-					$fileArray[$uid]['cid'] = $row['uid_foreign'];
-					$fileArray[$uid]['tt_pid'] = $row['tt_pid'];
-					$fileArray[$uid]['tt_lang'] = $row['tt_lang'];
-					//echo "uid $uid <br>\n";
-				}
-			}
-		}
-		$GLOBALS['TYPO3_DB']->sql_free_result($res);
-		
-		foreach ($fileOrder as $uid) {
-			$imgArray = $fileArray[$uid];
-			if (((($img_without == 1) || ($img_without == 3)) && (($imgArray['meta_alt']=='') && ($imgArray['ref_alt']==''))) ||
-				((($img_without == 2) || ($img_without == 3)) && (($imgArray['meta_title']=='') && ($imgArray['ref_title']==''))) ||
-				((($img_without == 4) || ($img_without == 6)) && (($imgArray['meta_alt']!='') || ($imgArray['ref_alt']!=''))) ||
-				((($img_without == 5) || ($img_without == 6)) && (($imgArray['meta_title']!='') || ($imgArray['ref_title']!='')))) {
-				
-				$root = array_pop($pageRep->getRootLine($imgArray['tt_pid']));
-				$imgArray['root'] = $root['uid'];
-				$imgArray['domain'] = $domains[$root['uid']];
-				$finalArray[] = $imgArray;
-			}
-		}
-		return $finalArray;
-	}
-*/
-    
 	/**
 	 * Formats bytes.
 	 *
