@@ -12,7 +12,7 @@
 
 $EM_CONF[$_EXTKEY] = array (
   'title' => 'Backend tools',
-  'description' => '6 admin tools for extensions, redirects, files, images and links: extensionlist, redirects import, filedeletion, images with no title, unzip and linklist. Still depends on typo3db_legacy.',
+  'description' => '6 admin tools for extensions, redirects, files, images and links: extensionlist, redirects import, filedeletion, images with no title, unzip and linklist.',
   'category' => 'module',
 	'author' => 'Kurt Gusbeth',
 	'author_company' => 'fixpunkt werbeagentur gmbh',
