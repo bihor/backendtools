@@ -21,12 +21,11 @@ $EM_CONF[$_EXTKEY] = array (
   'uploadfolder' => false,
   'createDirs' => '',
   'clearCacheOnLoad' => false,
-  'version' => '1.3.7',
+  'version' => '1.4.0',
   'constraints' => 
   array (
     'depends' => array (
         'typo3' => '9.5.0-9.5.99',
-    	'typo3db_legacy' => '1.0.0-1.9.99',
     ),
   ),
 );

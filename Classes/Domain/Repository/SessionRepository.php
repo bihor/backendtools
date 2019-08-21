@@ -185,6 +185,303 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 	}
 	
 	/**
+	 * Finde Elemente mit Links zu einer gesuchten Seite
+	 *
+	 * @param   integer	$my_c: content hidden?
+	 * @param	integer	$my_p: page hidden?
+	 * @param	integer	$linkto_uid: gesuchte uid
+	 *
+	 * @return  array     Content-Elemente
+	 */
+	function getPageLinks($my_c, $my_p, $linkto_uid) {
+		$finalArray = [];
+		
+		// Links in tt_content und sys_file_reference. Query aufbauen
+		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('tt_content')->createQueryBuilder();
+		$res = $queryBuilder ->select(...[
+			'tt_content.uid',
+			'tt_content.pid',
+			'tt_content.deleted AS ttdeleted',
+			'tt_content.hidden AS tthidden',
+			'tt_content.header',
+			'tt_content.sys_language_uid',
+			'pages.title',
+			'pages.deleted AS pdeleted',
+			'pages.hidden AS phidden'
+		]) -> from ('tt_content')
+		-> join(
+			'tt_content',
+			'pages',
+			'pages',
+			$queryBuilder->expr()->eq('tt_content.pid', $queryBuilder->quoteIdentifier('pages.uid'))
+		);
+		
+		// Restricions
+		$queryBuilder
+		->getRestrictions()
+		->removeAll();
+		
+		if ($my_c==1) {
+			$res -> andWhere("tt_content.deleted=1 OR tt_content.hidden=1");
+		} else if ($my_c==2) {
+			$res -> andWhere(...[
+				$queryBuilder->expr()->eq('tt_content.deleted', 0),
+				$queryBuilder->expr()->eq('tt_content.hidden', 0)
+			]);
+		}
+		if ($my_p==1) {
+			$res -> andWhere("pages.deleted=1 OR pages.hidden=1");
+		} else if ($my_p==2) {
+			$res -> andWhere(...[
+				$queryBuilder->expr()->eq('pages.deleted', 0),
+				$queryBuilder->expr()->eq('pages.hidden', 0)
+			]);
+		}
+		
+		// Das Haupt-Where
+		$res -> andWhere("tt_content.bodytext LIKE '%\"t3://page?uid=".$linkto_uid."\"%'
+ OR tt_content.header_link='t3://page?uid=".$linkto_uid."'
+ OR tt_content.header_link LIKE 't3://page?uid=".$linkto_uid." %'
+ OR tt_content.uid IN (SELECT uid_foreign FROM sys_file_reference WHERE tablenames='tt_content' AND (link='t3://page?uid=".$linkto_uid."' OR link LIKE 't3://page?uid=".$linkto_uid." %'))");
+		
+		$result = $res -> orderBy('tt_content.pid')
+		-> addOrderBy('tt_content.sorting')
+		-> execute();
+		
+		foreach($result as $row) {
+			$finalArray[] = $row;
+		}
+		return $finalArray;
+	}
+	
+	/**
+	 * Finde news mit Links zu einer gesuchten Seite
+	 *
+	 * @param   integer	$my_c: content hidden?
+	 * @param	integer	$my_p: page hidden?
+	 * @param	integer	$linkto_uid: gesuchte uid
+	 *
+	 * @return  array     Content-Elemente
+	 */
+	function getNewsLinks($my_c, $my_p, $linkto_uid) {
+		$finalArray = [];
+		
+		// Links in news. Query aufbauen
+		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('tx_news_domain_model_news')->createQueryBuilder();
+		$res = $queryBuilder ->select(...[
+			'uid',
+			'pid',
+			'deleted',
+			'hidden',
+			'title',
+			'sys_language_uid'
+		]) -> from ('tx_news_domain_model_news');
+		
+		// Restricions
+		$queryBuilder
+		->getRestrictions()
+		->removeAll();
+		
+		if ($my_c==1) {
+			$res -> andWhere("deleted=1 OR hidden=1");
+		} else if ($my_c==2) {
+			$res -> andWhere(...[
+				$queryBuilder->expr()->eq('deleted', 0),
+				$queryBuilder->expr()->eq('hidden', 0)
+			]);
+		}
+		$res -> andWhere("bodytext LIKE '%\"t3://page?uid=".$linkto_uid."\"%'
+ OR internalurl='t3://page?uid=".$linkto_uid."'
+ OR internalurl LIKE 't3://page?uid=".$linkto_uid." %'");
+		
+		$result = $res -> orderBy('pid', 'ASC')
+		-> addOrderBy('tstamp', 'DESC')
+		-> execute();
+		
+		foreach($result as $row) {
+			$uid = $row['uid'];
+			$finalArray[$uid] = $row;
+		}
+		
+		// images links
+		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('tx_news_domain_model_news')->createQueryBuilder();
+		$res = $queryBuilder ->select(...[
+			'tx_news_domain_model_news.uid',
+			'tx_news_domain_model_news.pid',
+			'tx_news_domain_model_news.deleted',
+			'tx_news_domain_model_news.hidden',
+			'tx_news_domain_model_news.title',
+			'tx_news_domain_model_news.sys_language_uid'
+		]) -> from ('tx_news_domain_model_news')
+		-> join(
+			'tx_news_domain_model_news',
+			'sys_file_reference',
+			'ref',
+			$queryBuilder->expr()->eq('tx_news_domain_model_news.uid', $queryBuilder->quoteIdentifier('ref.uid_foreign'))
+		)
+		-> andWhere("ref.tablenames='tx_news_domain_model_news'");
+		
+		// Restricions
+		$queryBuilder
+		->getRestrictions()
+		->removeAll();
+		
+		if ($my_c==1) {
+			$res -> andWhere("tx_news_domain_model_news.deleted=1 OR tx_news_domain_model_news.hidden=1");
+		} else if ($my_c==2) {
+			$res -> andWhere(...[
+				$queryBuilder->expr()->eq('tx_news_domain_model_news.deleted', 0),
+				$queryBuilder->expr()->eq('tx_news_domain_model_news.hidden', 0)
+			]);
+		}
+		$res -> andWhere("ref.link='t3://page?uid=".$linkto_uid."' OR ref.link LIKE 't3://page?uid=".$linkto_uid." %'");
+		
+		$result = $res -> orderBy('tx_news_domain_model_news.pid', 'ASC')
+		-> addOrderBy('tx_news_domain_model_news.tstamp', 'DESC')
+		-> execute();
+		
+		foreach($result as $row) {
+			$uid = $row['uid'];
+			$finalArray[$uid] = $row;
+		}
+		
+		// related links
+		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('tx_news_domain_model_news')->createQueryBuilder();
+		$res = $queryBuilder ->select(...[
+			'tx_news_domain_model_news.uid',
+			'tx_news_domain_model_news.pid',
+			'tx_news_domain_model_news.deleted',
+			'tx_news_domain_model_news.hidden',
+			'tx_news_domain_model_news.title',
+			'tx_news_domain_model_news.sys_language_uid'
+		]) -> from ('tx_news_domain_model_news')
+		-> join(
+			'tx_news_domain_model_news',
+			'tx_news_domain_model_link',
+			'tx_news_domain_model_link',
+			$queryBuilder->expr()->eq('tx_news_domain_model_news.uid', $queryBuilder->quoteIdentifier('tx_news_domain_model_link.parent'))
+		);
+			
+		// Restricions
+		$queryBuilder
+		->getRestrictions()
+		->removeAll();
+			
+		if ($my_c==1) {
+			$res -> andWhere("tx_news_domain_model_news.deleted=1 OR tx_news_domain_model_news.hidden=1");
+		} else if ($my_c==2) {
+			$res -> andWhere(...[
+				$queryBuilder->expr()->eq('tx_news_domain_model_news.deleted', 0),
+				$queryBuilder->expr()->eq('tx_news_domain_model_news.hidden', 0)
+			]);
+		}
+		$res -> andWhere("tx_news_domain_model_link.uri='t3://page?uid=".$linkto_uid."' OR tx_news_domain_model_link.uri LIKE 't3://page?uid=".$linkto_uid." %'");
+			
+		$result = $res -> orderBy('tx_news_domain_model_news.pid', 'ASC')
+		-> addOrderBy('tx_news_domain_model_news.tstamp', 'DESC')
+		-> execute();
+			
+		foreach($result as $row) {
+			$uid = $row['uid'];
+			$finalArray[$uid] = $row;
+		}
+		return $finalArray;
+	}
+	
+	/**
+	 * Finde Camaliga-Elemente mit Links zu einer gesuchten Seite
+	 *
+	 * @param   integer	$my_c: content hidden?
+	 * @param	integer	$my_p: page hidden?
+	 * @param	integer	$linkto_uid: gesuchte uid
+	 *
+	 * @return  array     Content-Elemente
+	 */
+	function getCamaligaLinks($my_c, $my_p, $linkto_uid) {
+		$finalArray = [];
+		
+		// Links in camaliga. Query aufbauen
+		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('tx_camaliga_domain_model_content')->createQueryBuilder();
+		$res = $queryBuilder ->select(...[
+			'uid',
+			'pid',
+			'deleted',
+			'hidden',
+			'title',
+			'sys_language_uid'
+		]) -> from ('tx_camaliga_domain_model_content');
+		
+		// Restricions
+		$queryBuilder
+		->getRestrictions()
+		->removeAll();
+		
+		if ($my_c==1) {
+			$res -> andWhere("deleted=1 OR hidden=1");
+		} else if ($my_c==2) {
+			$res -> andWhere(...[
+				$queryBuilder->expr()->eq('deleted', 0),
+				$queryBuilder->expr()->eq('hidden', 0)
+			]);
+		}
+		$res -> andWhere("longdesc LIKE '%\"t3://page?uid=".$linkto_uid."\"%'
+ OR link='t3://page?uid=".$linkto_uid."'
+ OR link LIKE 't3://page?uid=".$linkto_uid." %'");
+		
+		$result = $res -> orderBy('pid', 'ASC')
+		-> addOrderBy('tstamp', 'DESC')
+		-> execute();
+		
+		foreach($result as $row) {
+			$uid = $row['uid'];
+			$finalArray[$uid] = $row;
+		}
+		
+		// image links
+		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('tx_camaliga_domain_model_content')->createQueryBuilder();
+		$res = $queryBuilder ->select(...[
+			'tx_camaliga_domain_model_content.uid',
+			'tx_camaliga_domain_model_content.pid',
+			'tx_camaliga_domain_model_content.deleted',
+			'tx_camaliga_domain_model_content.hidden',
+			'tx_camaliga_domain_model_content.title',
+			'tx_camaliga_domain_model_content.sys_language_uid'
+		]) -> from ('tx_camaliga_domain_model_content')
+		-> join(
+			'tx_camaliga_domain_model_content',
+			'sys_file_reference',
+			'ref',
+			$queryBuilder->expr()->eq('tx_camaliga_domain_model_content.uid', $queryBuilder->quoteIdentifier('ref.uid_foreign'))
+		)
+		-> andWhere("ref.tablenames='tx_camaliga_domain_model_content'");
+			
+		// Restricions
+		$queryBuilder
+		->getRestrictions()
+		->removeAll();
+			
+		if ($my_c==1) {
+			$res -> andWhere("tx_camaliga_domain_model_content.deleted=1 OR tx_camaliga_domain_model_content.hidden=1");
+		} else if ($my_c==2) {
+			$res -> andWhere(...[
+				$queryBuilder->expr()->eq('tx_camaliga_domain_model_content.deleted', 0),
+				$queryBuilder->expr()->eq('tx_camaliga_domain_model_content.hidden', 0)
+			]);
+		}
+		$res -> andWhere("ref.link='t3://page?uid=".$linkto_uid."' OR ref.link LIKE 't3://page?uid=".$linkto_uid." %'");
+			
+		$result = $res -> orderBy('tx_camaliga_domain_model_content.pid', 'ASC')
+		-> addOrderBy('tx_camaliga_domain_model_content.tstamp', 'DESC')
+		-> execute();
+			
+		foreach($result as $row) {
+			$uid = $row['uid'];
+			$finalArray[$uid] = $row;
+		}
+		return $finalArray;
+	}
+	
+	/**
 	 * Bilder ohne Alt- oder Titel-Text
 	 *
 	 * @param   integer   Modus

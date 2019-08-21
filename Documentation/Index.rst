@@ -29,13 +29,13 @@ Backend tools
 		backend,tools,extensions
 
 	:Copyright:
-		2016
+		2019
 
 	:Author:
 		Kurt Gusbeth
 
 	:Email:
-		k.gusbeth@fixpunkt.com
+		info@quizpalme.de
 
 	:License:
 		This document is published under the Open Content License

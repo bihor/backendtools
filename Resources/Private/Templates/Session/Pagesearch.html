@@ -100,7 +100,7 @@
 </tbody>
 </table>
 </f:widget.paginate>
-	<p>{pages -> f:count()} content element(s) with links to the UID {linksto} found.</p>
+	<p>{pages -> f:count()} content element(s) with links to the pages UID {linksto} found.</p>
 </f:then>
 <f:else>
 	<p>0 content elements found!</p>
@@ -108,42 +108,6 @@
 </f:if>
 
 <f:if condition="{exttoo} == 1">
-	<f:if condition="{tt_news -> f:count()} > 0">
-	<f:then>
-	<br>
-	<table class="table">
-	<thead>
-		<tr>
-			<th colspan="5" style="text-align:center;background-color:#fcc;">tt_news</th>
-		</tr>
-		<tr>
-			<th>pid</th>
-			<th>uid</th>
-			<th>lang.</th>
-			<th>deleted / hidden</th>
-			<th>title</th>
-		</tr>
-	</thead>
-	<tbody>
-		<f:for each="{tt_news}" as="page" iteration="iterator">
-			<tr{f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
-				<td>{page.pid}</td>
-				<td>{page.uid}</td>
-				<td>{page.sys_language_uid}</td>
-				<td><f:if condition="{page.deleted} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if> / 
-					<f:if condition="{page.hidden} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
-				<td>{page.title}</td>
-			</tr>
-		</f:for>
-	</tbody>
-	</table>
-		<p>{tt_news -> f:count()} tt_news entrie(s) with links to the UID {linksto} found.</p>
-	</f:then>
-	<f:else>
-		<p>0 tt_news entries found.</p>
-	</f:else>
-	</f:if>
-	
 	<f:if condition="{news -> f:count()} > 0">
 	<f:then>
 	<br>
@@ -173,7 +137,7 @@
 		</f:for>
 	</tbody>
 	</table>
-		<p>{news -> f:count()} news entrie(s) with links to the UID {linksto} found.</p>
+		<p>{news -> f:count()} news entrie(s) with links to the pages UID {linksto} found.</p>
 	</f:then>
 	<f:else>
 		<p>0 news entries found.</p>
@@ -209,7 +173,7 @@
 		</f:for>
 	</tbody>
 	</table>
-		<p>{camaliga -> f:count()} camaliga entrie(s) with links to the UID {linksto} found.</p>
+		<p>{camaliga -> f:count()} camaliga entrie(s) with links to the pages UID {linksto} found.</p>
 	</f:then>
 	<f:else>
 		<p>0 camaliga entries found.</p>

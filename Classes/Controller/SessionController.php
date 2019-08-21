@@ -301,9 +301,10 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     		// leider komme ich nicht an das beuser-obj dran, also muss die beuser-uid per update hinzugefügt werden..
     		$update = array('beuser' => $beuser_id);
     		$success = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_backendtools_domain_model_session', 'uid='.$def_uid, $update);*/
-   		} else
+   		} else {
 			$this->sessionRepository->update($default);
-    			
+   		}
+   		
     	$count=0;
     	if (($img_without == 1) && $this->request->hasArgument('replace_empty_alt')) {
     		// alt-Tags setzen. In der sys_file_metadata
@@ -353,34 +354,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     }
     
     /**
-     * action unzip
-     *
-     * @return void
-     */
-    public function unzipAction()
-    {
-    	if ($this->request->hasArgument('zipfile'))
-    		$zipfile = $this->request->getArgument('zipfile');		// zipfile
-    	else $zipfile = '';
-    	    	 
-    	if ($this->request->hasArgument('zipfile')) {
-    		$filename = \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/' . 'fileadmin/' . $zipfile;
-    		if (is_file($filename) && file_exists($filename)) {
-    			$pathinfo = pathinfo($filename); 
-    			$content = $this->unzip($filename, $pathinfo['dirname'] . '/');
-    		} else {
-    			$content = 'Note: file not found!!!';
-    		}
-    	} else {
-    		$content = 'Note: the zip-file will be extracted in the folder where it lies.';
-    	}
-    	
-    	$this->view->assign('zipfile', $zipfile);
-    	$this->view->assign('message', $content);
-    }
-    
-    /**
-     * action pagesearch
+     * action pagesearch: find pages which are linked
      *
      * @return void
      */
@@ -437,25 +411,21 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     		$this->sessionRepository->add($default);
     		$persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
     		$persistenceManager->persistAll();
-    		/*$def_uid = $default->getUid();
-    		// leider komme ich nicht an das beuser-obj dran, also muss die beuser-uid per update hinzugefügt werden..
-    		$update = array('beuser' => $beuser_id);
-    		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_backendtools_domain_model_session', 'uid='.$def_uid, $update);*/
-    	} else
+    	} else {
     		$this->sessionRepository->update($default);
+    	}
     	
-    	$pages = array();
-    	$tt_news = array();
-    	$news = array();
-    	$camaliga = array();
+    	$pages = [];
+    	$news = [];
+    	$camaliga = [];
     	if ($linkto_uid > 0) {
-    		$pages = $this->getPageLinks($my_c, $my_p, $linkto_uid);
+    		$pages = $this->sessionRepository->getPageLinks($my_c, $my_p, $linkto_uid);
     		if ($exttoo) {
     			if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('news')) {
-    				$news = $this->getNewsLinks($my_c, $my_p, $linkto_uid);
+    				$news = $this->sessionRepository->getNewsLinks($my_c, $my_p, $linkto_uid);
     			}
    				if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('camaliga')) {
-   					$camaliga = $this->getCamaligaLinks($my_c, $my_p, $linkto_uid);
+   					$camaliga = $this->sessionRepository->getCamaligaLinks($my_c, $my_p, $linkto_uid);
    				}	
     		}
     	}
@@ -466,7 +436,6 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	$this->view->assign('exttoo', $exttoo);
     	$this->view->assign('pages', $pages);
     	$this->view->assign('news', $news);
-    	$this->view->assign('tt_news', $tt_news);
     	$this->view->assign('camaliga', $camaliga);
     	$this->view->assign('my_page', $my_page);
     	$this->view->assign('settings', $this->settings);
@@ -588,6 +557,33 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	$this->view->assign('message', $content);
     }
     
+    /**
+     * action unzip
+     *
+     * @return void
+     */
+    public function unzipAction()
+    {
+    	if ($this->request->hasArgument('zipfile'))
+    		$zipfile = $this->request->getArgument('zipfile');		// zipfile
+    		else $zipfile = '';
+    		
+    		if ($this->request->hasArgument('zipfile')) {
+    			$filename = \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/' . 'fileadmin/' . $zipfile;
+    			if (is_file($filename) && file_exists($filename)) {
+    				$pathinfo = pathinfo($filename);
+    				$content = $this->unzip($filename, $pathinfo['dirname'] . '/');
+    			} else {
+    				$content = 'Note: file not found!!!';
+    			}
+    		} else {
+    			$content = 'Note: the zip-file will be extracted in the folder where it lies.';
+    		}
+    		
+    		$this->view->assign('zipfile', $zipfile);
+    		$this->view->assign('message', $content);
+    }
+    
     
     
     
@@ -637,162 +633,5 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 		$suffixes = array('', 'k', 'M', 'G', 'T');
 	
 		return round(pow(1024, $base - floor($base)), $precision) .' '. $suffixes[floor($base)] .'B';
-	}
-
-	/**
-	 * Finde Elemente mit Links zu einer gesuchten Seite
-	 *
-	 * @param   integer	$my_c: content hidden?
-	 * @param	integer	$my_p: page hidden?
-	 * @param	integer	$linkto_uid: gesuchte uid
-	 *
-	 * @return  array     Content-Elemente
-	 */
-	function getPageLinks($my_c, $my_p, $linkto_uid) {
-		$finalArray = array();
-		$where = "(tt.bodytext LIKE '%\"t3://page?uid=".$linkto_uid."\"%' OR tt.header_link='t3://page?uid=".$linkto_uid."' OR tt.header_link LIKE 't3://page?uid=".$linkto_uid." %')";
-		// OR tt.image_link=$linkto_uid)";
-		if ($my_c==1) $where .= ' AND (tt.deleted=1 OR tt.hidden=1)';
-		else if ($my_c==2) $where .= ' AND tt.deleted=0 AND tt.hidden=0';
-		if ($my_p==1) $where .= ' AND (pages.deleted=1 OR pages.hidden=1)';
-		else if ($my_p==2) $where .= ' AND pages.deleted=0 AND pages.hidden=0';
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-				'tt.uid,tt.pid,tt.deleted AS ttdeleted,tt.hidden AS tthidden,tt.header,tt.sys_language_uid, pages.title,pages.deleted AS pdeleted,pages.hidden AS phidden',
-				'tt_content tt, pages',
-				'tt.pid=pages.uid AND ' . $where,
-				'',
-				'tt.pid ASC,tt.sorting',
-				'');
-		$rows = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
-		if ($rows>0) {
-			while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)){
-				$finalArray[] = $row;
-			}
-		}
-    	$GLOBALS['TYPO3_DB']->sql_free_result($res);
-    	
-    	$where = "(ref.link='t3://page?uid=".$linkto_uid."' OR ref.link LIKE 't3://page?uid=".$linkto_uid." %')";
-		if ($my_c==1) $where .= ' AND (tt.deleted=1 OR tt.hidden=1)';
-		else if ($my_c==2) $where .= ' AND tt.deleted=0 AND tt.hidden=0';
-		if ($my_p==1) $where .= ' AND (pages.deleted=1 OR pages.hidden=1)';
-		else if ($my_p==2) $where .= ' AND pages.deleted=0 AND pages.hidden=0';
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-				'tt.uid,tt.pid,tt.deleted AS ttdeleted,tt.hidden AS tthidden,tt.header,tt.sys_language_uid, pages.title,pages.deleted AS pdeleted,pages.hidden AS phidden',
-				'tt_content tt, pages, sys_file_reference ref',
-				'tt.pid=pages.uid AND tt.uid=ref.uid_foreign AND ref.tablenames="tt_content" AND ' . $where,
-				'',
-				'tt.pid ASC,tt.sorting',
-				'');
-		$rows = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
-		if ($rows>0) {
-			while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)){
-				$finalArray[] = $row;
-			}
-		}
-    	$GLOBALS['TYPO3_DB']->sql_free_result($res);
-		return $finalArray;
-	}
-
-	/**
-	 * Finde news mit Links zu einer gesuchten Seite
-	 *
-	 * @param   integer	$my_c: content hidden?
-	 * @param	integer	$my_p: page hidden?
-	 * @param	integer	$linkto_uid: gesuchte uid
-	 *
-	 * @return  array     Content-Elemente
-	 */
-	function getNewsLinks($my_c, $my_p, $linkto_uid) {
-		$finalArray = array();
-		$where = "(bodytext LIKE '%\"t3://page?uid=".$linkto_uid."\"%' OR internalurl='t3://page?uid=".$linkto_uid."' OR internalurl LIKE 't3://page?uid=".$linkto_uid." %')";
-		if ($my_c==1) $where .= ' AND (deleted=1 OR hidden=1)';
-		else if ($my_c==2) $where .= ' AND deleted=0 AND hidden=0';
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-				'uid,pid,deleted,hidden,title,sys_language_uid',
-				'tx_news_domain_model_news',
-				$where,
-				'',
-				'pid ASC,tstamp DESC',
-				'');
-		$rows = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
-		if ($rows>0) {
-			while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)){
-				$uid = $row['uid'];
-				$finalArray[$uid] = $row;
-			}
-		}
-    	$GLOBALS['TYPO3_DB']->sql_free_result($res);
-    	
-		// images links
-    	$where = "(ref.link='t3://page?uid=".$linkto_uid."' OR ref.link LIKE 't3://page?uid=".$linkto_uid." %')";
-		if ($my_c==1) $where .= ' AND (news.deleted=1 OR news.hidden=1)';
-		else if ($my_c==2) $where .= ' AND news.deleted=0 AND news.hidden=0';
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-				'news.uid,news.pid,news.deleted,news.hidden,news.title,news.sys_language_uid',
-				'tx_news_domain_model_news news, sys_file_reference ref',
-				'news.uid=ref.uid_foreign AND ref.tablenames="tx_news_domain_model_news" AND ' . $where,
-				'',
-				'news.pid ASC,news.tstamp DESC',
-				'');
-		$rows = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
-		if ($rows>0) {
-			while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)){
-				$uid = $row['uid'];
-				$finalArray[$uid] = $row;
-			}
-		}
-    	$GLOBALS['TYPO3_DB']->sql_free_result($res);
-    	
-		// related links
-    	$where = "(tx_news_domain_model_link.uri='t3://page?uid=".$linkto_uid."' OR tx_news_domain_model_link.uri LIKE 't3://page?uid=".$linkto_uid." %')";
-    	if ($my_c==1) $where .= ' AND (news.deleted=1 OR news.hidden=1)';
-    	else if ($my_c==2) $where .= ' AND news.deleted=0 AND news.hidden=0';
-    	$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-    			'news.uid,news.pid,news.deleted,news.hidden,news.title,news.sys_language_uid',
-    			'tx_news_domain_model_news news, tx_news_domain_model_link',
-    			'news.uid=tx_news_domain_model_link.parent AND ' . $where,
-    			'',
-    			'news.pid ASC,news.tstamp DESC',
-    			'');
-    	$rows = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
-    	if ($rows>0) {
-    		while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)){
-    			$uid = $row['uid'];
-				$finalArray[$uid] = $row;
-    		}
-    	}
-    	$GLOBALS['TYPO3_DB']->sql_free_result($res);
-		return $finalArray;
-	}
-	
-	/**
-	 * Finde Camaliga-Elemente mit Links zu einer gesuchten Seite
-	 *
-	 * @param   integer	$my_c: content hidden?
-	 * @param	integer	$my_p: page hidden?
-	 * @param	integer	$linkto_uid: gesuchte uid
-	 *
-	 * @return  array     Content-Elemente
-	 */
-	function getCamaligaLinks($my_c, $my_p, $linkto_uid) {
-		$finalArray = array();
-		$where = "(longdesc LIKE '%\"t3://page?uid=".$linkto_uid."\"%' OR link='t3://page?uid=".$linkto_uid."' OR link LIKE 't3://page?uid=".$linkto_uid." %')";
-		if ($my_c==1) $where .= ' AND (deleted=1 OR hidden=1)';
-		else if ($my_c==2) $where .= ' AND deleted=0 AND hidden=0';
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-				'uid,pid,deleted,hidden,title,sys_language_uid',
-				'tx_camaliga_domain_model_content',
-				$where,
-				'',
-				'pid ASC,tstamp DESC',
-				'');
-		$rows = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
-		if ($rows>0) {
-			while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)){
-				$finalArray[] = $row;
-			}
-		}
-    	$GLOBALS['TYPO3_DB']->sql_free_result($res);
-		return $finalArray;
 	}
 }
