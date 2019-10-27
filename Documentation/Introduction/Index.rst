@@ -36,7 +36,7 @@ Tool 6: you can import simple redirect rules form your .htaccess to the table sy
 Screenshots
 -----------
 
-Two screenshot from the backend module.
+Some screenshots from the backend module.
 
 .. figure:: ../Images/backendtools1.jpg
    :width: 712px
