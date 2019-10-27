@@ -46,6 +46,14 @@ Two screenshot from the backend module.
    :width: 700px
    :alt: Resized Screenshot 2 of the Backendtools
 
+.. figure:: ../Images/backendtools3.jpg
+   :width: 712px
+   :alt: Resized Screenshot 3 of the Backendtools
+
+.. figure:: ../Images/backendtools4.jpg
+   :width: 654px
+   :alt: Screenshot 4 of the Backendtools
+
 .. _made-in:
 
 Made in...
