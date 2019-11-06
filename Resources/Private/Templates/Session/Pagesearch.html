@@ -57,12 +57,13 @@
 <table class="table">
 <thead>
 	<tr>
-		<th colspan="4" style="text-align:center;background-color:#cfc;">Content element</th>
+		<th colspan="5" style="text-align:center;background-color:#cfc;">Content element</th>
 		<th colspan="4" style="text-align:center;background-color:#ccf;">Page</th>
 	</tr>
 	<tr>
 		<th>uid</th>
 		<th>lang.</th>
+		<th>colPos</th>
 		<th>deleted / hidden</th>
 		<th>header</th>
 		<th>uid</th>
@@ -80,6 +81,7 @@
       			{page.uid}
       		</td>
 			<td>{page.sys_language_uid}</td>
+			<td>{page.colPos}</td>
 			<td><f:if condition="{page.ttdeleted} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if> / 
 				<f:if condition="{page.tthidden} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
 			<td>{page.header}</td>

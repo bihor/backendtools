@@ -82,6 +82,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 		$res = $queryBuilder ->select(...[
 			'tt_content.uid',
 			'tt_content.pid',
+			'tt_content.colPos',
 			'tt_content.deleted AS ttdeleted',
 			'tt_content.hidden AS tthidden',
 			'tt_content.header',
@@ -201,6 +202,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 		$res = $queryBuilder ->select(...[
 			'tt_content.uid',
 			'tt_content.pid',
+			'tt_content.colPos',
 			'tt_content.deleted AS ttdeleted',
 			'tt_content.hidden AS tthidden',
 			'tt_content.header',

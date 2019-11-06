@@ -75,8 +75,8 @@
 	<f:then>
 		<textarea name="dummy" rows="12" cols="120">
 Content element;;;;;;;;Page;;
-uid;deleted;hidden;header;lang.;CType;list tyle;FlexForm actions;uid;deleted;hidden;title
-<f:for each="{pages}" as="page" iteration="iterator">{page.uid};{page.ttdeleted};{page.tthidden};"{page.csvheader}";{page.sys_language_uid};{page.CType};{page.list_type};<f:format.raw>{page.actions}</f:format.raw>;{page.pid};{page.pdeleted};{page.phidden};"{page.csvtitle}"
+uid;lang.;colPos;deleted;hidden;header;CType;list tyle;FlexForm actions;uid;deleted;hidden;title
+<f:for each="{pages}" as="page" iteration="iterator">{page.uid};{page.sys_language_uid};{page.colPos};{page.ttdeleted};{page.tthidden};"{page.csvheader}";{page.CType};{page.list_type};<f:format.raw>{page.actions}</f:format.raw>;{page.pid};{page.pdeleted};{page.phidden};"{page.csvtitle}"
 </f:for></textarea>
 	</f:then>
 	<f:else>
@@ -84,14 +84,15 @@ uid;deleted;hidden;header;lang.;CType;list tyle;FlexForm actions;uid;deleted;hid
 		<table class="table">
 		<thead>
 			<tr>
-				<th colspan="7" style="text-align:center;background-color:#cfc;">Content element</th>
+				<th colspan="8" style="text-align:center;background-color:#cfc;">Content element</th>
 				<th colspan="4" style="text-align:center;background-color:#ccf;">Page</th>
 			</tr>
 			<tr>
 				<th>uid</th>
+				<th>lang.</th>
+				<th>colPos</th>
 				<th>deleted / hidden</th>
 				<th>header</th>
-				<th>lang.</th>
 				<th>CType</th>
 				<th>list tyle</th>
 				<th>FlexForm actions</th>
@@ -109,10 +110,11 @@ uid;deleted;hidden;header;lang.;CType;list tyle;FlexForm actions;uid;deleted;hid
 		      			</ex:editLink>
 						{page.uid}
 					</td>
+					<td>{page.sys_language_uid}</td>
+					<td>{page.colPos}</td>
 					<td><f:if condition="{page.ttdeleted} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if> / 
 						<f:if condition="{page.tthidden} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
 					<td>{page.header}</td>
-					<td>{page.sys_language_uid}</td>
 					<td>{page.CType}</td>
 					<td>{page.list_type}</td>
 					<td><f:format.raw>{page.actions}</f:format.raw></td>
