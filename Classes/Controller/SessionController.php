@@ -260,6 +260,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     		$default = GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
     		$default->setAction('images');
     		$default->setValue1(0);
+    		$default->setValue2(0);
     	} else {
     		$new = FALSE;
     		$default = $result[0];
@@ -269,6 +270,10 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     		$img_without = intval($this->request->getArgument('img_without'));
 	    	$default->setValue1($img_without);
     	} else $img_without = $default->getValue1();
+    	if ($this->request->hasArgument('img_other')) {
+    		$img_other = intval($this->request->getArgument('img_other'));
+    		$default->setValue2($img_other);
+    	} else $img_other = $default->getValue2();
     	if ($this->request->hasArgument('my_page')) {
     		$my_page = intval($this->request->getArgument('my_page'));		// elements per page
     		$default->setPageel($my_page);
@@ -283,10 +288,11 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	}
     	
     	if ($img_without) {
-    		$finalArray = $this->sessionRepository->getImagesWithout($img_without);
+    		$finalArray = $this->sessionRepository->getImagesWithout($img_without, $img_other);
     	} else {
     		$finalArray = [];
     	}
+    	$replacedArray = [];
     	
    		if ($new) {
    			$objectManager = GeneralUtility::makeInstance(ObjectManager::class);
@@ -297,58 +303,63 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
    			$this->sessionRepository->add($default);
    			$persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
    			$persistenceManager->persistAll();
-    		/*$def_uid = $default->getUid();
-    		// leider komme ich nicht an das beuser-obj dran, also muss die beuser-uid per update hinzugefügt werden..
-    		$update = array('beuser' => $beuser_id);
-    		$success = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_backendtools_domain_model_session', 'uid='.$def_uid, $update);*/
    		} else {
 			$this->sessionRepository->update($default);
    		}
    		
     	$count=0;
+    	
     	if (($img_without == 1) && $this->request->hasArgument('replace_empty_alt')) {
-    		// alt-Tags setzen. In der sys_file_metadata
-    		foreach ($finalArray as $key => $imgArray) {
-    			$uid = $imgArray['uid'];
-    			if ($imgArray['ref_title'])
-    				$finalArray[$key]['meta_alt'] = $imgArray['ref_title'];
+    		// alt-Tags setzen. In der sys_file_reference
+    		foreach ($finalArray as $key => $refArray) {
+    			$uid = $refArray['ref_uid'];
+    			$imgArray = $refArray['file'];
+    			if ($refArray['ref_title'])
+    				$finalArray[$key]['ref_alt'] = $refArray['ref_title'];
     			else if ($imgArray['meta_title'])
-    				$finalArray[$key]['meta_alt'] = $imgArray['meta_title'];
+    				$finalArray[$key]['ref_alt'] = $imgArray['meta_title'];
     			else {
     				if (strrpos($imgArray['name'], '.') > 0)
-    					$finalArray[$key]['meta_alt'] = trim(str_replace('_', ' ', substr($imgArray['name'], 0, strrpos($imgArray['name'], '.'))));
+    					$finalArray[$key]['ref_alt'] = trim(str_replace('_', ' ', substr($imgArray['name'], 0, strrpos($imgArray['name'], '.'))));
     				else
-    					$finalArray[$key]['meta_alt'] = trim(str_replace('_', ' ', $imgArray['name']));
+    					$finalArray[$key]['ref_alt'] = trim(str_replace('_', ' ', $imgArray['name']));
     			}
-    			//$update = array('alternative' => $finalArray[$key]['meta_alt']);
-    			//$success = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('sys_file_metadata', 'file='.$uid, $update);
-    			$success = $this->sessionRepository->setAltOrTitle($uid, $finalArray[$key]['meta_alt'], '');
-    			if ($success) $count++;
+    			$success = $this->sessionRepository->setAltOrTitle($uid, $finalArray[$key]['ref_alt'], '');
+    			if ($success) {
+    				$count++;
+    				$replacedArray[] = $finalArray[$key];
+    			}
     		}
+    		$finalArray = $this->sessionRepository->getImagesWithout($img_without, $img_other);
     	} else if (($img_without == 2) && $this->request->hasArgument('replace_empty_meta')) {
-    		// title-Tags setzen. In der sys_file_metadata
-    		foreach ($finalArray as $key => $imgArray) {
-    			$uid = $imgArray['uid'];
-    			if ($imgArray['ref_alt'])
-    				$finalArray[$key]['meta_title'] = $imgArray['ref_alt'];
+    		// title-Tags setzen. In der sys_file_reference
+    		foreach ($finalArray as $key => $refArray) {
+    			$uid = $refArray['ref_uid'];
+    			$imgArray = $refArray['file'];
+    			if ($refArray['ref_alt'])
+    				$finalArray[$key]['ref_title'] = $refArray['ref_alt'];
     			else if ($imgArray['meta_alt'])
-    				$finalArray[$key]['meta_title'] = $imgArray['meta_alt'];
+    				$finalArray[$key]['ref_title'] = $imgArray['meta_alt'];
     			else {
     				if (strrpos($imgArray['name'], '.') > 0)
-    					$finalArray[$key]['meta_title'] = trim(str_replace('_', ' ', substr($imgArray['name'], 0, strrpos($imgArray['name'], '.'))));
+    					$finalArray[$key]['ref_title'] = trim(str_replace('_', ' ', substr($imgArray['name'], 0, strrpos($imgArray['name'], '.'))));
     				else
-    					$finalArray[$key]['meta_title'] = trim(str_replace('_', ' ', $imgArray['name']));
+    					$finalArray[$key]['ref_title'] = trim(str_replace('_', ' ', $imgArray['name']));
     			}
-    			//$update = array('title' => $finalArray[$key]['meta_title']);
-    			//$success = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('sys_file_metadata', 'file='.$uid, $update);
-    			$success = $this->sessionRepository->setAltOrTitle($uid, '', $finalArray[$key]['meta_title']);
-    			if ($success) $count++;
+    			$success = $this->sessionRepository->setAltOrTitle($uid, '', $finalArray[$key]['ref_title']);
+    			if ($success) {
+    				$count++;
+    				$replacedArray[] = $finalArray[$key];
+    			}
     		}
+    		$finalArray = $this->sessionRepository->getImagesWithout($img_without, $img_other);
     	}
 
     	$this->view->assign('img_without', $img_without);
+    	$this->view->assign('img_other', $img_other);
     	$this->view->assign('count', $count);
     	$this->view->assign('images', $finalArray);
+    	$this->view->assign('imagesReplaced', $replacedArray);
     	$this->view->assign('my_page', $my_page);
     	$this->view->assign('settings', $this->settings);
     }

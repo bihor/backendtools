@@ -487,15 +487,17 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 	 * Bilder ohne Alt- oder Titel-Text
 	 *
 	 * @param   integer   Modus
+	 * @param   integer   not only in tt_content?
 	 *
 	 * @return  array     Bilder
 	 */
-	function getImagesWithout($img_without) {
+	function getImagesWithout($img_without, $img_other) {
 		$pageRep = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
 		$domains = $this->getDomains();
-		$fileArray = array();
-		$fileOrder = array();
-		$finalArray = array();
+		$fileArray = [];
+		//$fileOrder = [];
+		$referenceArray = [];
+		$finalArray = [];
 		
 		// sys_file: get images
 		$table = 'sys_file';
@@ -508,7 +510,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 			->execute();
 		while ($row = $statement->fetch()) {
 			$uid = $row['uid'];
-			$fileOrder[] = $uid;
+			//$fileOrder[] = $uid;
 			$fileArray[$uid] = $row;
 		}
 		
@@ -522,6 +524,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 		while ($row = $statement->fetch()) {
 			$uid = $row['file'];
 			if ($fileArray[$uid]['uid'] == $uid) {
+				$fileArray[$uid]['meta_uid'] = $row['uid'];
 				$fileArray[$uid]['meta_title'] = $row['title'];
 				$fileArray[$uid]['meta_alt'] = $row['alternative'];
 				$fileArray[$uid]['meta_width'] = $row['width'];
@@ -530,57 +533,96 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 		}
 		
 		// sys_file_reference und tt_content
-		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('tt_content')->createQueryBuilder();
+		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('sys_file_reference')->createQueryBuilder();
 		$res = $queryBuilder ->select(...[
-			'sys_file_reference.uid',
-			'sys_file_reference.title',
-			'sys_file_reference.alternative',
-			'sys_file_reference.uid_local',
-			'sys_file_reference.uid_foreign',
-			'tt_content.pid AS tt_pid',
-			'tt_content.sys_language_uid AS tt_lang'
-		]) -> from ('sys_file_reference')
-		-> join(
-			'sys_file_reference',
-			'tt_content',
-			'tt_content',
-			$queryBuilder->expr()->eq('sys_file_reference.uid_foreign', $queryBuilder->quoteIdentifier('tt_content.uid'))
-			);
-		$res -> andWhere('sys_file_reference.tablenames="tt_content"');
+				'sys_file_reference.uid',
+				'sys_file_reference.title',
+				'sys_file_reference.alternative',
+				'sys_file_reference.uid_local',
+				'sys_file_reference.uid_foreign',
+				'tt_content.pid AS tt_pid',
+				'tt_content.colPos AS tt_pos',
+				'tt_content.sys_language_uid AS tt_lang'
+			]) -> from ('sys_file_reference')
+			-> join(
+				'sys_file_reference',
+				'tt_content',
+				'tt_content',
+				$queryBuilder->expr()->eq('sys_file_reference.uid_foreign', $queryBuilder->quoteIdentifier('tt_content.uid'))
+			)
+			-> andWhere('sys_file_reference.tablenames = "tt_content"')
+			->orderBy('tt_pid', 'ASC');
 		//print_r($queryBuilder->getSQL());
 		$result = $res -> execute();
 		foreach($result as $row) {
-			$uid = $row['uid_local'];
-			if ($fileArray[$uid]['uid'] == $uid) {
-				$fileArray[$uid]['ref_title'] = $row['title'];
-				$fileArray[$uid]['ref_alt'] = $row['alternative'];
-				$fileArray[$uid]['cid'] = $row['uid_foreign'];
-				$fileArray[$uid]['tt_pid'] = $row['tt_pid'];
-				$fileArray[$uid]['tt_lang'] = $row['tt_lang'];
+			$uid = $row['uid'];
+			$uid_file = $row['uid_local'];
+			if ($fileArray[$uid_file]['uid'] == $uid_file) {
+				$referenceArray[$uid]['ref_uid'] = $uid;
+				$referenceArray[$uid]['ref_title'] = $row['title'];
+				$referenceArray[$uid]['ref_alt'] = $row['alternative'];
+				$referenceArray[$uid]['tt_uid'] = $referenceArray[$uid]['cid'] = $row['uid_foreign'];
+				$referenceArray[$uid]['tt_pid'] = $row['tt_pid'];
+				$referenceArray[$uid]['tt_lang'] = $row['tt_lang'];
+				$referenceArray[$uid]['tt_pos'] = $row['tt_pos'];
+				//$referenceArray[$uid]['file_uid'] = $uid_file;
+				$referenceArray[$uid]['file'] = $fileArray[$uid_file];	// file-array
 				//echo "uid $uid <br>\n";
 			}
 		}
 		
-		foreach ($fileOrder as $uid) {
-			$imgArray = $fileArray[$uid];
-			//echo $imgArray['meta_alt'] .'#'. $imgArray['ref_alt'];
-			if (((($img_without == 1) || ($img_without == 3)) && (($imgArray['meta_alt']=='') && ($imgArray['ref_alt']==''))) ||
-				((($img_without == 2) || ($img_without == 3)) && (($imgArray['meta_title']=='') && ($imgArray['ref_title']==''))) ||
-				((($img_without == 4) || ($img_without == 6)) && (($imgArray['meta_alt']!='') || ($imgArray['ref_alt']!=''))) ||
-				((($img_without == 5) || ($img_without == 6)) && (($imgArray['meta_title']!='') || ($imgArray['ref_title']!='')))) {
-					// TODO: wenn ein Bild mehrfach benutzt wird, wird dies bisher nicht berücksichtigt! Man müsste die uid von sys_file_reference berücksichtigen!
-					$root = array_pop($pageRep->getRootLine($imgArray['tt_pid']));
-					$imgArray['root'] = $root['uid'];
-					$imgArray['domain'] = $domains[$root['uid']];
-					$finalArray[] = $imgArray;
+		if ($img_other) {
+			// sys_file_reference ohne tt_content
+			$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('sys_file_reference')->createQueryBuilder();
+			$res = $queryBuilder ->select(...[
+					'uid',
+					'title',
+					'alternative',
+					'uid_local',
+					'tablenames'
+				]) -> from ('sys_file_reference')
+				-> andWhere('tablenames != "tt_content"')
+				->orderBy('uid', 'ASC');
+			//print_r($queryBuilder->getSQL());
+			$result = $res -> execute();
+			foreach($result as $row) {
+				$uid = $row['uid'];
+				$uid_file = $row['uid_local'];
+				if (!$referenceArray[$uid] && ($fileArray[$uid_file]['uid'] == $uid_file)) {
+					$referenceArray[$uid]['ref_uid'] = $uid;
+					$referenceArray[$uid]['ref_title'] = $row['title'];
+					$referenceArray[$uid]['ref_alt'] = $row['alternative'];
+					$referenceArray[$uid]['ref_tablenames'] = $row['tablenames'];
+					//$referenceArray[$uid]['file_uid'] = $uid_file;
+					$referenceArray[$uid]['file'] = $fileArray[$uid_file];	// file-array
+					//echo "uid $uid <br>\n";
 				}
+			}
+		}
+			
+		// Bilder ohne alt oder title
+		foreach ($referenceArray as $uid => $refArray) {
+			$imgArray = $refArray['file'];
+			//echo $imgArray['meta_alt'] .'#'. $imgArray['ref_alt'];
+			if (((($img_without == 1) || ($img_without == 3)) && (($imgArray['meta_alt']=='') && ($refArray['ref_alt']==''))) ||
+				((($img_without == 2) || ($img_without == 3)) && (($imgArray['meta_title']=='') && ($refArray['ref_title']==''))) ||
+				((($img_without == 4) || ($img_without == 6)) && (($imgArray['meta_alt']!='') || ($refArray['ref_alt']!=''))) ||
+				((($img_without == 5) || ($img_without == 6)) && (($imgArray['meta_title']!='') || ($refArray['ref_title']!='')))) {
+				// neu ab version 1.4.3: final-array enthält reference-Daten statt file-Daten
+				if ($refArray['tt_pid']) {
+					$root = array_pop($pageRep->getRootLine($refArray['tt_pid']));
+					$refArray['root'] = $root['uid'];
+					$refArray['domain'] = $domains[$root['uid']];
+				}
+				$finalArray[] = $refArray;
+			}
 		}
 		return $finalArray;
 	}
 	
 	/**
 	 * setAltOrTitle
-	 * @param	int		$uid			uid of sys_file_metadata
+	 * @param	int		$uid			uid of sys_file_reference
 	 * @param	string	$alternative	alt-tag
 	 * @param	string	$title			title-tag
 	 * @return	boolean
@@ -593,15 +635,19 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 			$field = 'title';
 			$value = $title;
 		}
-		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
-		$queryBuilder
-			->update('sys_file_metadata')
-			->where(
-				$queryBuilder->expr()->eq('uid', $uid)
-			)
-			->set($field, $value)
-			->execute();
-		return true;
+		if ($uid && $field) {
+			$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_reference');
+			$queryBuilder
+				->update('sys_file_reference')
+				->where(
+					$queryBuilder->expr()->eq('uid', $uid)
+				)
+				->set($field, $value)
+				->execute();
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	/**

@@ -12,7 +12,7 @@
 
 $EM_CONF[$_EXTKEY] = array (
   'title' => 'Backend tools',
-  'description' => '6 admin tools for extensions, redirects, files, images and links: extensionlist, redirects import, filedeletion, images with no title, unzip and linklist.',
+  'description' => '6 admin tools for extensions, redirects, files, images and links: extensionlist, redirects import, filedeletion, images with no alt or title, unzip and linklist.',
   'category' => 'module',
 	'author' => 'Kurt Gusbeth',
 	'author_company' => 'fixpunkt werbeagentur gmbh',
@@ -21,7 +21,7 @@ $EM_CONF[$_EXTKEY] = array (
   'uploadfolder' => false,
   'createDirs' => '',
   'clearCacheOnLoad' => false,
-  'version' => '1.4.2',
+  'version' => '1.5.0',
   'constraints' => 
   array (
     'depends' => array (
