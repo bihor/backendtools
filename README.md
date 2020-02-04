@@ -1,6 +1,6 @@
 # backendtools
 
-version 1.5.0
+version 1.5.1
 
 6 admin tools for extensions, redirects, files, images and links:
 extensionlist, import redirects, delete unused files, images with no title, unzip and linklist.
@@ -8,4 +8,4 @@ extensionlist, import redirects, delete unused files, images with no title, unzi
 You find the documentation for this extension at typo3.org:
 https://docs.typo3.org/p/fixpunkt/backendtools/master/en-us/
 
-Last feature: colPos added. Image list view completly revised. 
+Last feature: link the title with the slug.

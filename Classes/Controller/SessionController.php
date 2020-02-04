@@ -132,6 +132,22 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	
     	$pages = $this->sessionRepository->getPagesWithExtensions($my_c, $my_p, $my_type, $my_value, $my_flexform, $my_exclude);
     	
+    	$fieldConfig = $GLOBALS['TCA']['pages']['columns']['slug']['config'];
+    	$slugHelper = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\DataHandling\SlugHelper::class, 'pages', 'slug', $fieldConfig);
+    	
+    	$connection = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Database\ConnectionPool::class)->getConnectionForTable('pages');
+    	$queryBuilder = $connection->createQueryBuilder();
+    	$queryBuilder->getRestrictions()->removeAll()->add(\TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction::class));
+    	
+    	foreach ($pages as $key => $page) {
+    		// URL ermitteln
+    		$record = $queryBuilder->select('*')->from('pages')->where(
+    			$queryBuilder->expr()->eq('uid', $page['pid'])
+    		)->execute()->fetch();
+    		//$record = $statement->fetch();
+    		$pages[$key]['slug'] = $slugHelper->generate($record, $record['pid']);
+    	}
+    	
     	// Assign
     	$this->view->assign('my_p', $my_p);
     	$this->view->assign('my_c', $my_c);
