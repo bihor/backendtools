@@ -469,6 +469,94 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     }
     
     /**
+     * action realurl: compare RealUrl path with slug
+     *
+     * @return void
+     */
+    public function realurlAction()
+    {
+    	$beuser_id = $GLOBALS['BE_USER']->user['uid'];
+    	$result = $this->sessionRepository->findByAction('realurl', $beuser_id);
+    	if ($result->count() == 0) {
+    		$new = TRUE;
+    		$default = GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
+    		$default->setAction('realurl');
+    		$default->setValue1(0);
+    		$default->setValue2(0);
+    	} else {
+    		$new = FALSE;
+    		$default = $result[0];
+    	}
+    	
+    	if ($this->request->hasArgument('my_p')) {
+    		$my_p = intval($this->request->getArgument('my_p'));
+    		$default->setValue1($my_p);
+    	} else $my_p = $default->getValue1();
+    	if ($this->request->hasArgument('my_e')) {
+    		$my_e = intval($this->request->getArgument('my_e'));
+    		$default->setValue2($my_e);
+    	} else $my_e = $default->getValue2();
+    	if ($this->request->hasArgument('my_page')) {
+    		$my_page = intval($this->request->getArgument('my_page'));		// elements per page
+    		$default->setPageel($my_page);
+    	} else $my_page = $default->getPageel();
+    	if (!$my_page) {
+    		$my_page = $this->settings['pagebrowser']['itemsPerPage'];
+    		if (!$my_page) {
+    			$my_page = $this->settings['pagebrowser']['itemsPerPage'] = 25;
+    		}
+    	} else {
+    		$this->settings['pagebrowser']['itemsPerPage'] = $my_page;
+    	}
+    	
+    	if ($new) {
+    		$objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+    		$backendUserRepository = $objectManager->get(BackendUserRepository::class);
+    		/** @var \TYPO3\CMS\Extbase\Domain\Model\BackendUser $user */
+    		$user = $backendUserRepository->findByUid($beuser_id);
+    		$default->setBeuser($user);
+    		$this->sessionRepository->add($default);
+    		$persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
+    		$persistenceManager->persistAll();
+    	} else {
+    		$this->sessionRepository->update($default);
+    	}
+    	
+    	$pagesRealurl = $this->sessionRepository->getPagesRealurl();
+    	$pagesSlug    = $this->sessionRepository->getPagesSlug($my_p);
+    	$pages        = [];
+    	$siteFinder   = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Site\SiteFinder::class);
+    	
+    	foreach ($pagesSlug as $key => $value) {
+    		$slug = $value['slug'];
+    		$site = $siteFinder->getSiteByPageId($key);
+    		if ($site) {
+    			$base = $site->getConfiguration()['base'];
+    			if (substr($base, 0, 4) == 'http') {
+    				$parse_url = parse_url($base);
+    				$base = $parse_url['path'];
+    			}
+    			$slug = substr($base, 0, -1) . $slug;
+    		}
+    		if ($slug != $pagesRealurl[$key]) {
+    			if (($my_e == 0) || (($my_e == 1) && !$pagesRealurl[$key]) || (($my_e == 2) && $pagesRealurl[$key])) {
+	    			$pages[$key] = $value;
+	    			$pages[$key]['uid'] = $key;
+	    			$pages[$key]['slug'] = $slug;
+	    			//$pages[$key]['slug'] = $value['slug'];
+	    			$pages[$key]['realurl'] = $pagesRealurl[$key];
+    			}
+    		}
+    	}
+    	
+    	$this->view->assign('my_p', $my_p);
+    	$this->view->assign('my_e', $my_e);
+    	$this->view->assign('my_page', $my_page);
+    	$this->view->assign('settings', $this->settings);
+    	$this->view->assign('pages', $pages);
+    }
+    
+    /**
      * action redirects
      *
      * @return void

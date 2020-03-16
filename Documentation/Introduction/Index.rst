@@ -17,19 +17,21 @@ Introduction
 What does it do?
 ----------------
 
-This extension provides some usefull tools in the “Admin tools” section of the backend of TYPO3. Currently it contains 5 tools for extensions, files, images and links.
+This extension provides some usefull tools in the “Admin tools” section of the backend of TYPO3. Currently it contains 7 tools for extensions, slugs, redirects, files, images and links.
 
 Tool 1: shows you all pages where you use extensions. You can see where you use which extension. You can search for non-extensions too, e.g. if you set Ctype='mailform'.
 
-Tool 2: you can extract an uploaded zip-file in the fileadmin-folder. Useful if you have no SSH connection.
+Tool 2: shows differences between RealURL-pagepath (in tx_realurl_pathdata) and Slug (in pages). Note: the old RealURL-tables must be present!
 
-Tool 3: helps you to delete unused files. Go to “Admin tools” → DB check” → “Database Relations” to find files which you can delete. This tool helps you to delete these files.
+Tool 3: you can extract an uploaded zip-file in the fileadmin-folder. Useful if you have no SSH connection.
 
-Tool 4: helps you to find pages that link to another page. You can find any content element with a link to a specific page.
+Tool 4: helps you to delete unused files. Go to “Admin tools” → DB check” → “Database Relations” to find files which you can delete. This tool helps you to delete these files.
 
-Tool 5: helps you to find images with no title- oder alternative-text. This tool can set that values for you too.
+Tool 5: helps you to find pages that link to another page. You can find any content element with a link to a specific page.
 
-Tool 6: you can import simple redirect rules form your .htaccess to the table sys_redirect.
+Tool 6: helps you to find images with no title- oder alternative-text. This tool can set that values for you too.
+
+Tool 7: you can import simple redirect rules form your .htaccess to the table sys_redirect.
 
 .. _screenshots:
 

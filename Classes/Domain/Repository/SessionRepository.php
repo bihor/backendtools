@@ -651,6 +651,60 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 	}
 	
 	/**
+	 * Get list of pages with RealUrl-path
+	 *
+	 * @return array
+	 */
+	public function getPagesRealurl() {
+		$pages = [];
+		$table = 'tx_realurl_pathdata';
+		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+		$statement = $queryBuilder
+		->select('*')
+		->from($table)
+		->orderBy('page_id', 'ASC')
+		->execute();
+		while ($row = $statement->fetch()) {
+			$pages[$row['page_id']] = '/' . $row['pagepath'];
+		}
+		return $pages;
+	}
+	
+	/**
+	 * Get list of pages with slug-path
+	 * @param	int		$hidden			hidden-flag
+	 * @return array
+	 */
+	public function getPagesSlug($hidden) {
+		$pages = [];
+		$table = 'pages';
+		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+		$statement = $queryBuilder
+		->select('*')
+		->from($table)
+		->where($queryBuilder->expr()->eq('deleted', 0))
+		->andWhere($queryBuilder->expr()->gt('pid', 0))
+		->orderBy('uid', 'ASC')
+		->execute();
+		while ($row = $statement->fetch()) {
+			$p_hidden = $row['hidden'];
+			if (($hidden == 0) || (($hidden == 1) && $p_hidden) || (($hidden == 2) && !$p_hidden)) {
+				$pages[$row['uid']] = [];
+				$pages[$row['uid']]['hidden'] = $hidden;
+				$pages[$row['uid']]['sys_language_uid'] = $row['sys_language_uid'];
+				$pages[$row['uid']]['title'] = $row['title'];
+				$pages[$row['uid']]['slug'] = $row['slug'];
+				if ($row['slug_locked'] && ($row['slug_locked'] == 1)) {
+					$pages[$row['uid']]['slug_locked'] = 1;
+				} else {
+					$pages[$row['uid']]['slug_locked'] = 0;
+				}
+			}
+		}
+		return $pages;
+	}
+	
+	/**
 	 * Get list of domains
 	 *
 	 * @return array

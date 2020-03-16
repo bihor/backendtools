@@ -13,7 +13,7 @@ call_user_func(
 				'mod1', // Submodule key
 				'', // Position
 				[
-					'Session' => 'list, filedeletion, unzip, images, pagesearch, redirects',
+					'Session' => 'list, filedeletion, unzip, images, pagesearch, redirects, realurl',
 				],
 				[
 					'access' => 'user,group',
