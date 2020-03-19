@@ -145,7 +145,10 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     			$queryBuilder->expr()->eq('uid', $page['pid'])
     		)->execute()->fetch();
     		//$record = $statement->fetch();
-    		$pages[$key]['slug'] = $slugHelper->generate($record, $record['pid']);
+			if (is_array($record)) {
+				// TODO: überprüfen
+				$pages[$key]['slug'] = $slugHelper->generate($record, $record['pid']);
+			}
     	}
     	
     	// Assign
