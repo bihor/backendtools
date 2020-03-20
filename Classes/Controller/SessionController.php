@@ -486,6 +486,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     		$default->setAction('realurl');
     		$default->setValue1(0);
     		$default->setValue2(0);
+    		$default->setValue3(0);
     	} else {
     		$new = FALSE;
     		$default = $result[0];
@@ -499,6 +500,10 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     		$my_e = intval($this->request->getArgument('my_e'));
     		$default->setValue2($my_e);
     	} else $my_e = $default->getValue2();
+    	if ($this->request->hasArgument('my_s')) {
+    		$my_s = intval($this->request->getArgument('my_s'));
+    		$default->setValue3($my_s);
+    	} else $my_s = $default->getValue3();
     	if ($this->request->hasArgument('my_page')) {
     		$my_page = intval($this->request->getArgument('my_page'));		// elements per page
     		$default->setPageel($my_page);
@@ -532,28 +537,34 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	
     	foreach ($pagesSlug as $key => $value) {
     		$slug = $value['slug'];
-    		$site = $siteFinder->getSiteByPageId($key);
-    		if ($site) {
-    			$base = $site->getConfiguration()['base'];
-    			if (substr($base, 0, 4) == 'http') {
-    				$parse_url = parse_url($base);
-    				$base = $parse_url['path'];
+    		$realurl = $pagesRealurl[$key];
+    		if ($slug != $realurl) {
+    			if ($my_s == 1) {
+	    		    $site = $siteFinder->getSiteByPageId($key);
+		    		if ($site) {
+		    			$base = $site->getConfiguration()['base'];
+		    			if (substr($base, 0, 4) == 'http') {
+		    				$parse_url = parse_url($base);
+		    				$base = $parse_url['path'];
+		    			}
+		    			$slug = substr($base, 0, -1) . $slug;
+		    		}
     			}
-    			$slug = substr($base, 0, -1) . $slug;
-    		}
-    		if ($slug != $pagesRealurl[$key]) {
-    			if (($my_e == 0) || (($my_e == 1) && !$pagesRealurl[$key]) || (($my_e == 2) && $pagesRealurl[$key])) {
-	    			$pages[$key] = $value;
-	    			$pages[$key]['uid'] = $key;
-	    			$pages[$key]['slug'] = $slug;
-	    			//$pages[$key]['slug'] = $value['slug'];
-	    			$pages[$key]['realurl'] = $pagesRealurl[$key];
-    			}
+	    		if ($slug != $realurl) {
+	    			if (($my_e == 0) || (($my_e == 1) && !$realurl) || (($my_e == 2) && $realurl)) {
+		    			$pages[$key] = $value;
+		    			$pages[$key]['uid'] = $key;
+		    			$pages[$key]['slug'] = $slug;
+		    			//$pages[$key]['slug'] = $value['slug'];
+		    			$pages[$key]['realurl'] = $realurl;
+	    			}
+	    		}
     		}
     	}
     	
     	$this->view->assign('my_p', $my_p);
     	$this->view->assign('my_e', $my_e);
+    	$this->view->assign('my_s', $my_s);
     	$this->view->assign('my_page', $my_page);
     	$this->view->assign('settings', $this->settings);
     	$this->view->assign('pages', $pages);

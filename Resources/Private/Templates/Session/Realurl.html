@@ -34,7 +34,17 @@
   </label>
 </div -->
 
-</div><div class="col-md-6">
+</div><div class="col-md-3">
+<div style="margin: 10px 0;">Site Configuration check:
+	<label class="checkbox-inline">
+	<f:form.radio name="my_s" value="0" checked="{my_s} == 0" /> no &nbsp; or
+  </label>
+  <label class="checkbox-inline">
+	<f:form.radio name="my_s" value="1" checked="{my_s} == 1" /> yes
+  </label>
+</div>
+
+</div><div class="col-md-3">
 <div style="margin: 10px 0;">Entries per page:
 	<f:form.textfield name="my_page" value="{my_page}" size="5" /> &nbsp;
 </div>
