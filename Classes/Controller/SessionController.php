@@ -535,29 +535,31 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	$pages        = [];
     	$siteFinder   = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Site\SiteFinder::class);
     	
-    	foreach ($pagesSlug as $key => $value) {
-    		$slug = $value['slug'];
-    		$realurl = $pagesRealurl[$key];
-    		if ($slug != $realurl) {
-    			if ($my_s == 1) {
-	    		    $site = $siteFinder->getSiteByPageId($key);
-		    		if ($site) {
-		    			$base = $site->getConfiguration()['base'];
-		    			if (substr($base, 0, 4) == 'http') {
-		    				$parse_url = parse_url($base);
-		    				$base = $parse_url['path'];
-		    			}
-		    			$slug = substr($base, 0, -1) . $slug;
-		    		}
-    			}
+    	foreach ($pagesSlug as $key => $langArray) {
+    		foreach ($langArray as $langId => $value) {
+	    		$slug = $value['slug'];
+	    		$realurl = $pagesRealurl[$key][$langId];
 	    		if ($slug != $realurl) {
-	    			if (($my_e == 0) || (($my_e == 1) && !$realurl) || (($my_e == 2) && $realurl)) {
-		    			$pages[$key] = $value;
-		    			$pages[$key]['uid'] = $key;
-		    			$pages[$key]['slug'] = $slug;
-		    			//$pages[$key]['slug'] = $value['slug'];
-		    			$pages[$key]['realurl'] = $realurl;
+	    			if ($my_s == 1) {
+		    		    $site = $siteFinder->getSiteByPageId($key);
+			    		if ($site) {
+			    			$base = $site->getConfiguration()['base'];
+			    			if (substr($base, 0, 4) == 'http') {
+			    				$parse_url = parse_url($base);
+			    				$base = $parse_url['path'];
+			    			}
+			    			$slug = substr($base, 0, -1) . $slug;
+			    		}
 	    			}
+		    		if ($slug != $realurl) {
+		    			if (($my_e == 0) || (($my_e == 1) && !$realurl) || (($my_e == 2) && $realurl)) {
+			    			$pages[$key] = $value;
+			    			$pages[$key]['uid'] = $key;
+			    			$pages[$key]['slug'] = $slug;
+			    			//$pages[$key]['slug'] = $value['slug'];
+			    			$pages[$key]['realurl'] = $realurl;
+		    			}
+		    		}
 	    		}
     		}
     	}
@@ -568,6 +570,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	$this->view->assign('my_page', $my_page);
     	$this->view->assign('settings', $this->settings);
     	$this->view->assign('pages', $pages);
+    	//$this->view->assign('pagesRealURL', $pagesRealurl);
     }
     
     /**
