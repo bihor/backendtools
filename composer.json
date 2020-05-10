@@ -21,7 +21,6 @@
 		}
 	},
 	"replace" : {
-		"backendtools" : "self.version",
 		"typo3-ter/backendtools" : "self.version"
 	},
 	"homepage" : "https://www.fixpunkt.com/webentwicklung/typo3/typo3-extensions/",
