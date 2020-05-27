@@ -60,7 +60,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     {
     	$beuser_id = $GLOBALS['BE_USER']->user['uid']; 
     	//$pageRep = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
-    	$domains = $this->sessionRepository->getDomains();
+    	//$domains = $this->sessionRepository->getDomains();
     	$result = $this->sessionRepository->findByAction('list', $beuser_id);
  		if ($result->count() == 0) {
  			$new = TRUE;
@@ -162,7 +162,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	$this->view->assign('my_outp', $my_outp);
     	$this->view->assign('rows', count($pages));
     	$this->view->assign('pages', $pages);
-    	$this->view->assign('domains', $domains);
+    	//$this->view->assign('domains', $domains);
     	$this->view->assign('settings', $this->settings);
     }
     

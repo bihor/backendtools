@@ -1,6 +1,8 @@
 <?php
 namespace Fixpunkt\Backendtools\ViewHelpers;
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 class EditLinkViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractTagBasedViewHelper {
 	
 	/**
@@ -41,12 +43,15 @@ class EditLinkViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractTagBa
             ],
         	'columnsOnly' => '', //$this->arguments['columnsOnly'],
             'createExtension' => 0,
-            'returnUrl' => \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('REQUEST_URI')
+            'returnUrl' => GeneralUtility::getIndpEnv('REQUEST_URI')
         ];
       //  if (count($this->arguments['defaultValues']) > 0) {
       //  	$urlParameters['defVals'] = $this->arguments['defaultValues'];
       //  }
-        $uri = \TYPO3\CMS\Backend\Utility\BackendUtility::getModuleUrl('record_edit', $urlParameters);
+//        $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
+        $uriBuilder = GeneralUtility::makeInstance('TYPO3\CMS\Backend\Routing\UriBuilder');
+        $uri = $uriBuilder->buildUriFromRoute('record_edit', $urlParameters);
+//        $uri = \TYPO3\CMS\Backend\Utility\BackendUtility::getModuleUrl('record_edit', $urlParameters);
       //  das hier funktioniert überhaupt nicht: 
       //  $uriBuilder = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder::class);
       //  $uri = $uriBuilder->buildUriFromRoute('record_edit', $urlParameters);

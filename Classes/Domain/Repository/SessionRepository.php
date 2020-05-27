@@ -65,8 +65,9 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 	 */
 	public function getPagesWithExtensions($my_c, $my_p, $my_type, $my_value, $my_flexform, $my_exclude) {
 		$pages = [];
-		$domains = $this->getDomains();
-		$PageRepository = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
+		//$domains = $this->getDomains();
+		//$PageRepository = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
+		$siteFinder = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Site\SiteFinder::class);
 		$exclude_ctypes = [
 			"html", "list", "text", "image", "textpic", "textmedia", "bullets", "menu",
 			"search", "mailform", "indexed_search", "login", "header", "rte",
@@ -176,9 +177,18 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 					$row['actions'] = $matches[2];
 				}
 			}
-			$root = array_pop($PageRepository->getRootLine($row['pid']));
-			$row['root'] = $root['uid'];
-			$row['domain'] = $domains[$root['uid']];
+			//$rootLineUtility = new \TYPO3\CMS\Core\Utility\RootlineUtility($row['pid']);
+			//$rootline = $rootLineUtility->get();
+			//$root = array_pop($rootline);
+			//$row['root'] = $root['uid'];
+			//$row['domain'] = $domains[$root['uid']];
+			if ( $row["pdeleted"] ) {
+			    $row['domain'] = '';
+			} else {
+    			$site = $siteFinder->getSiteByPageId($row['pid']);
+    			$base = $site->getConfiguration()['base'];
+    			$row['domain'] = rtrim($base, '/');
+			}
 			$row['csvtitle'] = str_replace(';', ',', str_replace('"', '', $row['title']));
 			$pages[] = $row;
 		}
@@ -492,8 +502,9 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 	 * @return  array     Bilder
 	 */
 	function getImagesWithout($img_without, $img_other) {
-		$pageRep = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
-		$domains = $this->getDomains();
+		//$pageRep = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
+	    $siteFinder = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Site\SiteFinder::class);
+		//$domains = $this->getDomains();
 		$fileArray = [];
 		//$fileOrder = [];
 		$referenceArray = [];
@@ -610,9 +621,15 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 				((($img_without == 5) || ($img_without == 6)) && (($imgArray['meta_title']!='') || ($refArray['ref_title']!='')))) {
 				// neu ab version 1.4.3: final-array enthält reference-Daten statt file-Daten
 				if ($refArray['tt_pid']) {
-					$root = array_pop($pageRep->getRootLine($refArray['tt_pid']));
-					$refArray['root'] = $root['uid'];
-					$refArray['domain'] = $domains[$root['uid']];
+				    //$rootLineUtility = new \TYPO3\CMS\Core\Utility\RootlineUtility($refArray['tt_pid']);
+				    //$rootline = $rootLineUtility->get();
+					//$root = array_pop($rootline);
+					//$refArray['root'] = $root['uid'];
+					//$refArray['domain'] = $domains[$root['uid']];
+				    //var_dump($refArray);
+				    $site = $siteFinder->getSiteByPageId($refArray['tt_pid']);
+				    $base = $site->getConfiguration()['base'];
+				    $refArray['domain'] = rtrim($base, '/');
 				}
 				$finalArray[] = $refArray;
 			}
@@ -716,7 +733,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 	}
 	
 	/**
-	 * Get list of domains
+	 * Get list of domains: wird nicht mehr gebraucht, da es die Tabelle in TYPO3 10 nicht mehr gibt!
 	 *
 	 * @return array
 	 */
