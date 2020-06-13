@@ -185,9 +185,13 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 			if ( $row["pdeleted"] ) {
 			    $row['domain'] = '';
 			} else {
-    			$site = $siteFinder->getSiteByPageId($row['pid']);
-    			$base = $site->getConfiguration()['base'];
-    			$row['domain'] = rtrim($base, '/');
+				try {
+					$site = $siteFinder->getSiteByPageId($row['pid']);
+					$base = $site->getConfiguration()['base'];
+					$row['domain'] = rtrim($base, '/');
+				} catch (SiteNotFoundException $e) {
+					$row['domain'] = 'SiteNotFound';
+				}
 			}
 			$row['csvtitle'] = str_replace(';', ',', str_replace('"', '', $row['title']));
 			$pages[] = $row;
