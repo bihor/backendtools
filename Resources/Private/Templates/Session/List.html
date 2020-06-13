@@ -75,7 +75,7 @@
 	<f:then>
 		<textarea name="dummy" rows="12" cols="120">
 Content element;;;;;;;;Page;;
-uid;lang.;colPos;deleted;hidden;header;CType;list tyle;FlexForm actions;uid;deleted;hidden;title
+uid;lang.;colPos;deleted;hidden;header;CType;list_type;FlexForm actions;uid;deleted;hidden;title
 <f:for each="{pages}" as="page" iteration="iterator">{page.uid};{page.sys_language_uid};{page.colPos};{page.ttdeleted};{page.tthidden};"{page.csvheader}";{page.CType};{page.list_type};<f:format.raw>{page.actions}</f:format.raw>;{page.pid};{page.pdeleted};{page.phidden};"{page.csvtitle}"
 </f:for></textarea>
 	</f:then>
@@ -94,7 +94,7 @@ uid;lang.;colPos;deleted;hidden;header;CType;list tyle;FlexForm actions;uid;dele
 				<th>deleted / hidden</th>
 				<th>header</th>
 				<th>CType</th>
-				<th>list tyle</th>
+				<th>list_type</th>
 				<th>FlexForm actions</th>
 				<th>uid</th>
 				<th>deleted / hidden</th>
