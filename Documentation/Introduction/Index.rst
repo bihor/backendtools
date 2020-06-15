@@ -66,3 +66,9 @@ Thanks to the
 for giving me the possibility to realize
 `this extension <https://www.fixpunkt.com/webentwicklung/typo3/typo3-extensions/>`_
 and share it with the TYPO3 community.
+
+
+TODOs
+-----
+
+Add the domain to the RealURL vs. slug list. Check generated slug.

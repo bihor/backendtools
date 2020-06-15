@@ -541,7 +541,18 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 	    		$realurl = $pagesRealurl[$key][$langId];
 	    		if ($slug != $realurl) {
 	    			if ($my_s == 1) {
-		    		    $site = $siteFinder->getSiteByPageId($key);
+	    			    $site = '';
+	    			    $rootLineUtility = new \TYPO3\CMS\Core\Utility\RootlineUtility($key);
+	    			    $rootline = $rootLineUtility->get();
+	    			    $root = array_pop($rootline);
+	    			    if ($root['is_siteroot']) {
+	    			        // nur bei Seiten mit Rootline kann man eine SiteConfig finden 
+	    			        try {
+	    			            $site = $siteFinder->getSiteByPageId($root['uid']);   // oder $key;
+	    			        } catch (SiteNotFoundException $e) {
+	    			            $site = '';
+	    			        }
+	    			    }
 			    		if ($site) {
 			    			$base = $site->getConfiguration()['base'];
 			    			if (substr($base, 0, 4) == 'http') {
