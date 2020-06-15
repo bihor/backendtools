@@ -177,21 +177,25 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 					$row['actions'] = $matches[2];
 				}
 			}
-			//$rootLineUtility = new \TYPO3\CMS\Core\Utility\RootlineUtility($row['pid']);
-			//$rootline = $rootLineUtility->get();
-			//$root = array_pop($rootline);
-			//$row['root'] = $root['uid'];
-			//$row['domain'] = $domains[$root['uid']];
 			if ( $row["pdeleted"] ) {
 			    $row['domain'] = '';
 			} else {
-				try {
-					$site = $siteFinder->getSiteByPageId($row['pid']);
-					$base = $site->getConfiguration()['base'];
-					$row['domain'] = rtrim($base, '/');
-				} catch (SiteNotFoundException $e) {
-					$row['domain'] = 'SiteNotFound';
-				}
+			    $rootLineUtility = new \TYPO3\CMS\Core\Utility\RootlineUtility($row['pid']);
+			    $rootline = $rootLineUtility->get();
+			    $root = array_pop($rootline);
+			    $row['root'] = $root['uid'];
+			    //$row['domain'] = $domains[$root['uid']];
+			    if ($root['is_siteroot']) {
+			        try {
+			            $site = $siteFinder->getSiteByPageId($root['uid']);   // oder $row['pid']);
+				    	$base = $site->getConfiguration()['base'];
+				        $row['domain'] = rtrim($base, '/');
+			        } catch (SiteNotFoundException $e) {
+			            $row['domain'] = '';
+			        }
+			    } else {
+			        $row['domain'] = '';
+			    }
 			}
 			$row['csvtitle'] = str_replace(';', ',', str_replace('"', '', $row['title']));
 			$pages[] = $row;
@@ -610,6 +614,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 					$referenceArray[$uid]['ref_tablenames'] = $row['tablenames'];
 					//$referenceArray[$uid]['file_uid'] = $uid_file;
 					$referenceArray[$uid]['file'] = $fileArray[$uid_file];	// file-array
+					$referenceArray[$uid]['domain'] = '';
 					//echo "uid $uid <br>\n";
 				}
 			}
@@ -625,15 +630,22 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 				((($img_without == 5) || ($img_without == 6)) && (($imgArray['meta_title']!='') || ($refArray['ref_title']!='')))) {
 				// neu ab version 1.4.3: final-array enthält reference-Daten statt file-Daten
 				if ($refArray['tt_pid']) {
-				    //$rootLineUtility = new \TYPO3\CMS\Core\Utility\RootlineUtility($refArray['tt_pid']);
-				    //$rootline = $rootLineUtility->get();
-					//$root = array_pop($rootline);
-					//$refArray['root'] = $root['uid'];
+				    $rootLineUtility = new \TYPO3\CMS\Core\Utility\RootlineUtility($refArray['tt_pid']);
+				    $rootline = $rootLineUtility->get();
+					$root = array_pop($rootline);
+					$refArray['root'] = $root['uid'];
 					//$refArray['domain'] = $domains[$root['uid']];
 				    //var_dump($refArray);
-				    $site = $siteFinder->getSiteByPageId($refArray['tt_pid']);
-				    $base = $site->getConfiguration()['base'];
-				    $refArray['domain'] = rtrim($base, '/');
+				    if ($root['is_siteroot']) {
+				        try {
+				            $site = $siteFinder->getSiteByPageId($root['uid']);  /// oder $refArray['tt_pid']);
+				            $base = $site->getConfiguration()['base'];
+				            $refArray['domain'] = rtrim($base, '/');
+				        } catch (SiteNotFoundException $e) {
+				            $refArray['domain'] = '';
+				        }
+				    }
+				    
 				}
 				$finalArray[] = $refArray;
 			}
@@ -679,17 +691,21 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 	public function getPagesRealurl() {
 		$pages = [];
 		$table = 'tx_realurl_pathdata';
-		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
-		$statement = $queryBuilder
-		->select('*')
-		->from($table)
-		->orderBy('page_id', 'ASC')
-		->execute();
-		while ($row = $statement->fetch()) {
-			if (!is_array($pages[$row['page_id']])) {
-				$pages[$row['page_id']] = [];
-			}
-			$pages[$row['page_id']][$row['language_id']] = '/' . $row['pagepath'];
+		try {
+    		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+    		$statement = $queryBuilder
+    		->select('*')
+    		->from($table)
+    		->orderBy('page_id', 'ASC')
+    		->execute();
+    		while ($row = $statement->fetch()) {
+    			if (!is_array($pages[$row['page_id']])) {
+    				$pages[$row['page_id']] = [];
+    			}
+    			$pages[$row['page_id']][$row['language_id']] = '/' . $row['pagepath'];
+    		}
+		} catch (TableNotFoundException $e) {
+		    // Die Tabelle fehlt, aber das try hilft auch nicht
 		}
 		return $pages;
 	}
