@@ -3,6 +3,7 @@ namespace Fixpunkt\Backendtools\Domain\Repository;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Database\Connection;
 
 /***************************************************************
  *  Copyright notice
@@ -100,7 +101,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 			'pages',
 			'pages',
 			$queryBuilder->expr()->eq('tt_content.pid', $queryBuilder->quoteIdentifier('pages.uid'))
-			);
+		);
 		
 		// Restricions
 		$queryBuilder
@@ -108,19 +109,31 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 		->removeAll();
 		
 		if ($my_c==1) {
-			$res -> andWhere("tt_content.deleted=1 OR tt_content.hidden=1"); //ToDO: Schöner machen
+			$res -> andWhere(...[
+				$queryBuilder->expr()->orX(
+					$queryBuilder->expr()->eq('tt_content.deleted', $queryBuilder->createNamedParameter(1)),
+					$queryBuilder->expr()->eq('tt_content.hidden', $queryBuilder->createNamedParameter(1))
+				)
+			]);
+			//	"tt_content.deleted=1 OR tt_content.hidden=1"); //ToDO: Schöner machen
 		} else if ($my_c==2) {
 			$res -> andWhere(...[
-				$queryBuilder->expr()->eq('tt_content.deleted', 0),
-				$queryBuilder->expr()->eq('tt_content.hidden', 0)
+				$queryBuilder->expr()->eq('tt_content.deleted', $queryBuilder->createNamedParameter(0)),
+				$queryBuilder->expr()->eq('tt_content.hidden', $queryBuilder->createNamedParameter(0))
 			]);
 		}
 		if ($my_p==1) {
-			$res -> andWhere("pages.deleted=1 OR pages.hidden=1"); //ToDO: Schöner machen
+			$res -> andWhere(...[
+				$queryBuilder->expr()->orX(
+					$queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(1)),
+					$queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(1))
+					)
+			]);
+			//$res -> andWhere("pages.deleted=1 OR pages.hidden=1"); //ToDO: Schöner machen
 		} else if ($my_p==2) {
 			$res -> andWhere(...[
-				$queryBuilder->expr()->eq('pages.deleted', 0),
-				$queryBuilder->expr()->eq('pages.hidden', 0)
+				$queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(0)),
+				$queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(0))
 			]);
 		}
 		
@@ -140,13 +153,22 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 			/*$exclude_ctypes = $queryBuilder->createNamedParameter(
                 '"'.
 				implode('","', 	$exclude_ctypes).
-				'"');*/
+				'"');
 			$exclude_ctypes =	'"'.implode('","', 	$exclude_ctypes).'"';
 			$res -> andWhere('
             (
                 tt_content.list_type!="" AND tt_content.list_type != "0"
             )
-            OR tt_content.CType NOT IN ('.$exclude_ctypes.')');
+            OR tt_content.CType NOT IN ('.$exclude_ctypes.')'); */
+			$res -> andWhere(...[
+				$queryBuilder->expr()->orX(
+					$queryBuilder->expr()->andX(
+						$queryBuilder->expr()->neq('tt_content.list_type', $queryBuilder->createNamedParameter('')),
+						$queryBuilder->expr()->neq('tt_content.list_type', $queryBuilder->createNamedParameter('0'))
+					),
+					$queryBuilder->expr()->notIn('tt_content.CType', $queryBuilder->createNamedParameter($exclude_ctypes, Connection::PARAM_STR_ARRAY))
+				)
+			]);
 		}
 		
 		if ($my_flexform) {
@@ -155,8 +177,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 			);
 		}
 		
-		//print_r($queryBuilder->getSQL());
-		//echo "<pre>";
+		//print_r($res->getSQL());
 		
 		$result = $res -> orderBy('tt_content.pid')
 		-> addOrderBy('tt_content.sorting')
