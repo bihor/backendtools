@@ -115,7 +115,6 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 					$queryBuilder->expr()->eq('tt_content.hidden', $queryBuilder->createNamedParameter(1))
 				)
 			]);
-			//	"tt_content.deleted=1 OR tt_content.hidden=1"); //ToDO: Schöner machen
 		} else if ($my_c==2) {
 			$res -> andWhere(...[
 				$queryBuilder->expr()->eq('tt_content.deleted', $queryBuilder->createNamedParameter(0)),
@@ -129,7 +128,6 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 					$queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(1))
 					)
 			]);
-			//$res -> andWhere("pages.deleted=1 OR pages.hidden=1"); //ToDO: Schöner machen
 		} else if ($my_p==2) {
 			$res -> andWhere(...[
 				$queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(0)),
@@ -141,25 +139,14 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 		if ($my_value) {
 			if ($my_type == 2) {
 				$res -> andWhere(
-					$queryBuilder->expr()->like('tt_content.CType', $queryBuilder->createNamedParameter($my_value."%"))
+					$queryBuilder->expr()->like('tt_content.CType', $queryBuilder->createNamedParameter($queryBuilder->escapeLikeWildcards($my_value) . "%"))
 				);
 			} else if ($my_type == 1) {
 				$res -> andWhere(
-					$queryBuilder->expr()->like('tt_content.list_type', $queryBuilder->createNamedParameter($my_value."%"))
+					$queryBuilder->expr()->like('tt_content.list_type', $queryBuilder->createNamedParameter($queryBuilder->escapeLikeWildcards($my_value) . "%"))
 				);
 			}
 		} else {
-			//ToDo: hier kommt eine Art Array zurück 
-			/*$exclude_ctypes = $queryBuilder->createNamedParameter(
-                '"'.
-				implode('","', 	$exclude_ctypes).
-				'"');
-			$exclude_ctypes =	'"'.implode('","', 	$exclude_ctypes).'"';
-			$res -> andWhere('
-            (
-                tt_content.list_type!="" AND tt_content.list_type != "0"
-            )
-            OR tt_content.CType NOT IN ('.$exclude_ctypes.')'); */
 			$res -> andWhere(...[
 				$queryBuilder->expr()->orX(
 					$queryBuilder->expr()->andX(
@@ -173,7 +160,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 		
 		if ($my_flexform) {
 			$res -> andWhere(
-				$queryBuilder->expr()->like('tt_content.pi_flexform', $queryBuilder->createNamedParameter("%".$my_flexform."%"))
+				$queryBuilder->expr()->like('tt_content.pi_flexform', $queryBuilder->createNamedParameter("%" . $queryBuilder->escapeLikeWildcards($my_flexform) . "%"))
 			);
 		}
 		
@@ -263,19 +250,29 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 		->removeAll();
 		
 		if ($my_c==1) {
-			$res -> andWhere("tt_content.deleted=1 OR tt_content.hidden=1");
+			$res -> andWhere(...[
+				$queryBuilder->expr()->orX(
+					$queryBuilder->expr()->eq('tt_content.deleted', $queryBuilder->createNamedParameter(1)),
+					$queryBuilder->expr()->eq('tt_content.hidden', $queryBuilder->createNamedParameter(1))
+					)
+			]);
 		} else if ($my_c==2) {
 			$res -> andWhere(...[
-				$queryBuilder->expr()->eq('tt_content.deleted', 0),
-				$queryBuilder->expr()->eq('tt_content.hidden', 0)
+				$queryBuilder->expr()->eq('tt_content.deleted', $queryBuilder->createNamedParameter(0)),
+				$queryBuilder->expr()->eq('tt_content.hidden', $queryBuilder->createNamedParameter(0))
 			]);
 		}
 		if ($my_p==1) {
-			$res -> andWhere("pages.deleted=1 OR pages.hidden=1");
+			$res -> andWhere(...[
+				$queryBuilder->expr()->orX(
+					$queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(1)),
+					$queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(1))
+					)
+			]);
 		} else if ($my_p==2) {
 			$res -> andWhere(...[
-				$queryBuilder->expr()->eq('pages.deleted', 0),
-				$queryBuilder->expr()->eq('pages.hidden', 0)
+				$queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(0)),
+				$queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(0))
 			]);
 		}
 		
