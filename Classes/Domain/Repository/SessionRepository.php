@@ -222,6 +222,30 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 	 */
 	function getPageLinks($my_c, $my_p, $linkto_uid) {
 		$finalArray = [];
+		$referenceArray = [];
+		
+		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('sys_file_reference')->createQueryBuilder();
+		$res = $queryBuilder ->select('uid_foreign') -> from ('sys_file_reference');
+		$queryBuilder
+		->getRestrictions()
+		->removeAll();
+		$res->where(
+		    $queryBuilder->expr()->eq('tablenames', $queryBuilder->createNamedParameter('tt_content'))
+		);
+		$res -> andWhere(...[
+		    $queryBuilder->expr()->orX(
+		        $queryBuilder->expr()->eq('link', $queryBuilder->createNamedParameter("t3://page?uid=" . $linkto_uid)),
+		        $queryBuilder->expr()->like('link', $queryBuilder->createNamedParameter("t3://page?uid=" . $linkto_uid . " %"))
+		    )
+		]);
+		//print_r($res->getSQL());
+		$result = $res -> execute();
+		//print_r($queryBuilder->getParameters());
+		
+		foreach($result as $row) {
+		    $referenceArray[] = $row['uid_foreign'];
+		}
+		//var_dump($referenceArray);
 		
 		// Links in tt_content und sys_file_reference. Query aufbauen
 		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('tt_content')->createQueryBuilder();
@@ -277,11 +301,19 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 		}
 		
 		// Das Haupt-Where
-		$res -> andWhere("tt_content.bodytext LIKE '%\"t3://page?uid=".$linkto_uid."\"%'
- OR tt_content.header_link='t3://page?uid=".$linkto_uid."'
- OR tt_content.header_link LIKE 't3://page?uid=".$linkto_uid." %'
- OR tt_content.uid IN (SELECT uid_foreign FROM sys_file_reference WHERE tablenames='tt_content' AND (link='t3://page?uid=".$linkto_uid."' OR link LIKE 't3://page?uid=".$linkto_uid." %'))");
-		
+		$res -> andWhere(...[
+		    $queryBuilder->expr()->orX(
+		        $queryBuilder->expr()->like('tt_content.bodytext', $queryBuilder->createNamedParameter('%"t3://page?uid=' . $linkto_uid . '"%')),
+		        $queryBuilder->expr()->eq('tt_content.header_link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid)),
+		        $queryBuilder->expr()->like('tt_content.header_link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid . ' %')),
+		        $queryBuilder->expr()->in('tt_content.uid', $queryBuilder->createNamedParameter($referenceArray, Connection::PARAM_INT_ARRAY))
+		    )
+		]);
+//		$res -> andWhere("tt_content.bodytext LIKE '%\"t3://page?uid=".$linkto_uid."\"%'
+// OR tt_content.header_link='t3://page?uid=".$linkto_uid."'
+// OR tt_content.header_link LIKE 't3://page?uid=".$linkto_uid." %'
+// OR tt_content.uid IN (SELECT uid_foreign FROM sys_file_reference WHERE tablenames='tt_content' AND (link='t3://page?uid=".$linkto_uid."' OR link LIKE 't3://page?uid=".$linkto_uid." %'))");
+		//print_r($res->getSQL());
 		$result = $res -> orderBy('tt_content.pid')
 		-> addOrderBy('tt_content.sorting')
 		-> execute();
@@ -321,17 +353,25 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 		->removeAll();
 		
 		if ($my_c==1) {
-			$res -> andWhere("deleted=1 OR hidden=1");
+			$res -> andWhere(...[
+			    $queryBuilder->expr()->orX(
+			        $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(1)),
+			        $queryBuilder->expr()->eq('hidden', $queryBuilder->createNamedParameter(1))
+			    )
+			]);
 		} else if ($my_c==2) {
 			$res -> andWhere(...[
 				$queryBuilder->expr()->eq('deleted', 0),
 				$queryBuilder->expr()->eq('hidden', 0)
 			]);
 		}
-		$res -> andWhere("bodytext LIKE '%\"t3://page?uid=".$linkto_uid."\"%'
- OR internalurl='t3://page?uid=".$linkto_uid."'
- OR internalurl LIKE 't3://page?uid=".$linkto_uid." %'");
-		
+		$res -> andWhere(...[
+		    $queryBuilder->expr()->orX(
+		        $queryBuilder->expr()->like('bodytext', $queryBuilder->createNamedParameter('%"t3://page?uid=' . $linkto_uid . '"%')),
+		        $queryBuilder->expr()->eq('internalurl', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid)),
+		        $queryBuilder->expr()->like('internalurl', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid . ' %'))
+		    )
+		]);
 		$result = $res -> orderBy('pid', 'ASC')
 		-> addOrderBy('tstamp', 'DESC')
 		-> execute();
@@ -357,7 +397,9 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 			'ref',
 			$queryBuilder->expr()->eq('tx_news_domain_model_news.uid', $queryBuilder->quoteIdentifier('ref.uid_foreign'))
 		)
-		-> andWhere("ref.tablenames='tx_news_domain_model_news'");
+		-> andWhere(
+		    $queryBuilder->expr()->eq('ref.tablenames', $queryBuilder->quoteIdentifier('tx_news_domain_model_news'))
+		);
 		
 		// Restricions
 		$queryBuilder
@@ -365,14 +407,25 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 		->removeAll();
 		
 		if ($my_c==1) {
-			$res -> andWhere("tx_news_domain_model_news.deleted=1 OR tx_news_domain_model_news.hidden=1");
+			$res -> andWhere(...[
+			    $queryBuilder->expr()->orX(
+			        $queryBuilder->expr()->eq('tx_news_domain_model_news.deleted', $queryBuilder->createNamedParameter(1)),
+			        $queryBuilder->expr()->eq('tx_news_domain_model_news.hidden', $queryBuilder->createNamedParameter(1))
+			    )
+			]);
 		} else if ($my_c==2) {
 			$res -> andWhere(...[
 				$queryBuilder->expr()->eq('tx_news_domain_model_news.deleted', 0),
 				$queryBuilder->expr()->eq('tx_news_domain_model_news.hidden', 0)
 			]);
 		}
-		$res -> andWhere("ref.link='t3://page?uid=".$linkto_uid."' OR ref.link LIKE 't3://page?uid=".$linkto_uid." %'");
+		$res -> andWhere(...[
+		    $queryBuilder->expr()->orX(
+		        $queryBuilder->expr()->eq('ref.link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid)),
+		        $queryBuilder->expr()->like('ref.link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid . ' %'))
+		    )
+		]);
+		//$res -> andWhere("ref.link='t3://page?uid=".$linkto_uid."' OR ref.link LIKE 't3://page?uid=".$linkto_uid." %'");
 		
 		$result = $res -> orderBy('tx_news_domain_model_news.pid', 'ASC')
 		-> addOrderBy('tx_news_domain_model_news.tstamp', 'DESC')
@@ -406,15 +459,25 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 		->removeAll();
 			
 		if ($my_c==1) {
-			$res -> andWhere("tx_news_domain_model_news.deleted=1 OR tx_news_domain_model_news.hidden=1");
+		    $res -> andWhere(...[
+		        $queryBuilder->expr()->orX(
+		            $queryBuilder->expr()->eq('tx_news_domain_model_news.deleted', $queryBuilder->createNamedParameter(1)),
+		            $queryBuilder->expr()->eq('tx_news_domain_model_news.hidden', $queryBuilder->createNamedParameter(1))
+		        )
+		    ]);
 		} else if ($my_c==2) {
 			$res -> andWhere(...[
 				$queryBuilder->expr()->eq('tx_news_domain_model_news.deleted', 0),
 				$queryBuilder->expr()->eq('tx_news_domain_model_news.hidden', 0)
 			]);
 		}
-		$res -> andWhere("tx_news_domain_model_link.uri='t3://page?uid=".$linkto_uid."' OR tx_news_domain_model_link.uri LIKE 't3://page?uid=".$linkto_uid." %'");
-			
+		//$res -> andWhere("tx_news_domain_model_link.uri='t3://page?uid=".$linkto_uid."' OR tx_news_domain_model_link.uri LIKE 't3://page?uid=".$linkto_uid." %'");
+		$res -> andWhere(...[
+		    $queryBuilder->expr()->orX(
+		        $queryBuilder->expr()->eq('tx_news_domain_model_link.uri', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid)),
+		        $queryBuilder->expr()->like('tx_news_domain_model_link.uri', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid . ' %'))
+		    )
+		]);
 		$result = $res -> orderBy('tx_news_domain_model_news.pid', 'ASC')
 		-> addOrderBy('tx_news_domain_model_news.tstamp', 'DESC')
 		-> execute();
