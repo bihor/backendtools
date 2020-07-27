@@ -397,10 +397,9 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 			'ref',
 			$queryBuilder->expr()->eq('tx_news_domain_model_news.uid', $queryBuilder->quoteIdentifier('ref.uid_foreign'))
 		)
-		-> andWhere(
-		    $queryBuilder->expr()->eq('ref.tablenames', $queryBuilder->quoteIdentifier('tx_news_domain_model_news'))
+		->where(
+		    $queryBuilder->expr()->eq('tablenames', $queryBuilder->createNamedParameter('tx_news_domain_model_news'))
 		);
-		
 		// Restricions
 		$queryBuilder
 		->getRestrictions()
@@ -425,7 +424,6 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 		        $queryBuilder->expr()->like('ref.link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid . ' %'))
 		    )
 		]);
-		//$res -> andWhere("ref.link='t3://page?uid=".$linkto_uid."' OR ref.link LIKE 't3://page?uid=".$linkto_uid." %'");
 		
 		$result = $res -> orderBy('tx_news_domain_model_news.pid', 'ASC')
 		-> addOrderBy('tx_news_domain_model_news.tstamp', 'DESC')
