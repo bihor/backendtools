@@ -516,17 +516,25 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 		->removeAll();
 		
 		if ($my_c==1) {
-			$res -> andWhere("deleted=1 OR hidden=1");
+			$res -> andWhere(...[
+				$queryBuilder->expr()->orX(
+					$queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(1)),
+					$queryBuilder->expr()->eq('hidden', $queryBuilder->createNamedParameter(1))
+				)
+			]);
 		} else if ($my_c==2) {
 			$res -> andWhere(...[
 				$queryBuilder->expr()->eq('deleted', 0),
 				$queryBuilder->expr()->eq('hidden', 0)
 			]);
 		}
-		$res -> andWhere("longdesc LIKE '%\"t3://page?uid=".$linkto_uid."\"%'
- OR link='t3://page?uid=".$linkto_uid."'
- OR link LIKE 't3://page?uid=".$linkto_uid." %'");
-		
+		$res -> andWhere(...[
+			$queryBuilder->expr()->orX(
+				$queryBuilder->expr()->like('longdesc', $queryBuilder->createNamedParameter('%"t3://page?uid=' . $linkto_uid . '"%')),
+				$queryBuilder->expr()->eq('link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid)),
+				$queryBuilder->expr()->like('link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid . ' %'))
+			)
+		]);		
 		$result = $res -> orderBy('pid', 'ASC')
 		-> addOrderBy('tstamp', 'DESC')
 		-> execute();
@@ -552,23 +560,33 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 			'ref',
 			$queryBuilder->expr()->eq('tx_camaliga_domain_model_content.uid', $queryBuilder->quoteIdentifier('ref.uid_foreign'))
 		)
-		-> andWhere("ref.tablenames='tx_camaliga_domain_model_content'");
-			
+		->where(
+			$queryBuilder->expr()->eq('tablenames', $queryBuilder->createNamedParameter('tx_camaliga_domain_model_content'))
+		);			
 		// Restricions
 		$queryBuilder
 		->getRestrictions()
 		->removeAll();
-			
+		
 		if ($my_c==1) {
-			$res -> andWhere("tx_camaliga_domain_model_content.deleted=1 OR tx_camaliga_domain_model_content.hidden=1");
+			$res -> andWhere(...[
+				$queryBuilder->expr()->orX(
+					$queryBuilder->expr()->eq('tx_camaliga_domain_model_content.deleted', $queryBuilder->createNamedParameter(1)),
+					$queryBuilder->expr()->eq('tx_camaliga_domain_model_content.hidden', $queryBuilder->createNamedParameter(1))
+				)
+			]);
 		} else if ($my_c==2) {
 			$res -> andWhere(...[
 				$queryBuilder->expr()->eq('tx_camaliga_domain_model_content.deleted', 0),
 				$queryBuilder->expr()->eq('tx_camaliga_domain_model_content.hidden', 0)
 			]);
 		}
-		$res -> andWhere("ref.link='t3://page?uid=".$linkto_uid."' OR ref.link LIKE 't3://page?uid=".$linkto_uid." %'");
-			
+		$res -> andWhere(...[
+			$queryBuilder->expr()->orX(
+				$queryBuilder->expr()->eq('ref.link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid)),
+				$queryBuilder->expr()->like('ref.link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid . ' %'))
+			)
+		]);		
 		$result = $res -> orderBy('tx_camaliga_domain_model_content.pid', 'ASC')
 		-> addOrderBy('tx_camaliga_domain_model_content.tstamp', 'DESC')
 		-> execute();
@@ -603,7 +621,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 		$statement = $queryBuilder
 			->select('*')
 			->from($table)
-			->where($queryBuilder->expr()->like('mime_type', '"image%"'))
+			->where($queryBuilder->expr()->like('mime_type', $queryBuilder->createNamedParameter('image%')))
 			->orderBy('name', 'ASC')
 			->execute();
 		while ($row = $statement->fetch()) {
@@ -648,7 +666,9 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 				'tt_content',
 				$queryBuilder->expr()->eq('sys_file_reference.uid_foreign', $queryBuilder->quoteIdentifier('tt_content.uid'))
 			)
-			-> andWhere('sys_file_reference.tablenames = "tt_content"')
+			->where(
+				$queryBuilder->expr()->eq('sys_file_reference.tablenames', $queryBuilder->createNamedParameter('tt_content'))
+			)
 			->orderBy('tt_pid', 'ASC');
 		//print_r($queryBuilder->getSQL());
 		$result = $res -> execute();
@@ -678,9 +698,11 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 					'alternative',
 					'uid_local',
 					'tablenames'
-				]) -> from ('sys_file_reference')
-				-> andWhere('tablenames != "tt_content"')
-				->orderBy('uid', 'ASC');
+			]) -> from ('sys_file_reference')
+			->where(
+				$queryBuilder->expr()->neq('tablenames', $queryBuilder->createNamedParameter('tt_content'))
+			)
+			->orderBy('uid', 'ASC');
 			//print_r($queryBuilder->getSQL());
 			$result = $res -> execute();
 			foreach($result as $row) {
