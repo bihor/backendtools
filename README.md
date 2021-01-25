@@ -1,6 +1,6 @@
 # backendtools
 
-version 1.7.4
+version 1.7.5
 
 7 admin tools for extensions, slug, redirects, files, images and links:
 extensionlist, Slug vs. RealURL, import redirects, delete unused files, images with no title, unzip and linklist.

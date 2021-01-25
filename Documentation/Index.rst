@@ -55,3 +55,4 @@ Backend tools
 
 	Introduction/Index
 	User/Index
+	Changelog/Index

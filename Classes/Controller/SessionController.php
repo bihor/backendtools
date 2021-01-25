@@ -1,5 +1,6 @@
 <?php
 namespace Fixpunkt\Backendtools\Controller;
+
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Domain\Repository\BackendUserRepository;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
@@ -47,7 +48,8 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 	 *
 	 * @param \Fixpunkt\Backendtools\Domain\Repository\SessionRepository $sessionRepository
 	 */
-	public function injectSessionRepository(\Fixpunkt\Backendtools\Domain\Repository\SessionRepository $sessionRepository) {
+	public function injectSessionRepository(\Fixpunkt\Backendtools\Domain\Repository\SessionRepository $sessionRepository)
+	{
 		$this->sessionRepository = $sessionRepository;
 	}
 	
@@ -60,7 +62,6 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     {
     	$beuser_id = $GLOBALS['BE_USER']->user['uid']; 
     	//$pageRep = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
-    	//$domains = $this->sessionRepository->getDomains();
     	$result = $this->sessionRepository->findByAction('list', $beuser_id);
  		if ($result->count() == 0) {
  			$new = TRUE;
@@ -131,25 +132,6 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	}
     	
     	$pages = $this->sessionRepository->getPagesWithExtensions($my_c, $my_p, $my_type, $my_value, $my_flexform, $my_exclude);
-    	
-    	$fieldConfig = $GLOBALS['TCA']['pages']['columns']['slug']['config'];
-    	$slugHelper = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\DataHandling\SlugHelper::class, 'pages', 'slug', $fieldConfig);
-    	
-    	$connection = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Database\ConnectionPool::class)->getConnectionForTable('pages');
-    	$queryBuilder = $connection->createQueryBuilder();
-    	$queryBuilder->getRestrictions()->removeAll()->add(\TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction::class));
-    	
-    	foreach ($pages as $key => $page) {
-    		// URL ermitteln
-    		$record = $queryBuilder->select('*')->from('pages')->where(
-    			$queryBuilder->expr()->eq('uid', $page['pid'])
-    		)->execute()->fetch();
-    		//$record = $statement->fetch();
-			if (is_array($record)) {
-				// TODO: überprüfen
-				$pages[$key]['slug'] = $slugHelper->generate($record, $record['pid']);
-			}
-    	}
     	
     	// Assign
     	$this->view->assign('my_p', $my_p);
@@ -738,7 +720,8 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
      *
      * @return  string     Succesful or not
      */
-    function unzip($zip_filename, $zip_extract_path) {
+    function unzip($zip_filename, $zip_extract_path)
+    {
     	$result ='';
 		try{
 			$zip_obj = new \ZipArchive;
@@ -771,7 +754,8 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 	 * @param integer $precision
 	 * @return string
 	 */
-	function formatBytes($size, $precision = 2)	{
+	function formatBytes($size, $precision = 2)
+	{
 		$base = log($size) / log(1024);
 		$suffixes = array('', 'k', 'M', 'G', 'T');
 	

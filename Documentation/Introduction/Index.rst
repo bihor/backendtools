@@ -71,4 +71,4 @@ and share it with the TYPO3 community.
 TODOs
 -----
 
-Add the domain to the RealURL vs. slug list. Check generated slug.
+Add the domain to the RealURL vs. slug list. 

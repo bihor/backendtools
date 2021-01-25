@@ -36,14 +36,17 @@ use TYPO3\CMS\Core\Database\Connection;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  *
  */
-class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
+class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
+{
 	
 	/**
 	 * findByAction ersetzen, wegen user-id-Abfrage
+	 * 
 	 * @param	string	$action		Action
 	 * @param	int		$beuser		BE-user-ID
 	 */
-	public function findByAction($action, $beuser) {
+	public function findByAction($action, $beuser)
+	{
 		$constraints = array();
 		$query = $this->createQuery();
 		$constraints[] = $query->equals('action', $action);
@@ -56,6 +59,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 	
 	/**
 	 * Get list of pages/elements with extensions
+	 * 
 	 * @param	int		$my_c			content visibility
 	 * @param	int		$my_p			pages visibility
 	 * @param	int		$my_type		type
@@ -64,9 +68,9 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 	 * @param	string	$my_exclude		exclude type
 	 * @return array
 	 */
-	public function getPagesWithExtensions($my_c, $my_p, $my_type, $my_value, $my_flexform, $my_exclude) {
+	public function getPagesWithExtensions($my_c, $my_p, $my_type, $my_value, $my_flexform, $my_exclude)
+	{
 		$pages = [];
-		//$domains = $this->getDomains();
 		//$PageRepository = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
 		$siteFinder = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Site\SiteFinder::class);
 		$exclude_ctypes = [
@@ -93,6 +97,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 			'tt_content.list_type',
 			'tt_content.pi_flexform',
 			'pages.title',
+		    'pages.slug',
 			'pages.deleted AS pdeleted',
 			'pages.hidden AS phidden'
 		]) -> from ('tt_content')
@@ -220,7 +225,8 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 	 *
 	 * @return  array     Content-Elemente
 	 */
-	function getPageLinks($my_c, $my_p, $linkto_uid) {
+	function getPageLinks($my_c, $my_p, $linkto_uid)
+	{
 		$finalArray = [];
 		$referenceArray = [];
 		
@@ -258,6 +264,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 			'tt_content.header',
 			'tt_content.sys_language_uid',
 			'pages.title',
+		    'pages.slug',
 			'pages.deleted AS pdeleted',
 			'pages.hidden AS phidden'
 		]) -> from ('tt_content')
@@ -333,7 +340,8 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 	 *
 	 * @return  array     Content-Elemente
 	 */
-	function getNewsLinks($my_c, $my_p, $linkto_uid) {
+	function getNewsLinks($my_c, $my_p, $linkto_uid)
+	{
 		$finalArray = [];
 		
 		// Links in news. Query aufbauen
@@ -496,7 +504,8 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 	 *
 	 * @return  array     Content-Elemente
 	 */
-	function getCamaligaLinks($my_c, $my_p, $linkto_uid) {
+	function getCamaligaLinks($my_c, $my_p, $linkto_uid)
+	{
 		$finalArray = [];
 		
 		// Links in camaliga. Query aufbauen
@@ -606,10 +615,10 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 	 *
 	 * @return  array     Bilder
 	 */
-	function getImagesWithout($img_without, $img_other) {
+	function getImagesWithout($img_without, $img_other)
+	{
 		//$pageRep = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
 	    $siteFinder = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Site\SiteFinder::class);
-		//$domains = $this->getDomains();
 		$fileArray = [];
 		//$fileOrder = [];
 		$referenceArray = [];
@@ -756,12 +765,14 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 	
 	/**
 	 * setAltOrTitle
+	 * 
 	 * @param	int		$uid			uid of sys_file_reference
 	 * @param	string	$alternative	alt-tag
 	 * @param	string	$title			title-tag
 	 * @return	boolean
 	 */
-	public function setAltOrTitle($uid, $alternative, $title) {
+	public function setAltOrTitle($uid, $alternative, $title)
+	{
 		if ($alternative) {
 			$field = 'alternative';
 			$value = $alternative;
@@ -789,7 +800,8 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 	 *
 	 * @return array
 	 */
-	public function getPagesRealurl() {
+	public function getPagesRealurl()
+	{
 		$pages = [];
 		$table = 'tx_realurl_pathdata';
 		try {
@@ -813,10 +825,12 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 	
 	/**
 	 * Get list of pages with slug-path
+	 * 
 	 * @param	int		$hidden			hidden-flag
 	 * @return array
 	 */
-	public function getPagesSlug($hidden) {
+	public function getPagesSlug($hidden)
+	{
 		$pages = [];
 		$table = 'pages';
 		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
@@ -854,47 +868,16 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 	}
 	
 	/**
-	 * Get list of domains: wird nicht mehr gebraucht, da es die Tabelle in TYPO3 10 nicht mehr gibt!
-	 *
-	 * @return array
-	 */
-	public function getDomains() {
-		$domains = array();
-		$table = 'sys_domain';
-		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
-		$statement = $queryBuilder
-			->select('*')
-			->from($table)
-		//	->where($queryBuilder->expr()->eq('hidden', 0))
-			->orderBy('sorting', 'DESC')
-			->execute();
-		while ($row = $statement->fetch()) {
-			// gibt es nicht mehr:
-			//if ($row['redirectTo']) {
-			//	$domain = $row['redirectTo'];
-			//} else {
-				$domain = $row['domainName'];
-			//}
-			if (substr($domain, 0, 4) != 'http') {
-				$domain = 'http://' . $domain;
-			}
-			if (substr($domain, -1) == '/') {
-				$domain = substr($domain, 0, -1);
-			}
-			$domains[$row['pid']] = $domain;
-		}
-		return $domains;
-	}
-	
-	/**
 	 * addRedirect
+	 * 
 	 * @param	string	$from	from link
 	 * @param	string	$to		to link
 	 * @param	int		$regexp	regular expression?
 	 * @param	int		$statuscode	Statuscode, e.g. 301
 	 * @param	int		$createdby	Created by BE-user
 	 */
-	public function addRedirect($from, $to, $regexp, $statuscode, $createdby) {
+	public function addRedirect($from, $to, $regexp, $statuscode, $createdby)
+	{
 		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_redirect');
 		return $queryBuilder
 			->insert('sys_redirect')
@@ -911,4 +894,3 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
 			->execute();
 	}
 }
-?>

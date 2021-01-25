@@ -97,7 +97,7 @@
 			</td>
 			<td><f:if condition="{page.pdeleted} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if> / 
 				<f:if condition="{page.phidden} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
-			<td>{page.title}</td>
+			<td><a href="{page.slug}" target="extern">{page.title}</a></td>
 		</tr>
 	</f:for>
 </tbody>
