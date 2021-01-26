@@ -90,14 +90,14 @@
 				<ex:editLink action="edit" table="pages" uid="{page.pid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=pagesearch">
       				<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-open.svg" width="16" height="16">
       			</ex:editLink>
-      			<a href="/index.php?id={page.pid}&L={page.sys_language_uid}&no_cache=1" target="extern">
+      			<a href="{page.domain}/index.php?id={page.pid}&no_cache=1" target="extern">
       				<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-view.svg" width="16" height="16">
       			</a>
 				{page.pid}
 			</td>
 			<td><f:if condition="{page.pdeleted} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if> / 
 				<f:if condition="{page.phidden} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
-			<td><a href="{page.slug}" target="extern">{page.title}</a></td>
+			<td><a href="{page.domain}{page.slug}" target="extern">{page.title}</a></td>
 		</tr>
 	</f:for>
 </tbody>

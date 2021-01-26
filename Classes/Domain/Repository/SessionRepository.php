@@ -1,6 +1,7 @@
 <?php
 namespace Fixpunkt\Backendtools\Domain\Repository;
 
+use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Connection;
@@ -38,7 +39,13 @@ use TYPO3\CMS\Core\Database\Connection;
  */
 class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 {
-	
+    /**
+     * Site finder
+     *
+     * @var \TYPO3\CMS\Core\Site\SiteFinder
+     */
+    protected $siteFinder = null;
+    
 	/**
 	 * findByAction ersetzen, wegen user-id-Abfrage
 	 * 
@@ -72,7 +79,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 	{
 		$pages = [];
 		//$PageRepository = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
-		$siteFinder = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Site\SiteFinder::class);
+		$this->siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
 		$exclude_ctypes = [
 			"html", "list", "text", "image", "textpic", "textmedia", "bullets", "menu",
 			"search", "mailform", "indexed_search", "login", "header", "rte",
@@ -193,24 +200,10 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 			if ( $row["pdeleted"] ) {
 			    $row['domain'] = '';
 			} else {
-			    $rootLineUtility = new \TYPO3\CMS\Core\Utility\RootlineUtility($row['pid']);
-			    $rootline = $rootLineUtility->get();
-			    $root = array_pop($rootline);
-			    $row['root'] = $root['uid'];
-			    //$row['domain'] = $domains[$root['uid']];
-			    if ($root['is_siteroot']) {
-			        try {
-			            $site = $siteFinder->getSiteByPageId($root['uid']);   // oder $row['pid']);
-				    	$base = $site->getConfiguration()['base'];
-				        $row['domain'] = rtrim($base, '/');
-			        } catch (SiteNotFoundException $e) {
-			            $row['domain'] = '';
-			        }
-			    } else {
-			        $row['domain'] = '';
-			    }
+			    $row['domain'] = $this->getDomain($row['pid'], $row['sys_language_uid']);
 			}
-			$row['csvtitle'] = str_replace(';', ',', str_replace('"', '', $row['title']));
+			$row['csvheader'] = str_replace('"', '\'', $row['header']);
+			$row['csvtitle'] = str_replace('"', '\'', $row['title']);
 			$pages[] = $row;
 		}
 		return $pages;
@@ -229,6 +222,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 	{
 		$finalArray = [];
 		$referenceArray = [];
+		$this->siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
 		
 		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('sys_file_reference')->createQueryBuilder();
 		$res = $queryBuilder ->select('uid_foreign') -> from ('sys_file_reference');
@@ -326,6 +320,11 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 		-> execute();
 		
 		foreach($result as $row) {
+		    if ( $row["pdeleted"] ) {
+		        $row['domain'] = '';
+		    } else {
+		        $row['domain'] = $this->getDomain($row['pid'], $row['sys_language_uid']);
+		    }
 			$finalArray[] = $row;
 		}
 		return $finalArray;
@@ -618,7 +617,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 	function getImagesWithout($img_without, $img_other)
 	{
 		//$pageRep = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
-	    $siteFinder = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Site\SiteFinder::class);
+	    $this->siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
 		$fileArray = [];
 		//$fileOrder = [];
 		$referenceArray = [];
@@ -740,22 +739,9 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 				((($img_without == 5) || ($img_without == 6)) && (($imgArray['meta_title']!='') || ($refArray['ref_title']!='')))) {
 				// neu ab version 1.4.3: final-array enthält reference-Daten statt file-Daten
 				if ($refArray['tt_pid']) {
-				    $rootLineUtility = new \TYPO3\CMS\Core\Utility\RootlineUtility($refArray['tt_pid']);
-				    $rootline = $rootLineUtility->get();
-					$root = array_pop($rootline);
-					$refArray['root'] = $root['uid'];
-					//$refArray['domain'] = $domains[$root['uid']];
-				    //var_dump($refArray);
-				    if ($root['is_siteroot']) {
-				        try {
-				            $site = $siteFinder->getSiteByPageId($root['uid']);  /// oder $refArray['tt_pid']);
-				            $base = $site->getConfiguration()['base'];
-				            $refArray['domain'] = rtrim($base, '/');
-				        } catch (SiteNotFoundException $e) {
-				            $refArray['domain'] = '';
-				        }
-				    }
-				    
+				    $refArray['domain'] = $this->getDomain($refArray['tt_pid'], $refArray['tt_lang']);
+				} else {
+				    $refArray['domain'] = '';
 				}
 				$finalArray[] = $refArray;
 			}
@@ -831,6 +817,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 	 */
 	public function getPagesSlug($hidden)
 	{
+	    $this->siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
 		$pages = [];
 		$table = 'pages';
 		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
@@ -862,9 +849,36 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 				} else {
 					$pages[$uid][$sys_language_uid]['slug_locked'] = 0;
 				}
+				$pages[$uid][$sys_language_uid]['domain'] = $this->getDomain($uid, $sys_language_uid);
 			}
 		}
 		return $pages;
+	}
+	
+	/**
+	 * Get the domain + language of a pages-entry
+	 *
+	 * @param	int		$uid	page-uid
+	 * @param	int		$sys_language_uid	language-uid
+	 * @return string
+	 */
+	protected function getDomain($uid, $sys_language_uid = 0) {
+	    $domain = '';
+	    $rootLineUtility = new \TYPO3\CMS\Core\Utility\RootlineUtility($uid);
+	    $rootline = $rootLineUtility->get();
+	    $root = array_pop($rootline);
+	    if ($root['is_siteroot']) {
+	        try {
+	            $site = $this->siteFinder->getSiteByPageId($root['uid']);   // oder $uid;
+	            $base = $site->getConfiguration()['base'];
+	            $lang = $site->getConfiguration()['languages'];
+	            $lang = $lang[$sys_language_uid]['base'];
+	            $domain = rtrim($base, '/') . rtrim($lang, '/');
+	        } catch (SiteNotFoundException $e) {
+	            $domain = '';
+	        }
+	    }
+	    return $domain;
 	}
 	
 	/**

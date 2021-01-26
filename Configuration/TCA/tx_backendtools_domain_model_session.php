@@ -11,9 +11,6 @@ return [
         'searchFields' => 'action',
         'iconfile' => 'EXT:backendtools/Resources/Public/Icons/tx_backendtools_domain_model_session.gif'
     ],
-    'interface' => [
-        'showRecordFieldList' => 'action, value1, value2, value3, value4, value5, value6, pageel, beuser',
-    ],
     'types' => [
         '1' => ['showitem' => 'action, value1, value2, value3, value4, value5, value6, pageel, beuser'],
     ],

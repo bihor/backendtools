@@ -81,14 +81,14 @@
 				<ex:editLink action="edit" table="pages" uid="{page.uid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=realurl">
       				<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-open.svg" width="16" height="16">
       			</ex:editLink>
-      			<a href="/index.php?id={page.uid}&L={page.sys_language_uid}&no_cache=1" target="extern">
+      			<a href="{page.domain}/index.php?id={page.uid}&no_cache=1" target="extern">
       				<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-view.svg" width="16" height="16">
       			</a>
       			{page.uid}
       		</td>
 			<td>{page.sys_language_uid}</td>
 			<td><f:if condition="{page.hidden} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
-			<td>{page.title}</td>
+			<td><a href="{page.domain}{page.slug}" target="extern">{page.title}</a></td>
 			<td>{page.realurl}</td>
 			<td>{page.slug}</td>
 			<td><f:if condition="{page.slug_locked} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>

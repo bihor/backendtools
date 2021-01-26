@@ -61,7 +61,6 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     public function listAction()
     {
     	$beuser_id = $GLOBALS['BE_USER']->user['uid']; 
-    	//$pageRep = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
     	$result = $this->sessionRepository->findByAction('list', $beuser_id);
  		if ($result->count() == 0) {
  			$new = TRUE;
@@ -144,7 +143,6 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	$this->view->assign('my_outp', $my_outp);
     	$this->view->assign('rows', count($pages));
     	$this->view->assign('pages', $pages);
-    	//$this->view->assign('domains', $domains);
     	$this->view->assign('settings', $this->settings);
     }
     
@@ -523,6 +521,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 	    		$realurl = $pagesRealurl[$key][$langId];
 	    		if ($slug != $realurl) {
 	    			if ($my_s == 1) {
+	    			    // Keine Ahnung, wozu das hier nochmal gut ist
 	    			    $site = '';
 	    			    $rootLineUtility = new \TYPO3\CMS\Core\Utility\RootlineUtility($key);
 	    			    $rootline = $rootLineUtility->get();
@@ -548,8 +547,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 		    			if (($my_e == 0) || (($my_e == 1) && !$realurl) || (($my_e == 2) && $realurl)) {
 			    			$pages[$key] = $value;
 			    			$pages[$key]['uid'] = $key;
-			    			$pages[$key]['slug'] = $slug;
-			    			//$pages[$key]['slug'] = $value['slug'];
+			    			$pages[$key]['slug'] = $slug;   			//$pages[$key]['slug'] = $value['slug'];
 			    			$pages[$key]['realurl'] = $realurl;
 		    			}
 		    		}
