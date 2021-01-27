@@ -513,7 +513,6 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	$pagesRealurl = $this->sessionRepository->getPagesRealurl();
     	$pagesSlug    = $this->sessionRepository->getPagesSlug($my_p);
     	$pages        = [];
-    	$siteFinder   = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Site\SiteFinder::class);
     	
     	foreach ($pagesSlug as $key => $langArray) {
     		foreach ($langArray as $langId => $value) {
@@ -521,33 +520,21 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 	    		$realurl = $pagesRealurl[$key][$langId];
 	    		if ($slug != $realurl) {
 	    			if ($my_s == 1) {
-	    			    // Keine Ahnung, wozu das hier nochmal gut ist
-	    			    $site = '';
-	    			    $rootLineUtility = new \TYPO3\CMS\Core\Utility\RootlineUtility($key);
-	    			    $rootline = $rootLineUtility->get();
-	    			    $root = array_pop($rootline);
-	    			    if ($root['is_siteroot']) {
-	    			        // nur bei Seiten mit Rootline kann man eine SiteConfig finden 
-	    			        try {
-	    			            $site = $siteFinder->getSiteByPageId($root['uid']);   // oder $key;
-	    			        } catch (SiteNotFoundException $e) {
-	    			            $site = '';
-	    			        }
+	    			    // wenn bei der Domainangabe noch ein Pfad drin ist, übernehmen wir hier mal auch den Pfad
+	    			    $base = $value['domain'];
+	    			    if (substr($base, 0, 4) == 'http') {
+	    			        $parse_url = parse_url($base);
+	    			        $base = $parse_url['path'];
 	    			    }
-			    		if ($site) {
-			    			$base = $site->getConfiguration()['base'];
-			    			if (substr($base, 0, 4) == 'http') {
-			    				$parse_url = parse_url($base);
-			    				$base = $parse_url['path'];
-			    			}
-			    			$slug = substr($base, 0, -1) . $slug;
-			    		}
+	    			    $slug2 = rtrim($base, '/') . $slug;
+	    			} else {
+	    			    $slug2 = $slug;
 	    			}
-		    		if ($slug != $realurl) {
+		    		if ($slug2 != $realurl) {
 		    			if (($my_e == 0) || (($my_e == 1) && !$realurl) || (($my_e == 2) && $realurl)) {
 			    			$pages[$key] = $value;
 			    			$pages[$key]['uid'] = $key;
-			    			$pages[$key]['slug'] = $slug;   			//$pages[$key]['slug'] = $value['slug'];
+			    			$pages[$key]['slug2'] = $slug2;   			//$pages[$key]['slug'] = $value['slug'];
 			    			$pages[$key]['realurl'] = $realurl;
 		    			}
 		    		}

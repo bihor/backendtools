@@ -23,17 +23,6 @@
 	<f:form.radio name="my_e" value="0" checked="{my_e} == 0" /> whatever ... RealURL-pagepath.
   </label>
 </div>
-<!--  div style="margin: 10px 0;">Show only 
-  <label class="checkbox-inline">
-	<f:form.radio name="my_p" value="1" checked="{my_p} == 1" /> not visible &nbsp; or
-  </label>
-  <label class="checkbox-inline">
-	<f:form.radio name="my_p" value="2" checked="{my_p} == 2" /> visible &nbsp; or
-  </label>
-  <label class="checkbox-inline">
-	<f:form.radio name="my_p" value="0" checked="{my_p} == 0" /> all ... pages.
-  </label>
-</div -->
 
 </div><div class="col-md-3">
 <div style="margin: 10px 0;">Site Configuration check:
@@ -90,7 +79,7 @@
 			<td><f:if condition="{page.hidden} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
 			<td><a href="{page.domain}{page.slug}" target="extern">{page.title}</a></td>
 			<td>{page.realurl}</td>
-			<td>{page.slug}</td>
+			<td>{page.slug2}</td>
 			<td><f:if condition="{page.slug_locked} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
 		</tr>
 	</f:for>

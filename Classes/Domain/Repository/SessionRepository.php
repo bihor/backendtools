@@ -856,7 +856,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 	}
 	
 	/**
-	 * Get the domain + language of a pages-entry
+	 * Get the domain + extra-path + language of a pages-entry
 	 *
 	 * @param	int		$uid	page-uid
 	 * @param	int		$sys_language_uid	language-uid
@@ -873,6 +873,11 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 	            $base = $site->getConfiguration()['base'];
 	            $lang = $site->getConfiguration()['languages'];
 	            $lang = $lang[$sys_language_uid]['base'];
+	            if ((substr($base, 0, 4) == 'http') && (substr($lang, 0, 4) == 'http')) {
+	                // wenn die Domain beides mal benutzt wird, entfernen wir sie bei der Sprache
+	                $parse_url = parse_url($lang);
+	                $lang = $parse_url['path'];
+	            }
 	            $domain = rtrim($base, '/') . rtrim($lang, '/');
 	        } catch (SiteNotFoundException $e) {
 	            $domain = '';
