@@ -11,7 +11,8 @@
 Changelog
 =========
 
-Version 2.0.1:
+Version 2.0.2:
+Order by added to the extension list view.
 Bugfix: Domain and language handling.
 
 Version 2.0.0:

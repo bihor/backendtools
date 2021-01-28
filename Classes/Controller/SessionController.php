@@ -116,6 +116,12 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	if ($this->request->hasArgument('my_outp')) {
     		$my_outp = intval($this->request->getArgument('my_outp'));		// output
     	} else $my_outp = 0;
+    	if ($this->request->hasArgument('my_orderby')) {
+    	    $my_orderby = intval($this->request->getArgument('my_orderby'));		// order by
+    	} else $my_orderby = 0;
+    	if ($this->request->hasArgument('my_direction')) {
+    	    $my_direction = intval($this->request->getArgument('my_direction'));		// order direction
+    	} else $my_direction = 0;
     	
     	if ($new) {
     		$objectManager = GeneralUtility::makeInstance(ObjectManager::class);
@@ -130,7 +136,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     		$this->sessionRepository->update($default);
     	}
     	
-    	$pages = $this->sessionRepository->getPagesWithExtensions($my_c, $my_p, $my_type, $my_value, $my_flexform, $my_exclude);
+    	$pages = $this->sessionRepository->getPagesWithExtensions($my_c, $my_p, $my_type, $my_value, $my_flexform, $my_exclude, $my_orderby, $my_direction);
     	
     	// Assign
     	$this->view->assign('my_p', $my_p);
@@ -141,6 +147,8 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	$this->view->assign('my_flexform', $my_flexform);
     	$this->view->assign('my_page', $my_page);
     	$this->view->assign('my_outp', $my_outp);
+    	$this->view->assign('my_orderby', $my_orderby);
+    	$this->view->assign('my_direction', $my_direction);
     	$this->view->assign('rows', count($pages));
     	$this->view->assign('pages', $pages);
     	$this->view->assign('settings', $this->settings);

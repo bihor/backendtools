@@ -73,9 +73,11 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 	 * @param	string	$my_value		type value
 	 * @param	string	$my_flexform	flexform value
 	 * @param	string	$my_exclude		exclude type
+	 * @param	int		$my_orderby		order by
+	 * @param	int		$my_direction	order direction
 	 * @return array
 	 */
-	public function getPagesWithExtensions($my_c, $my_p, $my_type, $my_value, $my_flexform, $my_exclude)
+	public function getPagesWithExtensions($my_c, $my_p, $my_type, $my_value, $my_flexform, $my_exclude, $my_orderby, $my_direction)
 	{
 		$pages = [];
 		//$PageRepository = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
@@ -176,11 +178,25 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 			);
 		}
 		
+		$asc = ($my_direction == 1) ? 'DESC' : 'ASC';
+		switch ($my_orderby) {
+		    case 1: $sort = 'tt_content.uid'; break;
+		    case 2: $sort = 'tt_content.sys_language_uid'; break;
+		    case 3: $sort = 'tt_content.colPos'; break;
+		    case 4: $sort = 'tt_content.header'; break;
+		    case 5: $sort = 'tt_content.CType'; break;
+		    case 6: $sort = 'tt_content.list_type'; break;
+		    case 7: $sort = 'pages.title'; break;
+		    default: $sort = 'tt_content.pid';
+		}
+		if ($my_orderby == 0) {
+		    $res -> orderBy($sort, $asc) -> addOrderBy('tt_content.sorting');
+		} else {
+		    $res -> orderBy($sort, $asc) -> addOrderBy('tt_content.pid');
+		}
 		//print_r($res->getSQL());
+		$result = $res-> execute();
 		
-		$result = $res -> orderBy('tt_content.pid')
-		-> addOrderBy('tt_content.sorting')
-		-> execute();
 		//print_r($queryBuilder->getParameters());
 		foreach($result as $row) {
 			$subject = $row['pi_flexform'];
