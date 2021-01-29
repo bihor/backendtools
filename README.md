@@ -11,4 +11,4 @@ https://docs.typo3.org/p/fixpunkt/backendtools/master/en-us/
 Version 2.0.0: refactoring. See changelog:
 https://docs.typo3.org/p/fixpunkt/backendtools/master/en-us/Changelog/Index.html
 
-Version 2.0.2: order by added to the list view. Bugfixing domain + language.
+Version 2.0.3: order by added to the list view. Bugfixing domain + language.

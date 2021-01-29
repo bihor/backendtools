@@ -895,6 +895,15 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 	                $lang = $parse_url['path'];
 	            }
 	            $domain = rtrim($base, '/') . rtrim($lang, '/');
+	            if ((substr($base, 0, 4) != 'http') && (strlen($base) > 4)) {
+	                if (substr($base, 0, 2) == '//') {
+    	                $domain = 'http:' . $domain;
+	                } else if (substr($base, 0, 1) == '/') {
+	                    $domain = 'http:/' . $domain;
+	                } else {
+	                    $domain = 'http://' . $domain;
+	                }
+	            }
 	        } catch (SiteNotFoundException $e) {
 	            $domain = '';
 	        }
