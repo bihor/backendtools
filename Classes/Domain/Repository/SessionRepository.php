@@ -213,6 +213,16 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 					$row['actions'] = $matches[2];
 				}
 			}
+			if ($row['sys_language_uid'] > 0) {
+			    // wir brauchen noch die Übersetzungen aus pages!
+			    $language_result = $this->getL10n($row['pid'], $row['sys_language_uid']);
+			    foreach ($language_result as $language_row) {
+			        $row['title'] = $language_row['title'];
+			        $row['slug'] = $language_row['slug'];
+			        $row['pdeleted'] = $language_row['pdeleted'];
+			        $row['phidden'] = $language_row['phidden'];
+			    }
+			}
 			if ( $row["pdeleted"] ) {
 			    $row['domain'] = '';
 			} else {
@@ -340,6 +350,16 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 		        $row['domain'] = '';
 		    } else {
 		        $row['domain'] = $this->getDomain($row['pid'], $row['sys_language_uid']);
+		    }
+		    if ($row['sys_language_uid'] > 0) {
+		        // wir brauchen noch die Übersetzungen aus pages!
+		        $language_result = $this->getL10n($row['pid'], $row['sys_language_uid']);
+		        foreach ($language_result as $language_row) {
+		            $row['title'] = $language_row['title'];
+		            $row['slug'] = $language_row['slug'];
+		            $row['pdeleted'] = $language_row['pdeleted'];
+		            $row['phidden'] = $language_row['phidden'];
+		        }
 		    }
 			$finalArray[] = $row;
 		}
@@ -872,13 +892,40 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 	}
 	
 	/**
+	 * Get a translation to a page-record
+	 *
+	 * @param	int		$parent	page-uid
+	 * @param	int		$sys_language_uid	language-uid
+	 * @return array
+	 */
+	function getL10n($parent, $sys_language_uid)
+	{
+	    $queryBuilderPages = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('pages')->createQueryBuilder();
+	    $language_res = $queryBuilderPages ->select(...[
+	        'pages.title',
+	        'pages.slug',
+	        'pages.deleted AS pdeleted',
+	        'pages.hidden AS phidden'
+	    ]) -> from ('pages');
+	    $queryBuilderPages
+	    ->getRestrictions()
+	    ->removeAll();
+	    $language_res -> andWhere(...[
+	        $queryBuilderPages->expr()->eq('l10n_parent', $queryBuilderPages->createNamedParameter($parent, \PDO::PARAM_INT)),
+	        $queryBuilderPages->expr()->eq('sys_language_uid', $queryBuilderPages->createNamedParameter($sys_language_uid, \PDO::PARAM_INT))
+	    ]);
+	    return $language_res-> execute();
+	}
+	
+	/**
 	 * Get the domain + extra-path + language of a pages-entry
 	 *
 	 * @param	int		$uid	page-uid
 	 * @param	int		$sys_language_uid	language-uid
 	 * @return string
 	 */
-	protected function getDomain($uid, $sys_language_uid = 0) {
+	protected function getDomain($uid, $sys_language_uid = 0)
+	{
 	    $domain = '';
 	    $rootLineUtility = new \TYPO3\CMS\Core\Utility\RootlineUtility($uid);
 	    $rootline = $rootLineUtility->get();
@@ -897,7 +944,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 	            $domain = rtrim($base, '/') . rtrim($lang, '/');
 	            if ((substr($base, 0, 4) != 'http') && (strlen($base) > 4)) {
 	                if (substr($base, 0, 2) == '//') {
-    	                $domain = 'http:' . $domain;
+    	            // muss nicht sein:   $domain = 'http:' . $domain;
 	                } else if (substr($base, 0, 1) == '/') {
 	                    $domain = 'http:/' . $domain;
 	                } else {

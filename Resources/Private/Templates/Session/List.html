@@ -111,7 +111,7 @@ uid;lang.;colPos;deleted;hidden;header;CType;list_type;FlexForm actions;uid;dele
 				<tr{f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
 					<td>
 						<ex:editLink action="edit" table="tt_content" uid="{page.uid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=list">
-		      				<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-open.svg" width="16" height="16">
+		      				<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/{svgs}actions/actions-document-open.svg" width="16" height="16">
 		      			</ex:editLink>
 						{page.uid}
 					</td>
@@ -125,10 +125,10 @@ uid;lang.;colPos;deleted;hidden;header;CType;list_type;FlexForm actions;uid;dele
 					<td><f:format.raw>{page.actions}</f:format.raw></td>
 					<td>
 						<ex:editLink action="edit" table="pages" uid="{page.pid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=list">
-		      				<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-open.svg" width="16" height="16">
+		      				<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/{svgs}actions/actions-document-open.svg" width="16" height="16">
 		      			</ex:editLink>
 		      			<a href="{page.domain}/index.php?id={page.pid}&no_cache=1" target="extern">
-		      				<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-view.svg" width="16" height="16">
+		      				<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/{svgs}actions/actions-document-view.svg" width="16" height="16">
 		      			</a>
 						{page.pid}
 					</td>
