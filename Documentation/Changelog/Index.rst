@@ -11,11 +11,12 @@
 Changelog
 =========
 
-Version 2.0.4:
+Version 2.0.5:
 Order by added to the extension list view.
-Bugfixing: use translated values when L>0. 
-Bugfixing: domain + language configuration.
-Bugfixing: icons for TYPO3 10.
+Bugfix: use translated values when L>0.
+Bugfix: edit page links when L>0.
+Bugfix: domain + language configuration.
+Bugfix: icons for TYPO3 10.
 
 Version 2.0.0:
 Refactoring: large modification of the queries.

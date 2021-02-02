@@ -87,11 +87,11 @@
 				<f:if condition="{page.tthidden} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
 			<td>{page.header}</td>
 			<td>
-				<ex:editLink action="edit" table="pages" uid="{page.pid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=pagesearch">
-      				<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-open.svg" width="16" height="16">
+				<ex:editLink action="edit" table="pages" uid="{page.pl10n}" language="{page.sys_language_uid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=pagesearch">
+      				<core:icon identifier="actions-open" size="small" />
       			</ex:editLink>
       			<a href="{page.domain}/index.php?id={page.pid}&no_cache=1" target="extern">
-      				<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-view.svg" width="16" height="16">
+      				<core:icon identifier="actions-document-view" size="small" />
       			</a>
 				{page.pid}
 			</td>

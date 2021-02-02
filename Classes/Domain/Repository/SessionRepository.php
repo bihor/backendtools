@@ -221,7 +221,10 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 			        $row['slug'] = $language_row['slug'];
 			        $row['pdeleted'] = $language_row['pdeleted'];
 			        $row['phidden'] = $language_row['phidden'];
+			        $row['pl10n'] = $language_row['pl10n'];
 			    }
+			} else {
+			    $row['pl10n'] = $row['pid'];
 			}
 			if ( $row["pdeleted"] ) {
 			    $row['domain'] = '';
@@ -359,7 +362,10 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 		            $row['slug'] = $language_row['slug'];
 		            $row['pdeleted'] = $language_row['pdeleted'];
 		            $row['phidden'] = $language_row['phidden'];
+		            $row['pl10n'] = $language_row['pl10n'];
 		        }
+		    } else {
+		        $row['pl10n'] = $row['pid'];
 		    }
 			$finalArray[] = $row;
 		}
@@ -902,6 +908,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 	{
 	    $queryBuilderPages = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('pages')->createQueryBuilder();
 	    $language_res = $queryBuilderPages ->select(...[
+	        'pages.uid AS pl10n',
 	        'pages.title',
 	        'pages.slug',
 	        'pages.deleted AS pdeleted',

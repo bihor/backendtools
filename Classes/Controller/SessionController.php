@@ -152,7 +152,6 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	$this->view->assign('rows', count($pages));
     	$this->view->assign('pages', $pages);
     	$this->view->assign('settings', $this->settings);
-    	$this->view->assign('svgs', $this->checkSvgPath());
     }
     
     /**
@@ -754,20 +753,5 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 		$suffixes = array('', 'k', 'M', 'G', 'T');
 	
 		return round(pow(1024, $base - floor($base)), $precision) .' '. $suffixes[floor($base)] .'B';
-	}
-	
-	/**
-	 * Check if additional path to svg-icons needed
-	 *
-	 * @return string
-	 */
-	function checkSvgPath()
-	{
-	    $version = TYPO3_version;
-	    $path = '';
-	    if ($version == '10.4.12') {
-	        $path = 'svgs/';
-	    }
-	    return $path;
 	}
 }

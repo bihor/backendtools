@@ -16,13 +16,13 @@
 	<td><f:if condition="{image.tt_uid} > 0">
 		{image.tt_uid}
 		<ex:editLink action="edit" table="tt_content" uid="{image.tt_uid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=images">
-    				<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-open.svg" width="16" height="16">
-    			</ex:editLink>
+    		<core:icon identifier="actions-open" size="small" />
+    	</ex:editLink>
 	</f:if></td>
 	<td><f:if condition="{image.tt_pid} > 0">
 		{image.tt_pid} 
 		<a href="{image.domain}/index.php?id={image.tt_pid}&no_cache=1" target="extern">
-			<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-view.svg" width="16" height="16">
+			<core:icon identifier="actions-document-view" size="small" />
 		</a>
 	</f:if></td>
 </f:then>

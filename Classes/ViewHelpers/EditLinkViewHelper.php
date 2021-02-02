@@ -22,6 +22,7 @@ class EditLinkViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractTagBa
 		$this->registerTagAttribute('action', 'string', 'Action to perform (new, edit)');
 		$this->registerTagAttribute('table', 'string', 'Name of the related table');
 		$this->registerTagAttribute('uid', 'integer', 'Id of the record to edit');
+		$this->registerTagAttribute('language', 'integer', 'sys language uid', false, 0);
 		$this->registerTagAttribute('returnUrl', 'string', 'URL to return to', false, '');
 	}
 	
@@ -41,17 +42,16 @@ class EditLinkViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractTagBa
               		$this->arguments['uid'] => $this->arguments['action']
                 ]
             ],
-        	'columnsOnly' => '', //$this->arguments['columnsOnly'],
-            'createExtension' => 0,
-            'returnUrl' => GeneralUtility::getIndpEnv('REQUEST_URI')
+        	'columnsOnly' => '',
+            'createExtension' => 0
         ];
-      //  if (count($this->arguments['defaultValues']) > 0) {
-      //  	$urlParameters['defVals'] = $this->arguments['defaultValues'];
-      //  }
-//        $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
+        if ($this->arguments['language'] > 0) {
+            $urlParameters['overrideVals']['pages']['sys_language_uid'] = $this->arguments['language'];
+        }
+        $urlParameters['returnUrl'] = GeneralUtility::getIndpEnv('REQUEST_URI');
         $uriBuilder = GeneralUtility::makeInstance('TYPO3\CMS\Backend\Routing\UriBuilder');
         $uri = $uriBuilder->buildUriFromRoute('record_edit', $urlParameters);
-//        $uri = \TYPO3\CMS\Backend\Utility\BackendUtility::getModuleUrl('record_edit', $urlParameters);
+      //  $uri = \TYPO3\CMS\Backend\Utility\BackendUtility::getModuleUrl('record_edit', $urlParameters);
       //  das hier funktioniert überhaupt nicht: 
       //  $uriBuilder = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder::class);
       //  $uri = $uriBuilder->buildUriFromRoute('record_edit', $urlParameters);
