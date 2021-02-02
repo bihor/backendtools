@@ -67,7 +67,7 @@
 	<f:for each="{paginatedpages}" as="page" iteration="iterator">
 		<tr{f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
 			<td>
-				<ex:editLink action="edit" table="pages" uid="{page.uid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=realurl">
+				<ex:editLink action="edit" table="pages" uid="{page.pl10n}" language="{page.sys_language_uid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=realurl">
       				<core:icon identifier="actions-open" size="small" />
       			</ex:editLink>
       			<a href="{page.domain}/index.php?id={page.uid}&no_cache=1" target="extern">

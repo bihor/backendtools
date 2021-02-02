@@ -874,9 +874,11 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 			$p_hidden = $row['hidden'];
 			if (($hidden == 0) || (($hidden == 1) && $p_hidden) || (($hidden == 2) && !$p_hidden)) {
 				$uid = $row['uid'];
+				$pl10n = $uid;
 				$sys_language_uid = $row['sys_language_uid'];
 				if ($sys_language_uid > 0) {
-					$uid = $row['l10n_parent'];
+				    $pl10n = $uid;
+				    $uid = $row['l10n_parent'];
 				}
 				if (!is_array($pages[$uid])) {
 					$pages[$uid] = [];
@@ -884,6 +886,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 				$pages[$uid][$sys_language_uid] = [];
 				$pages[$uid][$sys_language_uid]['hidden'] = $hidden;
 				$pages[$uid][$sys_language_uid]['sys_language_uid'] = $sys_language_uid;
+				$pages[$uid][$sys_language_uid]['pl10n'] = $pl10n;
 				$pages[$uid][$sys_language_uid]['title'] = $row['title'];
 				$pages[$uid][$sys_language_uid]['slug'] = $row['slug'];
 				if ($row['slug_locked'] && ($row['slug_locked'] == 1)) {
