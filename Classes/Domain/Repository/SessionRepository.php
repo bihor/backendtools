@@ -75,9 +75,10 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 	 * @param	string	$my_exclude		exclude type
 	 * @param	int		$my_orderby		order by
 	 * @param	int		$my_direction	order direction
+     * @param	boolen  $gridelements_loaded	Extension gridelements loaded?
 	 * @return array
 	 */
-	public function getPagesWithExtensions($my_c, $my_p, $my_type, $my_value, $my_flexform, $my_exclude, $my_orderby, $my_direction)
+	public function getPagesWithExtensions($my_c, $my_p, $my_type, $my_value, $my_flexform, $my_exclude, $my_orderby, $my_direction, $gridelements_loaded)
 	{
 		$pages = [];
 		//$PageRepository = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
@@ -91,7 +92,8 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 		if ($my_exclude) {
 			$exclude_ctypes = array_merge ($exclude_ctypes, explode(' ', $my_exclude));
 		}
-		
+		$more = ($gridelements_loaded) ? 'tt_content.tx_gridelements_backend_layout' : 'tt_content.t3_origuid';
+
 		// Query aufbauen
 		$queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('tt_content')->createQueryBuilder();
 		$res = $queryBuilder ->select(...[
@@ -105,6 +107,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 			'tt_content.CType',
 			'tt_content.list_type',
 			'tt_content.pi_flexform',
+			$more,
 			'pages.title',
 		    'pages.slug',
 			'pages.deleted AS pdeleted',
@@ -233,6 +236,9 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 			}
 			$row['csvheader'] = str_replace('"', '\'', $row['header']);
 			$row['csvtitle'] = str_replace('"', '\'', $row['title']);
+			if ($row['tx_gridelements_backend_layout']) {
+			    $row['misc'] = $row['tx_gridelements_backend_layout'];
+            }
 			$pages[] = $row;
 		}
 		return $pages;

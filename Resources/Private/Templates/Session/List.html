@@ -100,7 +100,7 @@ uid;lang.;colPos;deleted;hidden;header;CType;list_type;FlexForm actions;uid;dele
 				<th>header</th>
 				<th>CType</th>
 				<th>list_type</th>
-				<th>FlexForm actions</th>
+				<th>FlexForm actions / misc</th>
 				<th>uid</th>
 				<th>deleted / hidden</th>
 				<th>title</th>
@@ -122,7 +122,7 @@ uid;lang.;colPos;deleted;hidden;header;CType;list_type;FlexForm actions;uid;dele
 					<td>{page.header}</td>
 					<td>{page.CType}</td>
 					<td>{page.list_type}</td>
-					<td><f:format.raw>{page.actions}</f:format.raw></td>
+					<td><f:format.raw>{page.actions}</f:format.raw> {page.misc}</td>
 					<td>
 						<ex:editLink action="edit" table="pages" uid="{page.pl10n}" language="{page.sys_language_uid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=list">
 		      				<core:icon identifier="actions-open" size="small" />

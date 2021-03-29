@@ -4,6 +4,7 @@ namespace Fixpunkt\Backendtools\Controller;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Domain\Repository\BackendUserRepository;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 /***************************************************************
  *
@@ -135,8 +136,11 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	} else { 
     		$this->sessionRepository->update($default);
     	}
-    	
-    	$pages = $this->sessionRepository->getPagesWithExtensions($my_c, $my_p, $my_type, $my_value, $my_flexform, $my_exclude, $my_orderby, $my_direction);
+
+    	$gridelements_loaded = ExtensionManagementUtility::isLoaded('gridelements');
+    	$pages = $this->sessionRepository->getPagesWithExtensions(
+    	    $my_c, $my_p, $my_type, $my_value, $my_flexform, $my_exclude, $my_orderby, $my_direction, $gridelements_loaded
+        );
     	
     	// Assign
     	$this->view->assign('my_p', $my_p);
