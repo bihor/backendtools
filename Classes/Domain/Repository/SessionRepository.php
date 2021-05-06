@@ -973,7 +973,18 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 	    }
 	    return $domain;
 	}
-	
+
+    /**
+     * Get all domains
+     *
+     * @return array
+     */
+    public function getAllDomains()
+    {
+        $this->siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
+        return $this->siteFinder->getAllSites();
+    }
+
 	/**
 	 * addRedirect
 	 * 
@@ -1000,4 +1011,81 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 			])
 			->execute();
 	}
+
+    /**
+     * deleteRedirect
+     *
+     * @param	int		$uid	uid
+     */
+    public function deleteRedirect($uid)
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_redirect');
+        return $queryBuilder
+            ->delete('sys_redirect')
+            ->where(
+                $queryBuilder->expr()->eq('uid', (int) $uid)
+            )
+            ->execute();
+    }
+
+    /**
+     * getRedirects
+     *
+     * @return array
+     */
+    public function getRedirects()
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_redirect');
+        return $queryBuilder->select(...[
+                'uid',
+                'source_host',
+                'source_path',
+                'target'
+            ]) -> from ('sys_redirect')
+            ->execute();
+    }
+
+    /**
+     * Fetches the record with the given UID from the given table.
+     *
+     * The filter option accepts two values:
+     *
+     * "disabled" will filter out disabled and deleted records.
+     * "deleted" filters out deleted records but will return disabled records.
+     * If nothing is specified all records will be returned (including deleted).
+     *
+     * @param string $tableName The name of the table from which the record should be fetched.
+     * @param int $uid The UID of the record that should be fetched.
+     * @param string $filter A filter setting, can be empty or "disabled" or "deleted".
+     * @return array|bool The result row as associative array or false if nothing is found.
+     */
+    public function getRecordRow($tableName, $uid, $filter = '')
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($tableName);
+
+        switch ($filter) {
+            case 'disabled':
+                // All default restrictions for the QueryBuilder stay active
+                break;
+            case 'deleted':
+                $queryBuilder->getRestrictions()
+                    ->removeAll()
+                    ->add(GeneralUtility::makeInstance(\TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction::class));
+                break;
+            default:
+                $queryBuilder->getRestrictions()->removeAll();
+        }
+
+        return $queryBuilder
+            ->select('*')
+            ->from($tableName)
+            ->where(
+                $queryBuilder->expr()->eq(
+                    'uid',
+                    $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT)
+                )
+            )
+            ->execute()
+            ->fetch();
+    }
 }

@@ -33,6 +33,8 @@ Tool 6: helps you to find images with no title- oder alternative-text. This tool
 
 Tool 7: you can import simple redirect rules form your .htaccess to the table sys_redirect.
 
+Tool 8: you can check all your entries of sys_redirect, if the target links are reachable.
+
 .. _screenshots:
 
 Screenshots

@@ -564,7 +564,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     }
     
     /**
-     * action redirects
+     * action redirects import
      *
      * @return void
      */
@@ -678,7 +678,141 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	$this->view->assign('impfile', $impfile);
     	$this->view->assign('message', $content);
     }
-    
+
+    /**
+     * action redirects check
+     *
+     * @return void
+     */
+    public function redirectscheckAction()
+    {
+        $content = '';
+        $beuser_id = $GLOBALS['BE_USER']->user['uid'];
+        $result = $this->sessionRepository->findByAction('redirectscheck', $beuser_id);
+        if ($result->count() == 0) {
+            $new = TRUE;
+            $default = GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
+            $default->setAction('redirectscheck');
+            $default->setValue1(0);
+        } else {
+            $new = FALSE;
+            $default = $result[0];
+        }
+
+        if ($this->request->hasArgument('my_http')) {
+            $my_http = intval($this->request->getArgument('my_http'));
+            $default->setValue1($my_http);
+        } else $my_http = $default->getValue1();
+        if ($this->request->hasArgument('my_page')) {
+            $my_page = intval($this->request->getArgument('my_page'));		// elements per page
+            $default->setPageel($my_page);
+        } else $my_page = $default->getPageel();
+        if (!$my_page) {
+            $my_page = $this->settings['pagebrowser']['itemsPerPage'];
+            if (!$my_page) {
+                $my_page = $this->settings['pagebrowser']['itemsPerPage'] = 25;
+            }
+        } else {
+            $this->settings['pagebrowser']['itemsPerPage'] = $my_page;
+        }
+
+        if ($new) {
+            $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+            $backendUserRepository = $objectManager->get(BackendUserRepository::class);
+            /** @var \TYPO3\CMS\Extbase\Domain\Model\BackendUser $user */
+            $user = $backendUserRepository->findByUid($beuser_id);
+            $default->setBeuser($user);
+            $this->sessionRepository->add($default);
+            $persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
+            $persistenceManager->persistAll();
+        } else {
+            $this->sessionRepository->update($default);
+        }
+
+        if ($this->request->hasArgument('delete')) {
+            $deleteUids = $this->request->getArgument('delete');
+            if ($deleteUids) {
+                $i=0;
+                foreach ($deleteUids as $uid) {
+                    $this->sessionRepository->deleteRedirect($uid);
+                    $i++;
+                }
+                $content = $i . ' entries deleted.';
+            }
+        }
+
+        $redirectsArray = [];
+        $hostsArray = [];
+        $domains = $this->sessionRepository->getAllDomains();
+        foreach ($domains as $domain) {
+            $config = $domain->getConfiguration();
+            if ($config['base']) {
+                $hostsArray[] = $this->formatHost($config['base'], $my_http);
+            }
+        }
+        $redirects = $this->sessionRepository->getRedirects();
+        foreach ($redirects as $redirect) {
+            $status = '?';
+            $uid = $redirect['uid'];
+            $host = $redirect['source_host'];
+            $target = $redirect['target'];
+            $redirectsArray[$uid]['uid'] = $uid;
+            $redirectsArray[$uid]['host'] = $host;
+            $redirectsArray[$uid]['source'] = $redirect['source_path'];
+            $redirectsArray[$uid]['target'] = $target;
+            if (substr($target, 0, 1) == '/') {
+                if ($host == '*') {
+                    $checkHosts = $hostsArray;
+                } else {
+                    $checkHosts[] = $this->formatHost($host, $my_http);
+                }
+                foreach ($checkHosts as $checkHost) {
+                    $headers = @get_headers($checkHost . $target);
+                    if ($headers && strpos($headers[0], '200')) {
+                        $status = 'OK';
+                        break;
+                    } else {
+                        $status = $headers[0];
+                    }
+                }
+            } else if (substr($target, 0, 3) == 't3:') {
+                $parts = explode('=', $target);
+                [$pre, $rowid] = $parts;
+                $rowid = (int)$rowid;
+                $parts = explode('?', $pre);
+                [$pre, $after] = $parts;
+                $table = substr($pre, 5);
+                if ($rowid && (($table == 'file') || ($table == 'page'))) {
+                    $tableName = ($table == 'page') ? 'pages' : 'sys_file';
+                    // First check, if we find a non disabled record if the check for hidden records is enabled.
+                    $row = $this->sessionRepository->getRecordRow($tableName, $rowid, 'disabled');
+                    if ($row === false) {
+                        $status = 'target disabled or deleted!';
+                    }
+                    if (is_int($row['uid'])) {
+                        $status = 'OK';
+                    }
+                } else {
+                    $status = 'unknown table ' . $table;
+                }
+            } else if (substr($target, 0, 4) == 'http') {
+                $headers = @get_headers($target);
+                if ($headers && strpos($headers[0], '200')) {
+                    $status = 'OK';
+                } else {
+                    $status = $headers[0];
+                }
+            }
+            $redirectsArray[$uid]['status'] = $status;
+        }
+
+        $this->view->assign('message', $content);
+        $this->view->assign('redirects', $redirectsArray);
+        $this->view->assign('my_http', $my_http);
+        $this->view->assign('my_page', $my_page);
+        $this->view->assign('settings', $this->settings);
+    }
+
     /**
      * action unzip
      *
@@ -758,4 +892,23 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 	
 		return round(pow(1024, $base - floor($base)), $precision) .' '. $suffixes[floor($base)] .'B';
 	}
+
+    /**
+     * Formats a host
+     *
+     * @param string $host
+     * @param int $http
+     * @return string
+     */
+    function formatHost($host, $http)
+    {
+        if ((strlen($host) > 2) && (substr($host,0, 4) != 'http')) {
+            $pre = ($http) ? 'http://' : 'https://';
+            $host = $pre . $host;
+        }
+        if (substr($host, -1) == '/') {
+            $host = substr($host,0,-1);
+        }
+        return $host;
+    }
 }
