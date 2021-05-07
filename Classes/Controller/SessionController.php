@@ -694,6 +694,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             $default = GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
             $default->setAction('redirectscheck');
             $default->setValue1(0);
+            $default->setValue2(0);
         } else {
             $new = FALSE;
             $default = $result[0];
@@ -703,6 +704,10 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             $my_http = intval($this->request->getArgument('my_http'));
             $default->setValue1($my_http);
         } else $my_http = $default->getValue1();
+        if ($this->request->hasArgument('my_error')) {
+            $my_error = intval($this->request->getArgument('my_error'));
+            $default->setValue2($my_error);
+        } else $my_error = $default->getValue2();
         if ($this->request->hasArgument('my_page')) {
             $my_page = intval($this->request->getArgument('my_page'));		// elements per page
             $default->setPageel($my_page);
@@ -721,7 +726,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         } else {
             $page = 1;
         }
-        $limit_from = (($page-1) * $my_page) + 1;
+        $limit_from = ($page-1) * $my_page;
         $limit_to = $page * $my_page;
 
         if ($new) {
@@ -750,6 +755,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         }
 
         $i = 0;
+        $errorCount = 0;
         $redirectsArray = [];
         $hostsArray = [];
         $domains = $this->sessionRepository->getAllDomains();
@@ -761,33 +767,38 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         }
         $redirects = $this->sessionRepository->getRedirects();
         foreach ($redirects as $redirect) {
-            $i++;
             $status = '?';
+            $match = false;
             $uid = $redirect['uid'];
             $host = $redirect['source_host'];
             $target = $redirect['target'];
-            $redirectsArray[$uid]['uid'] = $uid;
-            $redirectsArray[$uid]['host'] = $host;
-            $redirectsArray[$uid]['source'] = $redirect['source_path'];
-            $redirectsArray[$uid]['target'] = $target;
             // Wir überprüfen den Status nur für die aktuelle Seite!
-            if (($i >= $limit_from) && ($i <= $limit_to)) {
-                if (substr($target, 0, 1) == '/') {
+            if (($i >= $limit_from) && ($i < $limit_to)) {
+                if ((substr($target, 0, 1) == '/') && ($my_error != 1)) {
                     if ($host == '*') {
                         $checkHosts = $hostsArray;
                     } else {
                         $checkHosts[] = $this->formatHost($host, $my_http);
                     }
+                    $errorFound = false;
                     foreach ($checkHosts as $checkHost) {
                         $headers = @get_headers($checkHost . $target);
                         if ($headers && strpos($headers[0], '200')) {
                             $status = 'OK';
                             break;
                         } else {
-                            $status = $headers[0];
+                            $code = substr($headers[0], 9, 3);
+                            $status = $code; //$headers[0];
+                            if ($code == $my_error) {
+                                $errorFound = true;
+                            }
                         }
                     }
-                } else if (substr($target, 0, 3) == 't3:') {
+                    if (($status != 'OK') && $errorFound) {
+                        $errorCount++;
+                        $match = true;
+                    }
+                } else if ((substr($target, 0, 3) == 't3:') && ($my_error < 2)) {
                     $parts = explode('=', $target);
                     [$pre, $rowid] = $parts;
                     $rowid = (int)$rowid;
@@ -800,29 +811,46 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
                         $row = $this->sessionRepository->getRecordRow($tableName, $rowid, 'disabled');
                         if ($row === false) {
                             $status = 'target disabled or deleted!';
-                        }
-                        if (is_int($row['uid'])) {
+                            $errorCount++;
+                            $match = true;
+                        } else if (is_int($row['uid'])) {
                             $status = 'OK';
                         }
                     } else {
                         $status = 'unknown table ' . $table;
                     }
-                } else if (substr($target, 0, 4) == 'http') {
+                } else if ((substr($target, 0, 4) == 'http') && ($my_error != 1)) {
                     $headers = @get_headers($target);
                     if ($headers && strpos($headers[0], '200')) {
                         $status = 'OK';
                     } else {
-                        $status = $headers[0];
+                        $code = substr($headers[0], 9, 3);
+                        $status = $code; //$headers[0];
+                        if ($code == $my_error) {
+                            $errorCount++;
+                            $match = true;
+                        }
                     }
                 }
             }
-            $redirectsArray[$uid]['status'] = $status;
+            $i++;
+            $redirectsArray[$uid]['uid'] = $uid;
+            $redirectsArray[$uid]['host'] = $host;
+            $redirectsArray[$uid]['source'] = $redirect['source_path'];
+            $redirectsArray[$uid]['target'] = $target;
+            if (!$my_error || $match) {
+                $redirectsArray[$uid]['status'] = $status;
+            } else {
+                $redirectsArray[$uid]['status'] = '-';
+            }
         }
 
         $this->view->assign('message', $content);
         $this->view->assign('redirects', $redirectsArray);
         $this->view->assign('my_http', $my_http);
+        $this->view->assign('my_error', $my_error);
         $this->view->assign('my_page', $my_page);
+        $this->view->assign('page', $page);
         $this->view->assign('settings', $this->settings);
     }
 

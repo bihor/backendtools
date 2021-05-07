@@ -9,7 +9,7 @@
 	.f3-widget-paginator li.current { font-weight: bold; }
 	</style>
 	<f:form action="redirectscheck" class="form-inline">
-		<div class="row"><div class="col-md-8">
+		<div class="row"><div class="col-md-3">
 			<div style="margin: 10px 0;">Use
 				<label class="checkbox-inline">
 					<f:form.radio name="my_http" value="1" checked="{my_http} == 1" /> http &nbsp; or
@@ -18,15 +18,40 @@
 					<f:form.radio name="my_http" value="0" checked="{my_http} == 0" /> https.
 				</label>
 			</div>
-		</div><div class="col-md-4">
-			<div style="margin: 10px 0;">Elements per page:
-				<f:form.textfield name="my_page" value="{my_page}" size="5" /> &nbsp;
+		</div><div class="col-md-6">
+			<div style="margin: 10px 0;">Status:
+				<label class="checkbox-inline">
+					<f:form.radio name="my_error" value="0" checked="{my_error} == 0" /> all or
+				</label>
+				<label class="checkbox-inline">
+					<f:form.radio name="my_error" value="1" checked="{my_error} == 1" /> t3-link-error or
+				</label>
+				<label class="checkbox-inline">
+					<f:form.radio name="my_error" value="301" checked="{my_error} == 301" /> 301 or
+				</label>
+				<label class="checkbox-inline">
+					<f:form.radio name="my_error" value="302" checked="{my_error} == 302" /> 302 or
+				</label>
+				<label class="checkbox-inline">
+					<f:form.radio name="my_error" value="303" checked="{my_error} == 303" /> 303 or
+				</label>
+				<label class="checkbox-inline">
+					<f:form.radio name="my_error" value="307" checked="{my_error} == 307" /> 307 or
+				</label>
+				<label class="checkbox-inline">
+					<f:form.radio name="my_error" value="404" checked="{my_error} == 404" /> 404 error.
+				</label>
+			</div>
+		</div><div class="col-md-3">
+			<div style="margin: 10px 0;">Check up to
+				<f:form.textfield name="my_page" value="{my_page}" size="3" /> redirects per page
 			</div>
 		</div></div>
 		<f:form.submit value="Set defaults" name="setting" class="btn btn-default" />
 	</f:form>
 	<br>
 	<f:form action="redirectscheck">
+		<f:form.hidden name="@widget_0[currentPage]" value="{page}" />
 		<f:if condition="{redirects -> f:count()} > 0">
 			<f:then>
 				<f:widget.paginate objects="{redirects}" as="paginatedRedirects" configuration="{settings.pagebrowser}">
@@ -37,20 +62,22 @@
 						</tr>
 						</thead>
 						<tbody>
-						<f:for each="{paginatedRedirects}" as="redirect">
-							<tr>
-								<td><f:form.checkbox name="delete[]" value="{redirect.uid}" /> &nbsp; {redirect.uid}</td>
-								<td>{redirect.host}</td>
-								<td>{redirect.source}</td>
-								<td>{redirect.target}</td>
-								<td>
-									<f:if condition="{redirect.status} == 'OK'"><f:then>
-										<span class="isok">OK</span>
-									</f:then><f:else>
-										{redirect.status}
-									</f:else></f:if>
-								</td>
-							</tr>
+						<f:for each="{paginatedRedirects}" as="redirect" iteration="iterator">
+							<f:if condition="{redirect.status} != '-'">
+								<tr{f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
+									<td><f:form.checkbox name="delete[]" value="{redirect.uid}" /> &nbsp; {redirect.uid}</td>
+									<td>{redirect.host}</td>
+									<td>{redirect.source}</td>
+									<td>{redirect.target}</td>
+									<td>
+										<f:if condition="{redirect.status} == 'OK'"><f:then>
+											<span class="isok">OK</span>
+										</f:then><f:else>
+											{redirect.status}
+										</f:else></f:if>
+									</td>
+								</tr>
+							</f:if>
 						</f:for>
 						</tbody>
 					</table>
