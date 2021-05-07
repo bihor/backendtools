@@ -715,6 +715,14 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         } else {
             $this->settings['pagebrowser']['itemsPerPage'] = $my_page;
         }
+        if ($this->request->hasArgument('@widget_0')) {
+            $widget = $this->request->getArgument('@widget_0');
+            $page = $widget['currentPage'];
+        } else {
+            $page = 1;
+        }
+        $limit_from = (($page-1) * $my_page) + 1;
+        $limit_to = $page * $my_page;
 
         if ($new) {
             $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
@@ -741,6 +749,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             }
         }
 
+        $i = 0;
         $redirectsArray = [];
         $hostsArray = [];
         $domains = $this->sessionRepository->getAllDomains();
@@ -752,6 +761,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         }
         $redirects = $this->sessionRepository->getRedirects();
         foreach ($redirects as $redirect) {
+            $i++;
             $status = '?';
             $uid = $redirect['uid'];
             $host = $redirect['source_host'];
@@ -760,47 +770,50 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             $redirectsArray[$uid]['host'] = $host;
             $redirectsArray[$uid]['source'] = $redirect['source_path'];
             $redirectsArray[$uid]['target'] = $target;
-            if (substr($target, 0, 1) == '/') {
-                if ($host == '*') {
-                    $checkHosts = $hostsArray;
-                } else {
-                    $checkHosts[] = $this->formatHost($host, $my_http);
-                }
-                foreach ($checkHosts as $checkHost) {
-                    $headers = @get_headers($checkHost . $target);
+            // Wir überprüfen den Status nur für die aktuelle Seite!
+            if (($i >= $limit_from) && ($i <= $limit_to)) {
+                if (substr($target, 0, 1) == '/') {
+                    if ($host == '*') {
+                        $checkHosts = $hostsArray;
+                    } else {
+                        $checkHosts[] = $this->formatHost($host, $my_http);
+                    }
+                    foreach ($checkHosts as $checkHost) {
+                        $headers = @get_headers($checkHost . $target);
+                        if ($headers && strpos($headers[0], '200')) {
+                            $status = 'OK';
+                            break;
+                        } else {
+                            $status = $headers[0];
+                        }
+                    }
+                } else if (substr($target, 0, 3) == 't3:') {
+                    $parts = explode('=', $target);
+                    [$pre, $rowid] = $parts;
+                    $rowid = (int)$rowid;
+                    $parts = explode('?', $pre);
+                    [$pre, $after] = $parts;
+                    $table = substr($pre, 5);
+                    if ($rowid && (($table == 'file') || ($table == 'page'))) {
+                        $tableName = ($table == 'page') ? 'pages' : 'sys_file';
+                        // First check, if we find a non disabled record if the check for hidden records is enabled.
+                        $row = $this->sessionRepository->getRecordRow($tableName, $rowid, 'disabled');
+                        if ($row === false) {
+                            $status = 'target disabled or deleted!';
+                        }
+                        if (is_int($row['uid'])) {
+                            $status = 'OK';
+                        }
+                    } else {
+                        $status = 'unknown table ' . $table;
+                    }
+                } else if (substr($target, 0, 4) == 'http') {
+                    $headers = @get_headers($target);
                     if ($headers && strpos($headers[0], '200')) {
                         $status = 'OK';
-                        break;
                     } else {
                         $status = $headers[0];
                     }
-                }
-            } else if (substr($target, 0, 3) == 't3:') {
-                $parts = explode('=', $target);
-                [$pre, $rowid] = $parts;
-                $rowid = (int)$rowid;
-                $parts = explode('?', $pre);
-                [$pre, $after] = $parts;
-                $table = substr($pre, 5);
-                if ($rowid && (($table == 'file') || ($table == 'page'))) {
-                    $tableName = ($table == 'page') ? 'pages' : 'sys_file';
-                    // First check, if we find a non disabled record if the check for hidden records is enabled.
-                    $row = $this->sessionRepository->getRecordRow($tableName, $rowid, 'disabled');
-                    if ($row === false) {
-                        $status = 'target disabled or deleted!';
-                    }
-                    if (is_int($row['uid'])) {
-                        $status = 'OK';
-                    }
-                } else {
-                    $status = 'unknown table ' . $table;
-                }
-            } else if (substr($target, 0, 4) == 'http') {
-                $headers = @get_headers($target);
-                if ($headers && strpos($headers[0], '200')) {
-                    $status = 'OK';
-                } else {
-                    $status = $headers[0];
                 }
             }
             $redirectsArray[$uid]['status'] = $status;
