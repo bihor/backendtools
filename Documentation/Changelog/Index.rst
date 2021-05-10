@@ -10,9 +10,10 @@
 
 Changelog
 =========
-Version 2.0.8:
+Version 2.1.0:
 Redirects check tool added.
 misc field added in the list of used extensions.
+Bugfix: Redirects import.
 
 Version 2.0.6:
 Order by added to the extension list view.

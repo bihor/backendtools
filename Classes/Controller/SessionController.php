@@ -640,13 +640,19 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     				$rewrites = explode(' ', $row);
     				preg_match('/R=(\d+)/', $rewrites[3], $treffer);
     				$statuscode = $treffer[1];
-    				if (!$statuscode) $statuscode = intval($defaultstatuscode);
-    				if ($rewrites[1] && substr($rewrites[1], 0, 2) != '^/') {
-    					$rewrites[1] = '^/' . substr($rewrites[1], 1);	// ein / wird am Anfang benötigt
+    				if (!$statuscode) {
+    				    $statuscode = intval($defaultstatuscode);
+                    }
+    				if ($rewrites[1] && (substr($rewrites[1], 0, 2) != '^/') && (substr($rewrites[1], 0, 1) == '^')) {
+    				    if ($regexp) {
+                            $rewrites[1] = '^/' . substr($rewrites[1], 1);    // aus ^xyz wird ^/xyz
+                        } else {
+                            $rewrites[1] = '/' . substr($rewrites[1], 1);    // aus ^xyz wird /xyz
+                        }
     				}
-    				if ($rewrites[1] && $regexp) {
-    					$rewrites[1] = '#' . $rewrites[1] . '#';		// TYPO3 will das so
-    				}
+    				if ($regexp) {
+                        $rewrites[1] = '#' . $rewrites[1] . '#';        // TYPO3 will das so
+                    }
     				if ($rewrites[1] && $rewrites[2] && (strlen($rewrites[1])>2)) {
     					if ($method) {
 	    					if ($this->sessionRepository->addRedirect($rewrites[1], $rewrites[2], $regexp, $statuscode, $beuser_id)) {
