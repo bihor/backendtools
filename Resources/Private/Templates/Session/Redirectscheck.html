@@ -1,3 +1,4 @@
+{namespace ex=Fixpunkt\Backendtools\ViewHelpers}
 <f:layout name="Default" />
 <f:section name="content">
 	<h1>Check sys_redirect entries for error targets</h1>
@@ -45,6 +46,7 @@
 		<f:form.hidden name="@widget_0[currentPage]" value="{page}" />
 		<f:if condition="{redirects -> f:count()} > 0">
 			<f:then>
+				<p>{redirects -> f:count()} redirects found:</p>
 				<f:widget.paginate objects="{redirects}" as="paginatedRedirects" configuration="{settings.pagebrowser}">
 					<table class="table">
 						<thead>
@@ -55,10 +57,16 @@
 						<tbody>
 						<f:for each="{paginatedRedirects}" as="redirect" iteration="iterator">
 							<f:if condition="{redirect.status} != '-'">
+							<f:then>
 								<tr{f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
-									<td><f:form.checkbox name="delete[]" value="{redirect.uid}" /> &nbsp; {redirect.uid}</td>
+									<td>
+										<ex:editLink action="edit" table="sys_redirect" uid="{redirect.uid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=redirectscheck">
+											<core:icon identifier="actions-open" size="small" />
+										</ex:editLink> &nbsp;
+										<f:form.checkbox name="delete[]" value="{redirect.uid}" /> &nbsp; {redirect.uid}
+									</td>
 									<td>{redirect.host}</td>
-									<td>{redirect.source}</td>
+									<td>{redirect.source -> f:format.crop(maxCharacters:100)}</td>
 									<td>{redirect.target}</td>
 									<td>
 										<f:if condition="{redirect.status} == 'OK'"><f:then>
@@ -68,6 +76,7 @@
 										</f:else></f:if>
 									</td>
 								</tr>
+							</f:then>
 							</f:if>
 						</f:for>
 						</tbody>
