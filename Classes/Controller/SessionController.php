@@ -787,9 +787,9 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
                             $status = 'OK';
                             break;
                         } else {
-                            $code = substr($headers[0], 9, 3);
+                            $code = intval(substr($headers[0], 9, 3));
                             $status = $code; //$headers[0];
-                            if ($code == $my_error) {
+                            if (($code >= $my_error) && ($code < ($my_error+100))) {
                                 $errorFound = true;
                             }
                         }
@@ -824,9 +824,9 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
                     if ($headers && strpos($headers[0], '200')) {
                         $status = 'OK';
                     } else {
-                        $code = substr($headers[0], 9, 3);
+                        $code = intval(substr($headers[0], 9, 3));
                         $status = $code; //$headers[0];
-                        if ($code == $my_error) {
+                        if (($code >= $my_error) && ($code < ($my_error+100))) {
                             $errorCount++;
                             $match = true;
                         }

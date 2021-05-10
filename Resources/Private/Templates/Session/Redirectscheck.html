@@ -1,6 +1,6 @@
 <f:layout name="Default" />
 <f:section name="content">
-	<h1>Check sys_redirect entries for 404 targets</h1>
+	<h1>Check sys_redirect entries for error targets</h1>
 	<f:flashMessages />
 	<style>
 	.isok {color:#007700}
@@ -27,19 +27,10 @@
 					<f:form.radio name="my_error" value="1" checked="{my_error} == 1" /> t3-link-error or
 				</label>
 				<label class="checkbox-inline">
-					<f:form.radio name="my_error" value="301" checked="{my_error} == 301" /> 301 or
+					<f:form.radio name="my_error" value="300" checked="{my_error} == 300" /> 3xx or
 				</label>
 				<label class="checkbox-inline">
-					<f:form.radio name="my_error" value="302" checked="{my_error} == 302" /> 302 or
-				</label>
-				<label class="checkbox-inline">
-					<f:form.radio name="my_error" value="303" checked="{my_error} == 303" /> 303 or
-				</label>
-				<label class="checkbox-inline">
-					<f:form.radio name="my_error" value="307" checked="{my_error} == 307" /> 307 or
-				</label>
-				<label class="checkbox-inline">
-					<f:form.radio name="my_error" value="404" checked="{my_error} == 404" /> 404 error.
+					<f:form.radio name="my_error" value="400" checked="{my_error} == 400" /> 4xx error.
 				</label>
 			</div>
 		</div><div class="col-md-3">
