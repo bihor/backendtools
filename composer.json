@@ -27,5 +27,10 @@
 	"support" : {
 		"email" : "info@quizpalme.de"
 	},
-	"license" : "GPL-3.0-or-later"
+	"license" : "GPL-3.0-or-later",
+	"extra": {
+		"typo3/cms": {
+			"extension-key": "backendtools"
+		}
+	}
 }
