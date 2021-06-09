@@ -9,7 +9,7 @@ use TYPO3\CMS\Core\Database\Connection;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2013 Kurt Gusbeth <info@quizpalme.de>
+ *  (c) 2021 Kurt Gusbeth <info@quizpalme.de>
  *  
  *  All rights reserved
  *
@@ -973,6 +973,27 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 	    }
 	    return $domain;
 	}
+
+
+    /**
+     * Check if a page is in the rootline
+     *
+     * @param	int		$uid	page-uid
+     * @param	int		$searchUid	page-uid which should be in the rootline
+     * @return boolean
+     */
+    public function isInRootLine($uid, $searchUid)
+    {
+        $rootLineUtility = new \TYPO3\CMS\Core\Utility\RootlineUtility($uid);
+        $rootline = $rootLineUtility->get();
+        foreach ($rootline as $page) {
+            if ($page['uid'] == $searchUid) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     /**
      * Get all domains

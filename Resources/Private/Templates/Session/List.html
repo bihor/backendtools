@@ -19,7 +19,7 @@
 	<f:form.radio name="my_type" value="2" checked="{my_type} == 2" /> CType value*: &nbsp;
   </label>
   <label class="checkbox-inline">
-	<f:form.textfield name="my_value" value="{my_value}" />
+	<f:form.textfield name="my_value" value="{my_value}" size="19" />
   </label>
 </div>
 <div style="margin: 10px 0;">Show only elements with this FlexForm value**:
@@ -28,7 +28,10 @@
 <div style="margin: 10px 0;">Or exclude elements with this CType values***:
 	<f:form.textfield name="my_exclude" value="{my_exclude}" /> &nbsp;
 </div>
-<div style="margin: 10px 0;">Order by:
+	<div style="margin: 10px 0;">Only pages under this pid (recursive)****:
+		<f:form.textfield name="my_recursive" value="{my_recursive}" size="5" /> &nbsp;
+	</div>
+<div style="margin: 10px 0;">Order by****:
 	<f:form.select name="my_orderby" options="{0: 'pid', 1: 'uid', 2: 'sys_language_uid', 3: 'colPos', 4: 'header', 5: 'CType', 6: 'list_type', 7: 'page title'}" value="{my_orderby}" /> &nbsp;
 	<f:form.select name="my_direction" options="{0: 'ascending', 1: 'descending'}" value="{my_direction}" /> &nbsp;
 </div>
@@ -148,5 +151,8 @@ uid;lang.;colPos;deleted;hidden;header;CType;list_type;FlexForm actions;uid;dele
 	<p>0 elements found!</p>
 </f:else>
 </f:if>
-<p><i>*: this is a LIKE 'sword%' search. **: this is a LIKE '%sword%' search. ***: you can use more values, separated by a space.</i></p>
+<p><i>*: this is a LIKE 'sword%' search.
+	**: this is a LIKE '%sword%' search.
+	***: you can use more values, separated by a space.
+	****: this fields are not working with the pagination, because they are not stored in the database.</i></p>
 </f:section>
