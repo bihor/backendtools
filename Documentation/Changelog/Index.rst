@@ -10,9 +10,10 @@
 
 Changelog
 =========
-Version 2.1.2:
+Version 2.2.0:
 Extension list view: search in the rootline added.
 Extension-key added to composer.json.
+Important: action unzip removed.
 
 Version 2.1.0:
 Redirects check tool added.

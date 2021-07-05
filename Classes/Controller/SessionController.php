@@ -881,70 +881,8 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         $this->view->assign('settings', $this->settings);
     }
 
-    /**
-     * action unzip
-     *
-     * @return void
-     */
-    public function unzipAction()
-    {
-    	if ($this->request->hasArgument('zipfile'))
-    		$zipfile = $this->request->getArgument('zipfile');		// zipfile
-    		else $zipfile = '';
-    		
-    		if ($this->request->hasArgument('zipfile')) {
-    			$filename = \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/' . 'fileadmin/' . $zipfile;
-    			if (is_file($filename) && file_exists($filename)) {
-    				$pathinfo = pathinfo($filename);
-    				$content = $this->unzip($filename, $pathinfo['dirname'] . '/');
-    			} else {
-    				$content = 'Note: file not found!!!';
-    			}
-    		} else {
-    			$content = 'Note: the zip-file will be extracted in the folder where it lies.';
-    		}
-    		
-    		$this->view->assign('zipfile', $zipfile);
-    		$this->view->assign('message', $content);
-    }
-    
-    
-    
-    
-    /**
-     * Unzip the source_file in the destination dir
-     *
-     * @param   string      The path to the ZIP-file.
-     * @param   string      The path where the zipfile should be unpacked, if false the directory of the zip-file is used
-     *
-     * @return  string     Succesful or not
-     */
-    function unzip($zip_filename, $zip_extract_path)
-    {
-    	$result ='';
-		try{
-			$zip_obj = new \ZipArchive;
-			if (file_exists($zip_filename)) {
-                $zip_stat = $zip_obj->open($zip_filename);
-                if ($zip_stat === TRUE) {
-                    $res = $zip_obj->extractTo($zip_extract_path);
-                    if ($res === false) {
-                       $result = "Error in extracting file on server.";
-                    } else {
-	                    $zip_obj->close();
-						$result = 'The zip-file was unziped to ' . $zip_extract_path;
-                    }
-                } else {
-                    $result = "Error in open file";
-                }
-            } else {
-                $result = "zip file not found for extraction";
-            }
-		} catch (Exception $e) {
-		    $result = $e->getMessage();
-		}
-    	return $result;
-    }
+
+
 	
 	/**
 	 * Formats bytes.
