@@ -61,9 +61,51 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 		$query->matching($query->logicalAnd($constraints));
 		return $query->execute();
 	}
-	
-	
-	
+
+
+    /**
+     * Get list of all used CTypes and list_types
+     *
+     * @return array
+     */
+    public function getAllTypes()
+    {
+        $types = [];
+        $types['0#0'] = "Select CType/list_type ...";
+        $exclude_ctypes = [
+            "html", "text", "image", "textpic", "textmedia", "bullets", "menu",
+            "search", "mailform", "indexed_search", "login", "header", "rte",
+            "table", "splash", "uploads", "multimedia", "media", "script",
+            "shortcut", "div"
+        ];
+        // Query aufbauen
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('tt_content')->createQueryBuilder();
+        $queryBuilder
+            ->getRestrictions()
+            ->removeAll();
+        $res = $queryBuilder ->select(...[
+            'CType',
+            'list_type'
+        ]) -> from ('tt_content');
+        $res -> andWhere(...[
+            $queryBuilder->expr()->notIn('CType', $queryBuilder->createNamedParameter($exclude_ctypes, Connection::PARAM_STR_ARRAY))
+        ]);
+        $res -> orderBy('CType', 'ASC') -> addOrderBy('list_type');
+        //$res -> groupBy('CType');
+        //print_r($res->getSQL());
+        $result = $res-> execute();
+
+        foreach($result as $row) {
+            if ($row['list_type']) {
+                $types['1#' . $row['list_type']] = $row['list_type'];
+            }
+            elseif ($row['CType'] && $row['CType']!='list') {
+                $types['2#' . $row['CType']] = $row['CType'];
+            }
+        }
+        return $types;
+    }
+
 	/**
 	 * Get list of pages/elements with extensions
 	 * 

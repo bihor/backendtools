@@ -1,26 +1,42 @@
 {namespace ex=Fixpunkt\Backendtools\ViewHelpers}
 <f:layout name="Default" />
 <f:section name="content">
-<style>
-.f3-widget-paginator { padding-left:0; }
-.f3-widget-paginator li { display:inline-block; }
-.f3-widget-paginator li.current { font-weight: bold; }
-</style>
+	<style>
+		.f3-widget-paginator { padding-left:0; }
+		.f3-widget-paginator li { display:inline-block; }
+		.f3-widget-paginator li.current { font-weight: bold; }
+		#mytype3001 {margin-bottom: 10px;}
+	</style>
+	<script>
+		require(["jquery","jquery-ui/sortable"], function($) {
+			$(document).ready(function(){
+				$('#mytype3001').change(function() {
+					const rohwert = $(this).val();
+					const typearray = rohwert.split('#');
+					if (parseInt(typearray[0]) > 0) {
+						$('#mytype' + typearray[0]).prop('checked', true);
+						$('#mytypeval').val(typearray[1]);
+					}
+				});
+			});
+		});
+	</script>
 <h1>Pages that use (specific) extensions</h1>
 <f:flashMessages />
 <f:form action="list" class="form-inline">
 <div class="row"><div class="col-md-6">
 
 <div style="margin: 10px 0;">Show only elements with this
-  <label class="checkbox-inline">
-	<f:form.radio name="my_type" value="1" checked="{my_type} == 1" /> list_type  &nbsp; or this
-  </label>
-  <label class="checkbox-inline"> 
-	<f:form.radio name="my_type" value="2" checked="{my_type} == 2" /> CType value*: &nbsp;
-  </label>
-  <label class="checkbox-inline">
-	<f:form.textfield name="my_value" value="{my_value}" size="19" />
-  </label>
+	<f:form.select name="my_value3001" options="{types}" id="mytype3001" /><br />
+    (
+	<label class="checkbox-inline">
+	    <f:form.radio name="my_type" value="1" checked="{my_type} == 1" id="mytype1" /> list_type  &nbsp; or
+    </label>
+    <label class="checkbox-inline">
+    	<f:form.radio name="my_type" value="2" checked="{my_type} == 2" id="mytype2" /> CType*:
+    </label>
+    <f:form.textfield name="my_value" value="{my_value}" size="19" id="mytypeval" />
+    &nbsp; )
 </div>
 <div style="margin: 10px 0;">Show only elements with this FlexForm value**:
 	<f:form.textfield name="my_flexform" value="{my_flexform}" />
@@ -71,10 +87,10 @@
 	<f:form.radio name="my_outp" value="1" checked="{my_outp} == 1" /> CSV
   </label>
 </div>
-
+    <br />
+	<f:form.submit value="search" class="btn btn-default" />
 </div></div>
 
-<f:form.submit value="search" class="btn btn-default" />
 </f:form>
 
 <f:if condition="{rows} > 0">

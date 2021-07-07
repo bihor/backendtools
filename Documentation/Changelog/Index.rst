@@ -11,7 +11,7 @@
 Changelog
 =========
 Version 2.2.0:
-Extension list view: search in the rootline added.
+Extension list view: selectbox and search in the rootline added.
 Extension-key added to composer.json.
 Important: action unzip removed.
 

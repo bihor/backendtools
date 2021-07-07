@@ -144,6 +144,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	$pages = $this->sessionRepository->getPagesWithExtensions(
     	    $my_c, $my_p, $my_type, $my_value, $my_flexform, $my_exclude, $my_orderby, $my_direction, $gridelements_loaded
         );
+    	$types = $this->sessionRepository->getAllTypes();
     	if ($my_recursive > 0) {
     	    $tempPages = [];
     	    foreach ($pages as $page) {
@@ -168,6 +169,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	$this->view->assign('my_direction', $my_direction);
     	$this->view->assign('rows', count($pages));
     	$this->view->assign('pages', $pages);
+        $this->view->assign('types', $types);
     	$this->view->assign('settings', $this->settings);
     }
     
