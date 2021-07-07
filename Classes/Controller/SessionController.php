@@ -125,7 +125,8 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	} else $my_direction = 0;
         if ($this->request->hasArgument('my_recursive')) {
             $my_recursive = intval($this->request->getArgument('my_recursive'));		// recursive pid search
-        } else $my_recursive = 0;
+            $default->setPagestart($my_recursive);
+        } else $my_recursive = $default->getPagestart();
 
     	if ($new) {
     		$objectManager = GeneralUtility::makeInstance(ObjectManager::class);
@@ -146,13 +147,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         );
     	$types = $this->sessionRepository->getAllTypes();
     	if ($my_recursive > 0) {
-    	    $tempPages = [];
-    	    foreach ($pages as $page) {
-    	        if ($this->sessionRepository->isInRootLine($page['pid'], $my_recursive)) {
-    	            $tempPages[] = $page;
-                }
-            }
-    	    $pages = $tempPages;
+    	    $pages = $this->sessionRepository->filterPagesRecursive($pages, $my_recursive);
         }
     	
     	// Assign
@@ -438,6 +433,10 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	} else {
     		$this->settings['pagebrowser']['itemsPerPage'] = $my_page;
     	}
+        if ($this->request->hasArgument('my_recursive')) {
+            $my_recursive = intval($this->request->getArgument('my_recursive'));		// recursive pid search
+            $default->setPagestart($my_recursive);
+        } else $my_recursive = $default->getPagestart();
     	
     	if ($new) {
     		$objectManager = GeneralUtility::makeInstance(ObjectManager::class);
@@ -465,6 +464,9 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
    					$camaliga = $this->sessionRepository->getCamaligaLinks($my_c, $my_p, $linkto_uid);
    				}	
     		}
+            if ($my_recursive > 0) {
+                $pages = $this->sessionRepository->filterPagesRecursive($pages, $my_recursive);
+            }
     	}
 
     	$this->view->assign('my_c', $my_c);
@@ -475,6 +477,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	$this->view->assign('news', $news);
     	$this->view->assign('camaliga', $camaliga);
     	$this->view->assign('my_page', $my_page);
+        $this->view->assign('my_recursive', $my_recursive);
     	$this->view->assign('settings', $this->settings);
     }
     

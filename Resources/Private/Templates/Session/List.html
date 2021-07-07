@@ -44,14 +44,9 @@
 <div style="margin: 10px 0;">Or exclude elements with this CType values***:
 	<f:form.textfield name="my_exclude" value="{my_exclude}" /> &nbsp;
 </div>
-	<div style="margin: 10px 0;">Only pages under this pid (recursive)****:
+	<div style="margin: 10px 0;"><f:translate key="LLL:EXT:backendtools/Resources/Private/Language/locallang.xlf:tx_backendtools_domain_model_session.pagestart" />:
 		<f:form.textfield name="my_recursive" value="{my_recursive}" size="5" /> &nbsp;
 	</div>
-<div style="margin: 10px 0;">Order by****:
-	<f:form.select name="my_orderby" options="{0: 'pid', 1: 'uid', 2: 'sys_language_uid', 3: 'colPos', 4: 'header', 5: 'CType', 6: 'list_type', 7: 'page title'}" value="{my_orderby}" /> &nbsp;
-	<f:form.select name="my_direction" options="{0: 'ascending', 1: 'descending'}" value="{my_direction}" /> &nbsp;
-</div>
-
 </div><div class="col-md-6">
 
 <div style="margin: 10px 0;">Show 
@@ -76,9 +71,13 @@
 	<f:form.radio name="my_c" value="2" checked="{my_c} == 2" /> only visible ... content-elements
   </label>
 </div>
-<div style="margin: 10px 0;">Elements per page:
-	<f:form.textfield name="my_page" value="{my_page}" size="5" /> &nbsp;
-</div>
+	<div style="margin: 10px 0;">Elements per page:
+    	<f:form.textfield name="my_page" value="{my_page}" size="5" /> &nbsp;
+    </div>
+	<div style="margin: 10px 0;">Order by****:
+		<f:form.select name="my_orderby" options="{0: 'pid', 1: 'uid', 2: 'sys_language_uid', 3: 'colPos', 4: 'header', 5: 'CType', 6: 'list_type', 7: 'page title'}" value="{my_orderby}" /> &nbsp;
+		<f:form.select name="my_direction" options="{0: 'ascending', 1: 'descending'}" value="{my_direction}" /> &nbsp;
+	</div>
 <div style="margin: 10px 0;">Output: 
   <label class="checkbox-inline">
 	<f:form.radio name="my_outp" value="0" checked="{my_outp} == 0" /> HTML &nbsp; or
@@ -87,10 +86,9 @@
 	<f:form.radio name="my_outp" value="1" checked="{my_outp} == 1" /> CSV
   </label>
 </div>
-    <br />
-	<f:form.submit value="search" class="btn btn-default" />
 </div></div>
 
+	<f:form.submit value="search" class="btn btn-primary" />
 </f:form>
 
 <f:if condition="{rows} > 0">

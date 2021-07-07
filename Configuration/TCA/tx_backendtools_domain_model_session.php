@@ -12,7 +12,7 @@ return [
         'iconfile' => 'EXT:backendtools/Resources/Public/Icons/tx_backendtools_domain_model_session.gif'
     ],
     'types' => [
-        '1' => ['showitem' => 'action, value1, value2, value3, value4, value5, value6, pageel, beuser'],
+        '1' => ['showitem' => 'action, value1, value2, value3, value4, value5, value6, pageel, pagestart, beuser'],
     ],
     'columns' => [
 
@@ -82,6 +82,15 @@ return [
         'pageel' => [
             'exclude' => false,
             'label' => 'LLL:EXT:backendtools/Resources/Private/Language/locallang_db.xlf:tx_backendtools_domain_model_session.pageel',
+            'config' => [
+                'type' => 'input',
+                'size' => 4,
+                'eval' => 'int'
+            ],
+        ],
+        'pagestart' => [
+            'exclude' => false,
+            'label' => 'LLL:EXT:backendtools/Resources/Private/Language/locallang_db.xlf:tx_backendtools_domain_model_session.pagestart',
             'config' => [
                 'type' => 'input',
                 'size' => 4,

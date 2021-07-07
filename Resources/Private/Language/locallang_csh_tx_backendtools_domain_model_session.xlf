@@ -27,6 +27,9 @@
 			<trans-unit id="pageel.description">
 				<source>Elements per page</source>
 			</trans-unit>
+			<trans-unit id="pagestart.description">
+				<source>Only pages under this page (uid; recursive)</source>
+			</trans-unit>
 			<trans-unit id="beuser.description">
 				<source>beuser</source>
 			</trans-unit>

@@ -34,7 +34,9 @@
 	<f:form.radio name="my_p" value="0" checked="{my_p} == 0" /> all ... pages.
   </label>
 </div>
-
+	<div style="margin: 10px 0;"><f:translate key="LLL:EXT:backendtools/Resources/Private/Language/locallang.xlf:tx_backendtools_domain_model_session.pagestart" />:
+		<f:form.textfield name="my_recursive" value="{my_recursive}" size="5" /> &nbsp;
+	</div>
 </div><div class="col-md-6">
 
 <div style="margin: 10px 0;">Find links with this target ID (UID of a page): 
@@ -49,7 +51,7 @@
 
 </div></div>
 
-<f:form.submit value="search" name="search" class="btn btn-default" />
+<f:form.submit value="search" name="search" class="btn btn-primary" />
 </f:form>
 
 <f:if condition="{pages -> f:count()} > 0">
@@ -77,7 +79,7 @@
 		<tr{f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
 			<td>
 				<ex:editLink action="edit" table="tt_content" uid="{page.uid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=pagesearch">
-      				<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-open.svg" width="16" height="16">
+					<core:icon identifier="actions-open" size="small" />
       			</ex:editLink>
       			{page.uid}
       		</td>

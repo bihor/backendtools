@@ -90,7 +90,14 @@ class Session extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
      * @var int
      */
     protected $pageel = 0;
-    
+
+    /**
+     * Search from this pid
+     *
+     * @var int
+     */
+    protected $pagestart = 0;
+
     /**
      * beuser
      *
@@ -266,7 +273,28 @@ class Session extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     {
     	$this->pageel = $pageel;
     }
-    
+
+    /**
+     * Returns the pagestart
+     *
+     * @return int $pagestart
+     */
+    public function getPagestart()
+    {
+        return $this->pagestart;
+    }
+
+    /**
+     * Sets the pagestart
+     *
+     * @param int $pagestart
+     * @return void
+     */
+    public function setPagestart($pagestart)
+    {
+        $this->pagestart = $pagestart;
+    }
+
     /**
      * Returns the beuser
      *

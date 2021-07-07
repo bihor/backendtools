@@ -90,7 +90,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         $res -> andWhere(...[
             $queryBuilder->expr()->notIn('CType', $queryBuilder->createNamedParameter($exclude_ctypes, Connection::PARAM_STR_ARRAY))
         ]);
-        $res -> orderBy('CType', 'ASC') -> addOrderBy('list_type');
+        $res -> orderBy('list_type', 'ASC') -> addOrderBy('CType');
         //$res -> groupBy('CType');
         //print_r($res->getSQL());
         $result = $res-> execute();
@@ -1016,6 +1016,24 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 	    return $domain;
 	}
 
+
+    /**
+     * Take only pages under a pid
+     *
+     * @param	array	$pages	page-array
+     * @param	int		$uid	page-uid
+     * @return array
+     */
+    public function filterPagesRecursive($pages, $uid)
+    {
+        $tempPages = [];
+        foreach ($pages as $page) {
+            if ($this->isInRootLine($page['pid'], $uid)) {
+                $tempPages[] = $page;
+            }
+        }
+        return $tempPages;
+    }
 
     /**
      * Check if a page is in the rootline

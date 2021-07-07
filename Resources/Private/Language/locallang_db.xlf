@@ -30,8 +30,11 @@
 			<trans-unit id="tx_backendtools_domain_model_session.pageel">
 				<source>Elements per page</source>
 			</trans-unit>
+			<trans-unit id="tx_backendtools_domain_model_session.pagestart">
+				<source>Only pages under this page (uid; recursive)</source>
+			</trans-unit>
 			<trans-unit id="tx_backendtools_domain_model_session.beuser">
-				<source>Beuser</source>
+				<source>Backenduser</source>
 			</trans-unit>
 		</body>
 	</file>
