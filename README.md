@@ -1,6 +1,6 @@
 # backendtools
 
-version 2.1.5
+version 2.1.6
 
 7 admin tools for extensions, slug, redirects, files, images and links:
 extensionlist, Slug vs. RealURL, import redirects, check redirects, delete unused files, images with no title and linklist.
@@ -12,5 +12,5 @@ Version 2.1.0: redirects check tool added. Bugfix for redirect imports.
 Gridelements infos added to the extension list view. 
 
 Version 2.2.0: extension-key added to composer.json.
-Selectbox and rootline search added to the extension list view.
-Unzip action removed!
+List views: search in the rootline and selectbox in the extension-list added.
+Breaking: unzip action removed!

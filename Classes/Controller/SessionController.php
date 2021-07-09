@@ -307,6 +307,10 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	} else {
     		$this->settings['pagebrowser']['itemsPerPage'] = $my_page;
     	}
+        if ($this->request->hasArgument('my_recursive')) {
+            $my_recursive = intval($this->request->getArgument('my_recursive'));		// recursive pid search
+            $default->setPagestart($my_recursive);
+        } else $my_recursive = $default->getPagestart();
     	
     	if ($img_without) {
     		$finalArray = $this->sessionRepository->getImagesWithout($img_without, $img_other);
@@ -375,6 +379,9 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     		}
     		$finalArray = $this->sessionRepository->getImagesWithout($img_without, $img_other);
     	}
+        if (count($finalArray)>0 && $my_recursive>0) {
+            $finalArray = $this->sessionRepository->filterPagesRecursive($finalArray, $my_recursive);
+        }
 
     	$this->view->assign('img_without', $img_without);
     	$this->view->assign('img_other', $img_other);
@@ -382,6 +389,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	$this->view->assign('images', $finalArray);
     	$this->view->assign('imagesReplaced', $replacedArray);
     	$this->view->assign('my_page', $my_page);
+        $this->view->assign('my_recursive', $my_recursive);
     	$this->view->assign('settings', $this->settings);
     }
     

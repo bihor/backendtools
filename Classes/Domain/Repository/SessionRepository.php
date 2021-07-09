@@ -1028,7 +1028,11 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
     {
         $tempPages = [];
         foreach ($pages as $page) {
-            if ($this->isInRootLine($page['pid'], $uid)) {
+            $pid = $page['pid'];
+            if (!$pid) {
+                $pid = $page['tt_pid'];
+            }
+            if ($this->isInRootLine($pid, $uid)) {
                 $tempPages[] = $page;
             }
         }

@@ -10,10 +10,10 @@
 
 Changelog
 =========
-Version 2.2.0:
-Extension list view: selectbox and search in the rootline added.
+Version 3.0.0:
+List views: search in the rootline and selectbox in the extension-list added.
 Extension-key added to composer.json.
-Important: action unzip removed.
+Breaking: action unzip removed.
 
 Version 2.1.0:
 Redirects check tool added.
