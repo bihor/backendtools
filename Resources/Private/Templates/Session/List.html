@@ -2,10 +2,19 @@
 <f:layout name="Default" />
 <f:section name="content">
 	<style>
+		:root {
+			--shadow: 0.3rem 0.3rem 0.6rem #aaddff,
+			-0.2rem -0.2rem 0.5rem #ffffff;
+		}
 		.f3-widget-paginator { padding-left:0; }
 		.f3-widget-paginator li { display:inline-block; }
 		.f3-widget-paginator li.current { font-weight: bold; }
 		#mytype3001 {margin-bottom: 10px;}
+		#typo3-inner-docbody {padding-top: 4px;}
+		input,select,table.table {
+			-webkit-box-shadow: var(--shadow);
+			box-shadow: var(--shadow);
+		}
 	</style>
 	<script>
 		require(["jquery","jquery-ui/sortable"], function($) {
@@ -26,66 +35,66 @@
 <f:form action="list" class="form-inline">
 <div class="row"><div class="col-md-6">
 
-<div style="margin: 10px 0;">Show only elements with this
-	<f:form.select name="my_value3001" options="{types}" id="mytype3001" /><br />
-    (
-	<label class="checkbox-inline">
-	    <f:form.radio name="my_type" value="1" checked="{my_type} == 1" id="mytype1" /> list_type  &nbsp; or
-    </label>
-    <label class="checkbox-inline">
-    	<f:form.radio name="my_type" value="2" checked="{my_type} == 2" id="mytype2" /> CType*:
-    </label>
-    <f:form.textfield name="my_value" value="{my_value}" size="19" id="mytypeval" />
-    &nbsp; )
-</div>
-<div style="margin: 10px 0;">Show only elements with this FlexForm value**:
-	<f:form.textfield name="my_flexform" value="{my_flexform}" />
-</div>
-<div style="margin: 10px 0;">Or exclude elements with this CType values***:
-	<f:form.textfield name="my_exclude" value="{my_exclude}" /> &nbsp;
-</div>
-	<div style="margin: 10px 0;"><f:translate key="LLL:EXT:backendtools/Resources/Private/Language/locallang.xlf:tx_backendtools_domain_model_session.pagestart" />:
-		<f:form.textfield name="my_recursive" value="{my_recursive}" size="5" /> &nbsp;
+	<div style="margin: 10px 0;">Show only elements with this
+		<f:form.select name="my_value3001" options="{types}" id="mytype3001" /><br />
+		(
+		<label class="checkbox-inline">
+			<f:form.radio name="my_type" value="1" checked="{my_type} == 1" id="mytype1" /> list_type  &nbsp; or
+		</label>
+		<label class="checkbox-inline">
+			<f:form.radio name="my_type" value="2" checked="{my_type} == 2" id="mytype2" /> CType*:
+		</label>
+		<f:form.textfield name="my_value" value="{my_value}" size="19" id="mytypeval" />
+		&nbsp; )
 	</div>
-</div><div class="col-md-6">
-
-<div style="margin: 10px 0;">Show 
-  <label class="checkbox-inline">
-	<f:form.radio name="my_p" value="0" checked="{my_p} == 0" /> all &nbsp; or
-  </label>
-  <label class="checkbox-inline">
-	<f:form.radio name="my_p" value="1" checked="{my_p} == 1" /> only hidden &nbsp; or
-  </label>
-  <label class="checkbox-inline">
-	<f:form.radio name="my_p" value="2" checked="{my_p} == 2" /> only visible ... pages
-  </label>
-</div>
-<div style="margin: 10px 0;">Show
-  <label class="checkbox-inline">
-	<f:form.radio name="my_c" value="0" checked="{my_c} == 0" /> all &nbsp; or
-  </label>
-  <label class="checkbox-inline">
-	<f:form.radio name="my_c" value="1" checked="{my_c} == 1" /> only hidden &nbsp; or
-  </label>
-  <label class="checkbox-inline">
-	<f:form.radio name="my_c" value="2" checked="{my_c} == 2" /> only visible ... content-elements
-  </label>
-</div>
-	<div style="margin: 10px 0;">Elements per page:
-    	<f:form.textfield name="my_page" value="{my_page}" size="5" /> &nbsp;
-    </div>
+	<div style="margin: 10px 0;">Show only elements with this FlexForm value**:
+		<f:form.textfield name="my_flexform" value="{my_flexform}" />
+	</div>
+	<div style="margin: 10px 0;">Or exclude elements with this CType values***:
+		<f:form.textfield name="my_exclude" value="{my_exclude}" /> &nbsp;
+	</div>
 	<div style="margin: 10px 0;">Order by****:
 		<f:form.select name="my_orderby" options="{0: 'pid', 1: 'uid', 2: 'sys_language_uid', 3: 'colPos', 4: 'header', 5: 'CType', 6: 'list_type', 7: 'page title'}" value="{my_orderby}" /> &nbsp;
 		<f:form.select name="my_direction" options="{0: 'ascending', 1: 'descending'}" value="{my_direction}" /> &nbsp;
 	</div>
-<div style="margin: 10px 0;">Output: 
-  <label class="checkbox-inline">
-	<f:form.radio name="my_outp" value="0" checked="{my_outp} == 0" /> HTML &nbsp; or
-  </label>
-  <label class="checkbox-inline">
-	<f:form.radio name="my_outp" value="1" checked="{my_outp} == 1" /> CSV
-  </label>
-</div>
+</div><div class="col-md-6">
+
+	<div style="margin: 10px 0;">Show
+	  <label class="checkbox-inline">
+		<f:form.radio name="my_p" value="0" checked="{my_p} == 0" /> all &nbsp; or
+	  </label>
+	  <label class="checkbox-inline">
+		<f:form.radio name="my_p" value="1" checked="{my_p} == 1" /> only hidden &nbsp; or
+	  </label>
+	  <label class="checkbox-inline">
+		<f:form.radio name="my_p" value="2" checked="{my_p} == 2" /> only visible ... pages
+	  </label>
+	</div>
+	<div style="margin: 10px 0;">Show
+	  <label class="checkbox-inline">
+		<f:form.radio name="my_c" value="0" checked="{my_c} == 0" /> all &nbsp; or
+	  </label>
+	  <label class="checkbox-inline">
+		<f:form.radio name="my_c" value="1" checked="{my_c} == 1" /> only hidden &nbsp; or
+	  </label>
+	  <label class="checkbox-inline">
+		<f:form.radio name="my_c" value="2" checked="{my_c} == 2" /> only visible ... content-elements
+	  </label>
+	</div>
+	<div style="margin: 10px 0;"><f:translate key="LLL:EXT:backendtools/Resources/Private/Language/locallang.xlf:tx_backendtools_domain_model_session.pagestart" />:
+		<f:form.textfield name="my_recursive" value="{my_recursive}" size="5" /> &nbsp;
+	</div>
+	<div style="margin: 10px 0;">Elements per page:
+    	<f:form.textfield name="my_page" value="{my_page}" size="5" /> &nbsp;
+    </div>
+	<div style="margin: 10px 0;">Output:
+	  <label class="checkbox-inline">
+		<f:form.radio name="my_outp" value="0" checked="{my_outp} == 0" /> HTML &nbsp; or
+	  </label>
+	  <label class="checkbox-inline">
+		<f:form.radio name="my_outp" value="1" checked="{my_outp} == 1" /> CSV
+	  </label>
+	</div>
 </div></div>
 
 	<f:form.submit value="search" class="btn btn-default" />
@@ -125,7 +134,7 @@ uid;lang.;colPos;deleted;hidden;header;CType;list_type;FlexForm actions;uid;dele
 		</thead>
 		<tbody>
 			<f:for each="{paginatedpages}" as="page" iteration="iterator">
-				<tr{f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
+				<tr style="background-color:{f:if(condition:iterator.isOdd, then: '#fff', else: '#e7e7e7')};">
 					<td>
 						<ex:editLink action="edit" table="tt_content" uid="{page.uid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=list">
 		      				<core:icon identifier="actions-open" size="small" />

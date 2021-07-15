@@ -4,10 +4,19 @@
 	<h1>Check sys_redirect entries for error targets</h1>
 	<f:flashMessages />
 	<style>
-	.isok {color:#007700}
-	.f3-widget-paginator { padding-left:0; }
-	.f3-widget-paginator li { display:inline-block; }
-	.f3-widget-paginator li.current { font-weight: bold; }
+		:root {
+			--shadow: 0.3rem 0.3rem 0.6rem #aaddff,
+			-0.2rem -0.2rem 0.5rem #ffffff;
+		}
+		.f3-widget-paginator { padding-left:0; }
+		.f3-widget-paginator li { display:inline-block; }
+		.f3-widget-paginator li.current { font-weight: bold; }
+		#typo3-inner-docbody {padding-top: 4px;}
+		input,select,table.table {
+			-webkit-box-shadow: var(--shadow);
+			box-shadow: var(--shadow);
+		}
+		.isok {color:#007700}
 	</style>
 	<f:form action="redirectscheck" class="form-inline">
 		<div class="row"><div class="col-md-3">
