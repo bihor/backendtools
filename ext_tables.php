@@ -13,7 +13,7 @@ call_user_func(
 				'mod1', // Submodule key
 				'', // Position
 				[
-					'Session' => 'list, filedeletion, images, pagesearch, redirects, redirectscheck, realurl',
+                    \Fixpunkt\Backendtools\Controller\SessionController::class => 'list, filedeletion, images, pagesearch, redirects, redirectscheck',
 				],
 				[
 					'access' => 'user,group',

@@ -10,6 +10,10 @@
 
 Changelog
 =========
+Version 4.0.0:
+Now for TYPO3 10 and 11.3.
+Breaking: action realurl removed.
+
 Version 3.0.0:
 List views: search in the rootline and selectbox in the extension-list added.
 Extension-key added to composer.json.

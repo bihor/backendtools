@@ -12,7 +12,7 @@
 
 $EM_CONF[$_EXTKEY] = array (
   'title' => 'Backend tools',
-  'description' => '7 admin tools: extension-list, slug vs. RealURL, redirects import & check, file-deletion, images with no alt or title and link-list.',
+  'description' => '6 admin tools: extension-list, redirects import & check, file-deletion, images with no alt or title and link-list.',
   'category' => 'module',
   'author' => 'Kurt Gusbeth',
   'author_company' => 'fixpunkt werbeagentur gmbh',
@@ -21,11 +21,11 @@ $EM_CONF[$_EXTKEY] = array (
   'uploadfolder' => false,
   'createDirs' => '',
   'clearCacheOnLoad' => false,
-  'version' => '3.0.0',
+  'version' => '4.0.0',
   'constraints' => 
   array (
     'depends' => array (
-        'typo3' => '9.5.20-10.4.99',
+        'typo3' => '10.4.6-11.3.99',
     ),
   ),
 );

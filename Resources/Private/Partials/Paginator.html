@@ -1,0 +1,35 @@
+<ul class="pagination pagination-block">
+    <f:if condition="{pagination.previousPageNumber} && {pagination.previousPageNumber} >= {pagination.firstPageNumber}">
+        <f:then>
+            <li class="waves-effect">
+                <a href="{f:uri.action(action:'{action}', arguments:{currentPage: 1})}" title="first">
+                    First
+                </a>
+            </li>
+            <li class="waves-effect">
+                <a href="{f:uri.action(action:'{action}', arguments:{currentPage: pagination.previousPageNumber})}" title="previous">
+                    previous
+                </a>
+            </li>
+        </f:then>
+    </f:if>
+    <f:for each="{no_pages}" as="page">
+        <li class="{f:if(condition: '{page} == {paginator.currentPageNumber}', then:'active', else:'waves-effect')}">
+            <a href="{f:uri.action(action:'{action}', arguments:{currentPage: page})}">{page}</a>
+        </li>
+    </f:for>
+    <f:if condition="{pagination.nextPageNumber} && {pagination.nextPageNumber} <= {pagination.lastPageNumber}">
+        <f:then>
+            <li class="waves-effect">
+                <a href="{f:uri.action(action:'{action}', arguments:{currentPage: pagination.nextPageNumber})}" title="next">
+                    next
+                </a>
+            </li>
+            <li class="waves-effect">
+                <a href="{f:uri.action(action:'{action}', arguments:{currentPage: pagination.lastPageNumber})}" title="last">
+                    last
+                </a>
+            </li>
+        </f:then>
+    </f:if>
+</ul>

@@ -23,7 +23,7 @@ Backend tools
 		en
 
 	:Description:
-		8 admin tools for TYPO3 extension listing, slugs vs. RealURL-path, redirects, unzip, unused files, images with no alt- or title-tag and links.
+		6 admin tools for TYPO3 extension listing, redirects, unused files, images with no alt- or title-tag and links.
 
 	:Keywords:
 		backend,tools,extensions

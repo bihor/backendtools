@@ -5,6 +5,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Domain\Repository\BackendUserRepository;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Pagination\ArrayPaginator;
+use TYPO3\CMS\Core\Pagination\SimplePagination;
 
 /***************************************************************
  *
@@ -77,7 +79,10 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
  			$new = FALSE;
  			$default = $result[0];
  		}
- 			
+
+        if ($this->request->hasArgument('currentPage')) {
+            $currentPage = intval($this->request->getArgument('currentPage'));
+        } else $currentPage = 1;
     	if ($this->request->hasArgument('my_c')) {
     		$my_c = intval($this->request->getArgument('my_c'));		// content visibility
     		$default->setValue1($my_c);
@@ -149,7 +154,10 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	if ($my_recursive > 0) {
     	    $pages = $this->sessionRepository->filterPagesRecursive($pages, $my_recursive);
         }
-    	
+
+        $arrayPaginator = new ArrayPaginator($pages, $currentPage, $this->settings['pagebrowser']['itemsPerPage']);
+        $pagination = new SimplePagination($arrayPaginator);
+
     	// Assign
     	$this->view->assign('my_p', $my_p);
     	$this->view->assign('my_c', $my_c);
@@ -164,8 +172,12 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	$this->view->assign('my_direction', $my_direction);
     	$this->view->assign('rows', count($pages));
     	$this->view->assign('pages', $pages);
+        $this->view->assign('paginator', $arrayPaginator);
+        $this->view->assign('pagination', $pagination);
+        $this->view->assign('no_pages', range(1, $pagination->getLastPageNumber()));
         $this->view->assign('types', $types);
     	$this->view->assign('settings', $this->settings);
+        $this->view->assign('action', 'list');
     }
     
     /**
@@ -286,7 +298,10 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     		$new = FALSE;
     		$default = $result[0];
     	}
-    	
+
+        if ($this->request->hasArgument('currentPage')) {
+            $currentPage = intval($this->request->getArgument('currentPage'));
+        } else $currentPage = 1;
     	if ($this->request->hasArgument('img_without')) {
     		$img_without = intval($this->request->getArgument('img_without'));
 	    	$default->setValue1($img_without);
@@ -383,14 +398,22 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             $finalArray = $this->sessionRepository->filterPagesRecursive($finalArray, $my_recursive);
         }
 
+        if (!$finalArray) $finalArray = [];
+        $arrayPaginator = new ArrayPaginator($finalArray, $currentPage, $this->settings['pagebrowser']['itemsPerPage']);
+        $pagination = new SimplePagination($arrayPaginator);
+
     	$this->view->assign('img_without', $img_without);
     	$this->view->assign('img_other', $img_other);
     	$this->view->assign('count', $count);
     	$this->view->assign('images', $finalArray);
     	$this->view->assign('imagesReplaced', $replacedArray);
+        $this->view->assign('paginator', $arrayPaginator);
+        $this->view->assign('pagination', $pagination);
+        $this->view->assign('no_pages', range(1, $pagination->getLastPageNumber()));
     	$this->view->assign('my_page', $my_page);
         $this->view->assign('my_recursive', $my_recursive);
     	$this->view->assign('settings', $this->settings);
+        $this->view->assign('action', 'images');
     }
     
     /**
@@ -411,7 +434,10 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     		$new = FALSE;
     		$default = $result[0];
     	}
-    	
+
+        if ($this->request->hasArgument('currentPage')) {
+            $currentPage = intval($this->request->getArgument('currentPage'));
+        } else $currentPage = 1;
     	if ($this->request->hasArgument('my_c')) {
     		$my_c = intval($this->request->getArgument('my_c'));
     		$default->setValue1($my_c);
@@ -477,6 +503,10 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             }
     	}
 
+    	if (!$pages) $pages = [];
+        $arrayPaginator = new ArrayPaginator($pages, $currentPage, $this->settings['pagebrowser']['itemsPerPage']);
+        $pagination = new SimplePagination($arrayPaginator);
+
     	$this->view->assign('my_c', $my_c);
     	$this->view->assign('my_p', $my_p);
     	$this->view->assign('linksto', $linksto);
@@ -484,111 +514,15 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	$this->view->assign('pages', $pages);
     	$this->view->assign('news', $news);
     	$this->view->assign('camaliga', $camaliga);
+        $this->view->assign('paginator', $arrayPaginator);
+        $this->view->assign('pagination', $pagination);
+        $this->view->assign('no_pages', range(1, $pagination->getLastPageNumber()));
     	$this->view->assign('my_page', $my_page);
         $this->view->assign('my_recursive', $my_recursive);
     	$this->view->assign('settings', $this->settings);
+        $this->view->assign('action', 'pagesearch');
     }
-    
-    /**
-     * action realurl: compare RealUrl path with slug
-     *
-     * @return void
-     */
-    public function realurlAction()
-    {
-    	$beuser_id = $GLOBALS['BE_USER']->user['uid'];
-    	$result = $this->sessionRepository->findByAction('realurl', $beuser_id);
-    	if ($result->count() == 0) {
-    		$new = TRUE;
-    		$default = GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
-    		$default->setAction('realurl');
-    		$default->setValue1(0);
-    		$default->setValue2(0);
-    		$default->setValue3(0);
-    	} else {
-    		$new = FALSE;
-    		$default = $result[0];
-    	}
-    	
-    	if ($this->request->hasArgument('my_p')) {
-    		$my_p = intval($this->request->getArgument('my_p'));
-    		$default->setValue1($my_p);
-    	} else $my_p = $default->getValue1();
-    	if ($this->request->hasArgument('my_e')) {
-    		$my_e = intval($this->request->getArgument('my_e'));
-    		$default->setValue2($my_e);
-    	} else $my_e = $default->getValue2();
-    	if ($this->request->hasArgument('my_s')) {
-    		$my_s = intval($this->request->getArgument('my_s'));
-    		$default->setValue3($my_s);
-    	} else $my_s = $default->getValue3();
-    	if ($this->request->hasArgument('my_page')) {
-    		$my_page = intval($this->request->getArgument('my_page'));		// elements per page
-    		$default->setPageel($my_page);
-    	} else $my_page = $default->getPageel();
-    	if (!$my_page) {
-    		$my_page = $this->settings['pagebrowser']['itemsPerPage'];
-    		if (!$my_page) {
-    			$my_page = $this->settings['pagebrowser']['itemsPerPage'] = 25;
-    		}
-    	} else {
-    		$this->settings['pagebrowser']['itemsPerPage'] = $my_page;
-    	}
-    	
-    	if ($new) {
-    		$objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-    		$backendUserRepository = $objectManager->get(BackendUserRepository::class);
-    		/** @var \TYPO3\CMS\Extbase\Domain\Model\BackendUser $user */
-    		$user = $backendUserRepository->findByUid($beuser_id);
-    		$default->setBeuser($user);
-    		$this->sessionRepository->add($default);
-    		$persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
-    		$persistenceManager->persistAll();
-    	} else {
-    		$this->sessionRepository->update($default);
-    	}
-    	
-    	$pagesRealurl = $this->sessionRepository->getPagesRealurl();
-    	$pagesSlug    = $this->sessionRepository->getPagesSlug($my_p);
-    	$pages        = [];
-    	
-    	foreach ($pagesSlug as $key => $langArray) {
-    		foreach ($langArray as $langId => $value) {
-	    		$slug = $value['slug'];
-	    		$realurl = $pagesRealurl[$key][$langId];
-	    		if ($slug != $realurl) {
-	    			if ($my_s == 1) {
-	    			    // wenn bei der Domainangabe noch ein Pfad drin ist, übernehmen wir hier mal auch den Pfad
-	    			    $base = $value['domain'];
-	    			    if (substr($base, 0, 4) == 'http') {
-	    			        $parse_url = parse_url($base);
-	    			        $base = $parse_url['path'];
-	    			    }
-	    			    $slug2 = rtrim($base, '/') . $slug;
-	    			} else {
-	    			    $slug2 = $slug;
-	    			}
-		    		if ($slug2 != $realurl) {
-		    			if (($my_e == 0) || (($my_e == 1) && !$realurl) || (($my_e == 2) && $realurl)) {
-			    			$pages[$key] = $value;
-			    			$pages[$key]['uid'] = $key;
-			    			$pages[$key]['slug2'] = $slug2;   			//$pages[$key]['slug'] = $value['slug'];
-			    			$pages[$key]['realurl'] = $realurl;
-		    			}
-		    		}
-	    		}
-    		}
-    	}
-    	
-    	$this->view->assign('my_p', $my_p);
-    	$this->view->assign('my_e', $my_e);
-    	$this->view->assign('my_s', $my_s);
-    	$this->view->assign('my_page', $my_page);
-    	$this->view->assign('settings', $this->settings);
-    	$this->view->assign('pages', $pages);
-    	//$this->view->assign('pagesRealURL', $pagesRealurl);
-    }
-    
+
     /**
      * action redirects import
      *
@@ -613,7 +547,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     		$new = FALSE;
     		$default = $result[0];
     	}
-    	
+
     	if ($this->request->hasArgument('method')) {
     		$method = intval($this->request->getArgument('method'));
     		$default->setValue1($method);
@@ -732,6 +666,9 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             $default = $result[0];
         }
 
+        if ($this->request->hasArgument('currentPage')) {
+            $currentPage = intval($this->request->getArgument('currentPage'));
+        } else $currentPage = 1;
         if ($this->request->hasArgument('my_http')) {
             $my_http = intval($this->request->getArgument('my_http'));
             $default->setValue1($my_http);
@@ -752,14 +689,8 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         } else {
             $this->settings['pagebrowser']['itemsPerPage'] = $my_page;
         }
-        if ($this->request->hasArgument('@widget_0')) {
-            $widget = $this->request->getArgument('@widget_0');
-            $page = $widget['currentPage'];
-        } else {
-            $page = 1;
-        }
-        $limit_from = ($page-1) * $my_page;
-        $limit_to = $page * $my_page;
+        $limit_from = ($currentPage-1) * $my_page;
+        $limit_to = $currentPage * $my_page;
 
         if ($new) {
             $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
@@ -782,7 +713,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
                     $this->sessionRepository->deleteRedirect($uid);
                     $i++;
                 }
-                $content = $i . ' entries deleted.';
+                $content = $i . ' entry/ies deleted.';
             }
         }
 
@@ -885,13 +816,21 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             }
         }
 
+        if (!$redirectsArray) $redirectsArray = [];
+        $arrayPaginator = new ArrayPaginator($redirectsArray, $currentPage, $this->settings['pagebrowser']['itemsPerPage']);
+        $pagination = new SimplePagination($arrayPaginator);
+
         $this->view->assign('message', $content);
         $this->view->assign('redirects', $redirectsArray);
+        $this->view->assign('paginator', $arrayPaginator);
+        $this->view->assign('pagination', $pagination);
+        $this->view->assign('no_pages', range(1, $pagination->getLastPageNumber()));
         $this->view->assign('my_http', $my_http);
         $this->view->assign('my_error', $my_error);
         $this->view->assign('my_page', $my_page);
-        $this->view->assign('page', $page);
+        $this->view->assign('page', $currentPage);
         $this->view->assign('settings', $this->settings);
+        $this->view->assign('action', 'redirectscheck');
     }
 
 

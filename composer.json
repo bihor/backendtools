@@ -1,14 +1,14 @@
 {
 	"name" : "fixpunkt/backendtools",
 	"type" : "typo3-cms-extension",
-	"description" : "7 admin tools for extension listing, redirects, Slugs vs. RealURL, unused files, images with no alt- or title-tag and links.",
+	"description" : "6 admin tools for extension listing, redirects, unused files, images with no alt- or title-tag and links.",
 	"authors" : [{
 			"name" : "Kurt Gusbeth",
 			"role" : "Developer"
 		}
 	],
 	"require" : {
-		"typo3/cms-core" : "~9.5.20 || ~10.4.6"
+		"typo3/cms-core" : "~10.4.6 || ~11.3.1"
 	},
 	"autoload" : {
 		"psr-4" : {
