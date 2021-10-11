@@ -1,6 +1,6 @@
 # backendtools
 
-version 4.0.0
+version 4.0.1
 
 6 admin tools for extensions, slug, redirects, files, images and links:
 extensionlist, import redirects, check redirects, delete unused files, images with no title and linklist.
@@ -12,5 +12,5 @@ Version 3.0.0: extension-key added to composer.json.
 List views: search in the rootline and selectbox in the extension-list added.
 Breaking: unzip action removed!
 
-Version 4.0.0: now for TYPO3 10 and 11.3.
+Version 4.0.1: now for TYPO3 10 and 11.
 Breaking: realurl action removed!

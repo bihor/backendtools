@@ -18,14 +18,13 @@ $EM_CONF[$_EXTKEY] = array (
   'author_company' => 'fixpunkt werbeagentur gmbh',
   'author_email' => 'info@quizpalme.de',
   'state' => 'stable',
-  'uploadfolder' => false,
   'createDirs' => '',
   'clearCacheOnLoad' => false,
-  'version' => '4.0.0',
+  'version' => '4.0.1',
   'constraints' => 
   array (
     'depends' => array (
-        'typo3' => '10.4.6-11.3.99',
+        'typo3' => '10.4.6-11.5.99',
     ),
   ),
 );

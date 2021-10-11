@@ -17,7 +17,7 @@ call_user_func(
 				],
 				[
 					'access' => 'user,group',
-					'icon'   => 'EXT:backendtools/ext_icon.gif',
+					'icon'   => 'EXT:backendtools/Resources/Public/Icons/user_mod_mod1.gif',
 					'labels' => 'LLL:EXT:backendtools/Resources/Private/Language/locallang_mod1.xlf',
 				]
 			);

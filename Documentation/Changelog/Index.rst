@@ -10,8 +10,8 @@
 
 Changelog
 =========
-Version 4.0.0:
-Now for TYPO3 10 and 11.3.
+Version 4.0.1:
+Now for TYPO3 10 and 11.
 Breaking: action realurl removed.
 
 Version 3.0.0:
