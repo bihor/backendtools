@@ -1,6 +1,12 @@
 {namespace ex=Fixpunkt\Backendtools\ViewHelpers}
+<html
+		xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+		xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+		xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers"
+		data-namespace-typo3-fluid="true">
+
 <f:layout name="Default" />
-<f:section name="content">
+<f:section name="Content">
 	<style>
 		:root {
 			--shadow: 0.3rem 0.3rem 0.6rem #aaddff,
@@ -96,6 +102,7 @@
 
 	<f:form.submit value="search" class="btn btn-default" />
 </f:form>
+<br>
 
 <f:if condition="{rows} > 0">
 <f:then>
@@ -166,7 +173,7 @@ uid;lang.;colPos;deleted;hidden;header;CType;list_type;FlexForm actions;uid;dele
 		</table>
 		<f:if condition="{settings.pagebrowser.insertBelow} && ({paginator.numberOfPages} > 1)">
 			<f:render partial="Paginator" arguments="{_all}" />
-			<p>Element {pagination.startRecordNumber} - {pagination.endRecordNumber}.</p>
+			<!-- p>Element {pagination.startRecordNumber} - {pagination.endRecordNumber}.</p -->
 		</f:if>
 	</f:else>
 	</f:if>
@@ -181,3 +188,5 @@ uid;lang.;colPos;deleted;hidden;header;CType;list_type;FlexForm actions;uid;dele
 	***: you can use more values, separated by a space.
 	****: this fields are not working with the pagination, because they are not stored in the database.</i></p>
 </f:section>
+
+</html>

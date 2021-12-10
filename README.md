@@ -1,6 +1,6 @@
 # backendtools
 
-version 4.0.1
+version 4.0.2
 
 6 admin tools for extensions, slug, redirects, files, images and links:
 extensionlist, import redirects, check redirects, delete unused files, images with no title and linklist.
@@ -14,3 +14,5 @@ Breaking: unzip action removed!
 
 Version 4.0.1: now for TYPO3 10 and 11.
 Breaking: realurl action removed!
+
+Version 4.0.2: Layout adapted to TYPO3 11.
