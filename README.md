@@ -15,4 +15,5 @@ Breaking: unzip action removed!
 Version 4.0.1: now for TYPO3 10 and 11.
 Breaking: realurl action removed!
 
-Version 4.0.2: Layout adapted to TYPO3 11.
+Version 4.0.3: Layout adapted to TYPO3 11.
+Checking of start- and endtime added.

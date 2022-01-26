@@ -8,17 +8,17 @@ call_user_func(
 		if (TYPO3_MODE === 'BE') {
 			
 			\TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerModule(
-				'Fixpunkt.Backendtools',
+				'Backendtools',
 				'tools', // Make module a submodule of 'tools'
 				'mod1', // Submodule key
 				'', // Position
 				[
-                    \Fixpunkt\Backendtools\Controller\SessionController::class => 'list, filedeletion, images, pagesearch, redirects, redirectscheck',
+                    \Fixpunkt\Backendtools\Controller\SessionController::class => 'list, filedeletion, images, pagesearch, redirects, redirectscheck'
 				],
 				[
 					'access' => 'user,group',
 					'icon'   => 'EXT:backendtools/Resources/Public/Icons/user_mod_mod1.gif',
-					'labels' => 'LLL:EXT:backendtools/Resources/Private/Language/locallang_mod1.xlf',
+					'labels' => 'LLL:EXT:backendtools/Resources/Private/Language/locallang_mod1.xlf'
 				]
 			);
 		}

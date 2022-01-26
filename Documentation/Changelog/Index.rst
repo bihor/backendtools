@@ -10,6 +10,10 @@
 
 Changelog
 =========
+Version 4.0.3:
+Layout adapted to TYPO3 11.
+Checking of start- and endtime added.
+
 Version 4.0.1:
 Now for TYPO3 10 and 11.
 Breaking: action realurl removed.

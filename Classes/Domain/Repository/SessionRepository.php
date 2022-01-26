@@ -184,13 +184,23 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 			$res -> andWhere(...[
 				$queryBuilder->expr()->orX(
 					$queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(1)),
-					$queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(1))
-					)
+					$queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(1)),
+                    $queryBuilder->expr()->gt('pages.starttime', $queryBuilder->createNamedParameter(time())),
+                    $queryBuilder->expr()->andX(
+                        $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(0)),
+                        $queryBuilder->expr()->lte('pages.endtime', $queryBuilder->createNamedParameter(time()))
+                    )
+				)
 			]);
 		} else if ($my_p==2) {
 			$res -> andWhere(...[
 				$queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(0)),
-				$queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(0))
+				$queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(0)),
+                $queryBuilder->expr()->lte('pages.starttime', $queryBuilder->createNamedParameter(time())),
+                $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->eq('pages.endtime', $queryBuilder->createNamedParameter(0)),
+                    $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(time()))
+                )
 			]);
 		}
 		
@@ -356,7 +366,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 				$queryBuilder->expr()->orX(
 					$queryBuilder->expr()->eq('tt_content.deleted', $queryBuilder->createNamedParameter(1)),
 					$queryBuilder->expr()->eq('tt_content.hidden', $queryBuilder->createNamedParameter(1))
-					)
+				)
 			]);
 		} else if ($my_c==2) {
 			$res -> andWhere(...[
@@ -368,13 +378,23 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 			$res -> andWhere(...[
 				$queryBuilder->expr()->orX(
 					$queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(1)),
-					$queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(1))
-					)
+					$queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(1)),
+                    $queryBuilder->expr()->gt('pages.starttime', $queryBuilder->createNamedParameter(time())),
+                    $queryBuilder->expr()->andX(
+                        $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(0)),
+                        $queryBuilder->expr()->lte('pages.endtime', $queryBuilder->createNamedParameter(time()))
+                    )
+				)
 			]);
 		} else if ($my_p==2) {
 			$res -> andWhere(...[
 				$queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(0)),
-				$queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(0))
+				$queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(0)),
+                $queryBuilder->expr()->lte('pages.starttime', $queryBuilder->createNamedParameter(time())),
+                $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->eq('pages.endtime', $queryBuilder->createNamedParameter(0)),
+                    $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(time()))
+                )
 			]);
 		}
 		
