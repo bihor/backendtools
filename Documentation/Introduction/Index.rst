@@ -18,26 +18,29 @@ What does it do?
 ----------------
 
 This extension provides some usefull tools in the “Admin tools” section of the backend of TYPO3.
-It contains 6/7/8 tools for extensions, slugs, redirects, files, images and links.
+It contains up to 9 tools for extensions, pages, slugs, redirects, files, images and links.
 
 Tool 1: shows you all pages where you use extensions. You can see where you use which extension.
 You can search for non-extensions too, e.g. if you set Ctype='mailform'.
 
-Tool 2: helps you to delete unused files. Go to “Admin tools” → DB check” → “Database Relations” to find files which you can delete.
+Tool 2: shows recently modified pages and content elements.
+
+Tool 3: helps you to delete unused files. Go to “Admin tools” → DB check” → “Database Relations” to find files which you can delete.
 This tool helps you to delete these files.
 
-Tool 3: helps you to find pages that link to another page. You can find any content element with a link to a specific page.
+Tool 4: helps you to find pages that link to another page. You can find any content element with a link to a specific page.
 
-Tool 4: helps you to find images with no title- oder alternative-text. This tool can set that values for you too.
+Tool 5: helps you to find images with no title- oder alternative-text. This tool can set that values for you too.
 
-Tool 5: you can import simple redirect rules form your .htaccess to the table sys_redirect.
+Tool 6: you can import simple redirect rules form your .htaccess to the table sys_redirect.
 
-Tool 6: you can check all your entries of sys_redirect, if the target links are reachable.
+Tool 7: you can check all your entries of sys_redirect, if the target links are reachable.
 
-Tool 7: shows differences between RealURL-pagepath (in tx_realurl_pathdata) and Slug (in pages).
-Note: the old RealURL-tables must be present! Note: this tool was removed in version 4.0.0.
+Tool 8: shows differences between RealURL-pagepath (in tx_realurl_pathdata) and Slug (in pages).
+Note: the old RealURL-tables must be present!
+Note: this tool was removed in version 4.0.0.
 
-Tool 8: unzip a zig file in the fileadmin-folder.
+Tool 9: unzip a zig file in the fileadmin-folder.
 Note: this tool was removed in version 3.0.0.
 
 .. _screenshots:

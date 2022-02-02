@@ -179,7 +179,149 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     	$this->view->assign('settings', $this->settings);
         $this->view->assign('action', 'list');
     }
-    
+
+    /**
+     * action latest
+     *
+     * @return void
+     */
+    public function latestAction()
+    {
+        $beuser_id = $GLOBALS['BE_USER']->user['uid'];
+        $result = $this->sessionRepository->findByAction('latest', $beuser_id);
+        if ($result->count() == 0) {
+            $new = TRUE;
+            $default = GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
+            $default->setAction('latest');
+            $default->setValue1(0);
+            $default->setValue2(0);
+            $default->setValue4('01.01.' . date('Y') . ' 00:00:00');
+            $default->setValue5('CET');
+        } else {
+            $new = FALSE;
+            $default = $result[0];
+        }
+
+        if ($this->request->hasArgument('currentPage')) {
+            $currentPage = intval($this->request->getArgument('currentPage'));
+        } else $currentPage = 1;
+        if ($this->request->hasArgument('my_c')) {
+            $my_c = intval($this->request->getArgument('my_c'));		// content visibility
+            $default->setValue1($my_c);
+        } else $my_c = $default->getValue1();
+        if ($this->request->hasArgument('my_p')) {
+            $my_p = intval($this->request->getArgument('my_p'));		// pages visibility
+            $default->setValue2($my_p);
+        } else $my_p = $default->getValue2();
+        if ($this->request->hasArgument('my_value')) {
+            $my_value = $this->request->getArgument('my_value');		// date and time
+            $default->setValue4($my_value);
+        } else $my_value = $default->getValue4();
+        if ($this->request->hasArgument('my_zone')) {
+            $my_zone = $this->request->getArgument('my_zone');		    // date zone
+            $default->setValue5($my_zone);
+        } else $my_zone = $default->getValue5();
+        if ($this->request->hasArgument('my_page')) {
+            $my_page = intval($this->request->getArgument('my_page'));		// elements per page
+            $default->setPageel($my_page);
+        } else $my_page = $default->getPageel();
+        if (!$my_page) {
+            $my_page = $this->settings['pagebrowser']['itemsPerPage'];
+            if (!$my_page) {
+                $my_page = $this->settings['pagebrowser']['itemsPerPage'] = 25;
+            }
+        } else {
+            $this->settings['pagebrowser']['itemsPerPage'] = $my_page;
+        }
+        if ($this->request->hasArgument('my_outp')) {
+            $my_outp = intval($this->request->getArgument('my_outp'));		// output
+        } else $my_outp = 0;
+        if ($this->request->hasArgument('my_recursive')) {
+            $my_recursive = intval($this->request->getArgument('my_recursive'));		// recursive pid search
+            $default->setPagestart($my_recursive);
+        } else $my_recursive = $default->getPagestart();
+
+        if ($new) {
+            $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+            $backendUserRepository = $objectManager->get(BackendUserRepository::class);
+            /** @var \TYPO3\CMS\Extbase\Domain\Model\BackendUser $user */
+            $user = $backendUserRepository->findByUid($beuser_id);
+            $default->setBeuser($user);
+            $this->sessionRepository->add($default);
+            $persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
+            $persistenceManager->persistAll();
+        } else {
+            $this->sessionRepository->update($default);
+        }
+
+        if (!$my_zone) {
+            $my_zone = 'CET';
+        }
+        $d = \DateTime::createFromFormat(
+            'd.m.Y H:i:s',
+            $my_value,
+            new \DateTimeZone($my_zone)
+        );
+        if ($d === false) {
+            $tstamp = time();
+        } else {
+            $tstamp = $d->getTimestamp();
+        }
+
+        $pages = $this->sessionRepository->getLatestContentElements(
+            $my_c, $my_p, $tstamp
+        );
+        $pages2 = $this->sessionRepository->getLatestPages(
+            $my_p, $tstamp
+        );
+        foreach ($pages2 as $page) {
+            $pid = $page['pid'];
+            $sys_lang_uid = $page['sys_language_uid'];
+            $found = false;
+            foreach ($pages as $ce) {
+                if (($ce['pid'] == $pid) && ($ce['sys_language_uid'] == $sys_lang_uid)) {
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                $pages[] = $page;
+            }
+        }
+        if ($my_recursive > 0) {
+            $pages = $this->sessionRepository->filterPagesRecursive($pages, $my_recursive);
+        }
+        foreach ($pages as $key => $page) {
+            if ($page['ptstamp'] > $page['ttstamp']) {
+                $pages[$key]['sorting'] = $page['ptstamp'];
+            } else {
+                $pages[$key]['sorting'] = $page['ttstamp'];
+            }
+        }
+        usort($pages, function($a, $b) {
+            return $b['sorting'] <=> $a['sorting'];
+        });
+
+        $arrayPaginator = new ArrayPaginator($pages, $currentPage, $this->settings['pagebrowser']['itemsPerPage']);
+        $pagination = new SimplePagination($arrayPaginator);
+
+        // Assign
+        $this->view->assign('my_p', $my_p);
+        $this->view->assign('my_c', $my_c);
+        $this->view->assign('my_value', $my_value);
+        $this->view->assign('my_zone', $my_zone);
+        $this->view->assign('my_page', $my_page);
+        $this->view->assign('my_outp', $my_outp);
+        $this->view->assign('my_recursive', $my_recursive);
+        $this->view->assign('rows', count($pages));
+        $this->view->assign('pages', $pages);
+        $this->view->assign('paginator', $arrayPaginator);
+        $this->view->assign('pagination', $pagination);
+        $this->view->assign('no_pages', range(1, $pagination->getLastPageNumber()));
+        $this->view->assign('settings', $this->settings);
+        $this->view->assign('action', 'latest');
+    }
+
     /**
      * action filedeletion
      *

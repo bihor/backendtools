@@ -4,12 +4,12 @@
             <f:if condition="{pagination.previousPageNumber} && {pagination.previousPageNumber} >= {pagination.firstPageNumber}">
                 <f:then>
                     <li class="page-item">
-                        <a href="{f:uri.action(arguments:{currentPage: 1})}" title="First" class="page-link">
+                        <a href="{f:uri.action(arguments:{currentPage: 1},action:action)}" title="First" class="page-link">
                             <core:icon identifier="actions-view-paging-first" />
                         </a>
                     </li>
                     <li class="page-item">
-                        <a href="{f:uri.action(arguments:{currentPage: pagination.previousPageNumber})}" title="previous" class="page-link">
+                        <a href="{f:uri.action(arguments:{currentPage: pagination.previousPageNumber},action:action)}" title="previous" class="page-link">
                             <core:icon identifier="actions-view-paging-previous" />
                         </a>
                     </li>
@@ -38,7 +38,7 @@
                     <form style="display:inline;"
                           data-global-event="submit"
                           data-action-navigate="$form=~s/$value/"
-                          data-navigate-value="{f:uri.action(arguments:'{currentPage: \'$[value]\'}')}"
+                          data-navigate-value="{f:uri.action(arguments:'{currentPage: \'$[value]\'}',action:action)}"
                           data-value-selector="input[name='paginator-target-page']">
                         <input
                                 min="{pagination.firstPageNumber}"
@@ -58,12 +58,12 @@
             <f:if condition="{pagination.nextPageNumber} && {pagination.nextPageNumber} <= {pagination.lastPageNumber}">
                 <f:then>
                     <li class="page-item">
-                        <a href="{f:uri.action(arguments:{currentPage: pagination.nextPageNumber})}" title="next" class="page-link">
+                        <a href="{f:uri.action(arguments:{currentPage: pagination.nextPageNumber},action:action)}" title="next" class="page-link">
                             <core:icon identifier="actions-view-paging-next" />
                         </a>
                     </li>
                     <li class="page-item">
-                        <a href="{f:uri.action(arguments:{currentPage: pagination.lastPageNumber})}" title="last" class="page-link">
+                        <a href="{f:uri.action(arguments:{currentPage: pagination.lastPageNumber},action:action)}" title="last" class="page-link">
                             <core:icon identifier="actions-view-paging-last" />
                         </a>
                     </li>
@@ -82,7 +82,7 @@
                 </f:else>
             </f:if>
             <li class="page-item">
-                <a href="{f:uri.action(arguments:{currentPage: paginator.currentPageNumber})}" title="refresh" class="page-link">
+                <a href="{f:uri.action(arguments:{currentPage: paginator.currentPageNumber},action:action)}" title="refresh" class="page-link">
                     <core:icon identifier="actions-refresh" />
                 </a>
             </li>

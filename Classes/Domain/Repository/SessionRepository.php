@@ -295,7 +295,191 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 		}
 		return $pages;
 	}
-	
+
+    /**
+     * Get list of pages/elements modified since a given date
+     *
+     * @param	int		$my_c			content visibility
+     * @param	int		$my_p			pages visibility
+     * @param	int		$tstamp		    date as timestamp
+     * @return array
+     */
+    public function getLatestContentElements($my_c, $my_p, $tstamp) {
+        $pages = [];
+        $this->siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
+        // Query aufbauen
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('tt_content')->createQueryBuilder();
+        $res = $queryBuilder ->select(...[
+            'tt_content.uid',
+            'tt_content.pid',
+            'tt_content.colPos',
+            'tt_content.deleted AS ttdeleted',
+            'tt_content.hidden AS tthidden',
+            'tt_content.header',
+            'tt_content.sys_language_uid',
+            'tt_content.CType',
+            'tt_content.list_type',
+            'tt_content.tstamp AS ttstamp',
+            'pages.title',
+            'pages.slug',
+            'pages.deleted AS pdeleted',
+            'pages.hidden AS phidden',
+            'pages.tstamp AS ptstamp'
+        ]) -> from ('tt_content')
+            -> join(
+                'tt_content',
+                'pages',
+                'pages',
+                $queryBuilder->expr()->eq('tt_content.pid', $queryBuilder->quoteIdentifier('pages.uid'))
+            )
+        ->where($queryBuilder->expr()->gt('tt_content.tstamp', $queryBuilder->createNamedParameter($tstamp)));
+        // Restricions
+        $queryBuilder
+            ->getRestrictions()
+            ->removeAll();
+        if ($my_c==1) {
+            $res -> andWhere(...[
+                $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->eq('tt_content.deleted', $queryBuilder->createNamedParameter(1)),
+                    $queryBuilder->expr()->eq('tt_content.hidden', $queryBuilder->createNamedParameter(1))
+                )
+            ]);
+        } else if ($my_c==2) {
+            $res -> andWhere(...[
+                $queryBuilder->expr()->eq('tt_content.deleted', $queryBuilder->createNamedParameter(0)),
+                $queryBuilder->expr()->eq('tt_content.hidden', $queryBuilder->createNamedParameter(0))
+            ]);
+        }
+        if ($my_p==1) {
+            $res -> andWhere(...[
+                $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(1)),
+                    $queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(1)),
+                    $queryBuilder->expr()->gt('pages.starttime', $queryBuilder->createNamedParameter(time())),
+                    $queryBuilder->expr()->andX(
+                        $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(0)),
+                        $queryBuilder->expr()->lte('pages.endtime', $queryBuilder->createNamedParameter(time()))
+                    )
+                )
+            ]);
+        } else if ($my_p==2) {
+            $res -> andWhere(...[
+                $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(0)),
+                $queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(0)),
+                $queryBuilder->expr()->lte('pages.starttime', $queryBuilder->createNamedParameter(time())),
+                $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->eq('pages.endtime', $queryBuilder->createNamedParameter(0)),
+                    $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(time()))
+                )
+            ]);
+        }
+        $res -> orderBy('tt_content.tstamp', 'DESC');
+        //$res -> setMaxResults(10);
+        //print_r($res->getSQL());
+        $result = $res-> execute();
+
+        foreach($result as $row) {
+            if ($row['sys_language_uid'] > 0) {
+                // wir brauchen noch die Übersetzungen aus pages!
+                $language_result = $this->getL10n($row['pid'], $row['sys_language_uid']);
+                foreach ($language_result as $language_row) {
+                    $row['title'] = $language_row['title'];
+                    $row['slug'] = $language_row['slug'];
+                    $row['pdeleted'] = $language_row['pdeleted'];
+                    $row['phidden'] = $language_row['phidden'];
+                    $row['pl10n'] = $language_row['pl10n'];
+                }
+            } else {
+                $row['pl10n'] = $row['pid'];
+            }
+            if ( $row["pdeleted"] ) {
+                $row['domain'] = '';
+            } else {
+                $row['domain'] = $this->getDomain($row['pid'], $row['sys_language_uid']);
+            }
+            $row['csvheader'] = str_replace('"', '\'', $row['header']);
+            $row['csvtitle'] = str_replace('"', '\'', $row['title']);
+            $pages[] = $row;
+        }
+        return $pages;
+    }
+
+    /**
+     * Get list of pages modified since a given date
+     *
+     * @param	int		$my_p			pages visibility
+     * @param	int		$tstamp		    date as timestamp
+     * @return array
+     */
+    public function getLatestPages($my_p, $tstamp) {
+        $pages = [];
+        $this->siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
+        // Query aufbauen
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('pages')->createQueryBuilder();
+        $res = $queryBuilder ->select(...[
+            'uid',
+            'l10n_parent',
+            'title',
+            'slug',
+            'sys_language_uid',
+            'deleted AS pdeleted',
+            'hidden AS phidden',
+            'tstamp AS ptstamp'
+        ]) -> from ('pages')
+        ->where($queryBuilder->expr()->gt('tstamp', $queryBuilder->createNamedParameter($tstamp)));
+        // Restricions
+        $queryBuilder
+            ->getRestrictions()
+            ->removeAll();
+        if ($my_p==1) {
+            $res -> andWhere(...[
+                $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(1)),
+                    $queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(1)),
+                    $queryBuilder->expr()->gt('pages.starttime', $queryBuilder->createNamedParameter(time())),
+                    $queryBuilder->expr()->andX(
+                        $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(0)),
+                        $queryBuilder->expr()->lte('pages.endtime', $queryBuilder->createNamedParameter(time()))
+                    )
+                )
+            ]);
+        } else if ($my_p==2) {
+            $res -> andWhere(...[
+                $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(0)),
+                $queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(0)),
+                $queryBuilder->expr()->lte('pages.starttime', $queryBuilder->createNamedParameter(time())),
+                $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->eq('pages.endtime', $queryBuilder->createNamedParameter(0)),
+                    $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(time()))
+                )
+            ]);
+        }
+        $res -> orderBy('tstamp', 'DESC');
+        //$res -> setMaxResults(10);
+        //print_r($res->getSQL());
+        $result = $res-> execute();
+
+        foreach($result as $row) {
+            if ($row['sys_language_uid'] > 0) {
+                $row['pl10n'] = $row['uid'];
+                $row['uid'] = $row['l10n_parent'];
+            } else {
+                $row['pl10n'] = $row['uid'];
+            }
+            $row['pid'] = $row['uid'];
+            $row['uid'] = 0;
+            if ( $row["pdeleted"] ) {
+                $row['domain'] = '';
+            } else {
+                $row['domain'] = $this->getDomain($row['pid'], $row['sys_language_uid']);
+            }
+            $row['csvheader'] = '';
+            $row['csvtitle'] = str_replace('"', '\'', $row['title']);
+            $pages[] = $row;
+        }
+        return $pages;
+    }
+
 	/**
 	 * Finde Elemente mit Links zu einer gesuchten Seite
 	 *

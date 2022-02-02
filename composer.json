@@ -1,7 +1,7 @@
 {
 	"name" : "fixpunkt/backendtools",
 	"type" : "typo3-cms-extension",
-	"description" : "6 admin tools for extension listing, redirects, unused files, images with no alt- or title-tag and links.",
+	"description" : "7 admin tools for extension listing, recent pages, redirects, unused files, images with no alt- or title-tag and links.",
 	"authors" : [{
 			"name" : "Kurt Gusbeth",
 			"role" : "Developer"

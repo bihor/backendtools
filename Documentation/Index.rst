@@ -23,7 +23,7 @@ Backend tools
 		en
 
 	:Description:
-		6 admin tools for TYPO3 extension listing, redirects, unused files, images with no alt- or title-tag and links.
+		7 admin tools for TYPO3 extension listing, recent pages, redirects, unused files, images with no alt- or title-tag and links.
 
 	:Keywords:
 		backend,tools,extensions

@@ -1,9 +1,10 @@
 # backendtools
 
-version 4.0.2
+version 4.0.4
 
-6 admin tools for extensions, slug, redirects, files, images and links:
-extensionlist, import redirects, check redirects, delete unused files, images with no title and linklist.
+7 admin tools for extensions, pages, slug, redirects, files, images and links:
+extension-list, recent pages and content elements, import redirects, check redirects, delete unused files,
+images with no title and linklist.
 
 You find the documentation for this extension at typo3.org:
 https://docs.typo3.org/p/fixpunkt/backendtools/master/en-us/
@@ -15,5 +16,6 @@ Breaking: unzip action removed!
 Version 4.0.1: now for TYPO3 10 and 11.
 Breaking: realurl action removed!
 
-Version 4.0.3: Layout adapted to TYPO3 11.
+Version 4.0.4: Layout adapted to TYPO3 11.
 Checking of start- and endtime added.
+New tool: show recently modified pages and content elements.

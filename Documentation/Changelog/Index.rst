@@ -10,7 +10,8 @@
 
 Changelog
 =========
-Version 4.0.3:
+Version 4.0.4:
+New tool: show recently modified pages and content elements.
 Layout adapted to TYPO3 11.
 Checking of start- and endtime added.
 
