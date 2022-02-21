@@ -10,9 +10,9 @@
 
 Changelog
 =========
-Version 4.0.4:
+Version 4.1.0:
 New tool: show recently modified pages and content elements.
-Layout adapted to TYPO3 11.
+Layout adapted to TYPO3 11. Runs now with PHP 8.1 too.
 Checking of start- and endtime added.
 
 Version 4.0.1:

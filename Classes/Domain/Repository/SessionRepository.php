@@ -255,19 +255,21 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 		//print_r($queryBuilder->getParameters());
 		foreach($result as $row) {
 			$subject = $row['pi_flexform'];
-			$pattern = '/<field index="switchableControllerActions">([\n|\r|\t| ]*)<value index="vDEF">(.*)</';
-			$matches = array();
-			preg_match($pattern, $subject, $matches);
-			if ($matches[2]) {
-				$row['actions'] = str_replace('###', '&gt;', str_replace(';', ', ', str_replace('&gt;', '###', $matches[2])));
-			} else {
-				$pattern = '/<field index="what_to_display">([\n|\r|\t| ]*)<value index="vDEF">(.*)</';
-				$matches = array();
-				preg_match($pattern, $subject, $matches);
-				if ($matches[2]) {
-					$row['actions'] = $matches[2];
-				}
-			}
+            if ($subject) {
+                $pattern = '/<field index="switchableControllerActions">([\n|\r|\t| ]*)<value index="vDEF">(.*)</';
+                $matches = array();
+                preg_match($pattern, $subject, $matches);
+                if ($matches[2]) {
+                    $row['actions'] = str_replace('###', '&gt;', str_replace(';', ', ', str_replace('&gt;', '###', $matches[2])));
+                } else {
+                    $pattern = '/<field index="what_to_display">([\n|\r|\t| ]*)<value index="vDEF">(.*)</';
+                    $matches = array();
+                    preg_match($pattern, $subject, $matches);
+                    if ($matches[2]) {
+                        $row['actions'] = $matches[2];
+                    }
+                }
+            }
 			if ($row['sys_language_uid'] > 0) {
 			    // wir brauchen noch die Übersetzungen aus pages!
 			    $language_result = $this->getL10n($row['pid'], $row['sys_language_uid']);
@@ -591,10 +593,6 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 		        $queryBuilder->expr()->in('tt_content.uid', $queryBuilder->createNamedParameter($referenceArray, Connection::PARAM_INT_ARRAY))
 		    )
 		]);
-//		$res -> andWhere("tt_content.bodytext LIKE '%\"t3://page?uid=".$linkto_uid."\"%'
-// OR tt_content.header_link='t3://page?uid=".$linkto_uid."'
-// OR tt_content.header_link LIKE 't3://page?uid=".$linkto_uid." %'
-// OR tt_content.uid IN (SELECT uid_foreign FROM sys_file_reference WHERE tablenames='tt_content' AND (link='t3://page?uid=".$linkto_uid."' OR link LIKE 't3://page?uid=".$linkto_uid." %'))");
 		//print_r($res->getSQL());
 		$result = $res -> orderBy('tt_content.pid')
 		-> addOrderBy('tt_content.sorting')
