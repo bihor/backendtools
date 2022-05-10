@@ -1,6 +1,6 @@
 # backendtools
 
-version 4.1.0
+version 4.1.1
 
 7 admin tools for extensions, pages, slug, redirects, files, images and links:
 extension-list, recent pages and content elements, import redirects, check redirects, delete unused files,
@@ -17,3 +17,6 @@ Version 4.1.0:
 New tool: show recently modified pages and content elements.
 Layout adapted to TYPO3 11. Runs now with PHP 8.1 too.
 Checking of start- and endtime added.
+
+Version 4.1.1:
+Bugfix for PHP 8.
