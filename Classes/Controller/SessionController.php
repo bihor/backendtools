@@ -112,7 +112,9 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             $default->setPageel($my_page);
         } else $my_page = $default->getPageel();
         if (!$my_page) {
-            $my_page = $this->settings['pagebrowser']['itemsPerPage'];
+            if (isset($this->settings['pagebrowser']['itemsPerPage'])) {
+                $my_page = $this->settings['pagebrowser']['itemsPerPage'];
+            }
             if (!$my_page) {
                 $my_page = $this->settings['pagebrowser']['itemsPerPage'] = 25;
             }
@@ -226,7 +228,9 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             $default->setPageel($my_page);
         } else $my_page = $default->getPageel();
         if (!$my_page) {
-            $my_page = $this->settings['pagebrowser']['itemsPerPage'];
+            if (isset($this->settings['pagebrowser']['itemsPerPage'])) {
+                $my_page = $this->settings['pagebrowser']['itemsPerPage'];
+            }
             if (!$my_page) {
                 $my_page = $this->settings['pagebrowser']['itemsPerPage'] = 25;
             }
@@ -461,7 +465,9 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             $default->setPageel($my_page);
         } else $my_page = $default->getPageel();
         if (!$my_page) {
-            $my_page = $this->settings['pagebrowser']['itemsPerPage'];
+            if (isset($this->settings['pagebrowser']['itemsPerPage'])) {
+                $my_page = $this->settings['pagebrowser']['itemsPerPage'];
+            }
             if (!$my_page) {
                 $my_page = $this->settings['pagebrowser']['itemsPerPage'] = 25;
             }
@@ -606,7 +612,9 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             $default->setPageel($my_page);
         } else $my_page = $default->getPageel();
         if (!$my_page) {
-            $my_page = $this->settings['pagebrowser']['itemsPerPage'];
+            if (isset($this->settings['pagebrowser']['itemsPerPage'])) {
+                $my_page = $this->settings['pagebrowser']['itemsPerPage'];
+            }
             if (!$my_page) {
                 $my_page = $this->settings['pagebrowser']['itemsPerPage'] = 25;
             }
@@ -828,7 +836,9 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             $default->setPageel($my_page);
         } else $my_page = $default->getPageel();
         if (!$my_page) {
-            $my_page = $this->settings['pagebrowser']['itemsPerPage'];
+            if (isset($this->settings['pagebrowser']['itemsPerPage'])) {
+                $my_page = $this->settings['pagebrowser']['itemsPerPage'];
+            }
             if (!$my_page) {
                 $my_page = $this->settings['pagebrowser']['itemsPerPage'] = 25;
             }
