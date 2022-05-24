@@ -17,7 +17,7 @@ Introduction
 What does it do?
 ----------------
 
-This extension provides some usefull tools in the “Admin tools” section of the backend of TYPO3.
+This extension provides some useful tools in the “Admin tools” section of the backend of TYPO3.
 It contains up to 9 tools for extensions, pages, slugs, redirects, files, images and links.
 
 Tool 1: shows you all pages where you use extensions. You can see where you use which extension.
@@ -42,6 +42,9 @@ Note: this tool was removed in version 4.0.0.
 
 Tool 9: unzip a zig file in the fileadmin-folder.
 Note: this tool was removed in version 3.0.0.
+
+Since version 4.2.0 there are some dashboard widgets available too.
+
 
 .. _screenshots:
 
