@@ -91,21 +91,5 @@ return function (ContainerConfigurator $configurator, ContainerBuilder $containe
                 ]
             );
 
-        $services->set('dashboard.widget.fixpunktBeLayouts')
-            ->class(\Fixpunkt\Backendtools\Widgets\BackendLayoutWidget::class)
-            ->arg('$view', new Reference('dashboard.views.widget'))
-            ->arg('$dataProvider', new Reference(\Fixpunkt\Backendtools\Widgets\Provider\BeLayoutsDataProvider::class))
-            ->tag(
-                'dashboard.widget',
-                [
-                    'identifier' => 'fixpunktBeLayouts',
-                    'groupNames' => 'fixpunkt',
-                    'title' => 'Infos about used backend layouts',
-                    'description' => 'Shows where backend layouts are in use.',
-                    'iconIdentifier' => 'content-widget-list',
-                    'height' => 'medium',
-                    'width' => 'medium'
-                ]
-            );
     }
 };

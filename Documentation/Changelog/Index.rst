@@ -11,7 +11,8 @@
 Changelog
 =========
 Version 4.2.0:
-5 dashboard widgets added.
+New tool: shows you where (backend) layouts are in use.
+4 dashboard widgets added.
 Bugfix for PHP 8.
 
 Version 4.1.0:

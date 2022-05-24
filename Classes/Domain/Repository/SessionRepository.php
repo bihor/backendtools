@@ -407,6 +407,103 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
     }
 
     /**
+     * Get list of pages with (backend)-layouts
+     *
+     * @param	int		$my_value		layouts or backend-layouts
+     * @param	int		$my_p			pages visibility
+     * @return array
+     */
+    public function getLayouts($my_value, $my_p) {
+        $pages = [];
+        $this->siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
+        // Query aufbauen
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('pages')->createQueryBuilder();
+        $res = $queryBuilder ->select(...[
+            'uid',
+            'l10n_parent',
+            'sys_language_uid',
+            'deleted AS pdeleted',
+            'hidden AS phidden',
+            'tstamp AS ptstamp',
+            'title',
+            'slug',
+            'layout',
+            'backend_layout',
+            'backend_layout_next_level'
+        ]) -> from ('pages');
+        if ($my_value == 0) {
+            $res->where(
+                $queryBuilder->expr()->neq(
+                    'layout',
+                    $queryBuilder->createNamedParameter('')
+                )
+            );
+        } else {
+            $res->where(
+                $queryBuilder->expr()->neq(
+                    'backend_layout',
+                    $queryBuilder->createNamedParameter('')
+                )
+            )
+            ->orWhere(
+                $queryBuilder->expr()->neq(
+                    'backend_layout_next_level',
+                    $queryBuilder->createNamedParameter('')
+                )
+            );
+        }
+        // Restricions
+        $queryBuilder
+            ->getRestrictions()
+            ->removeAll();
+        if ($my_p==1) {
+            $res -> andWhere(...[
+                $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(1)),
+                    $queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(1)),
+                    $queryBuilder->expr()->gt('pages.starttime', $queryBuilder->createNamedParameter(time())),
+                    $queryBuilder->expr()->andX(
+                        $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(0)),
+                        $queryBuilder->expr()->lte('pages.endtime', $queryBuilder->createNamedParameter(time()))
+                    )
+                )
+            ]);
+        } else if ($my_p==2) {
+            $res -> andWhere(...[
+                $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(0)),
+                $queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(0)),
+                $queryBuilder->expr()->lte('pages.starttime', $queryBuilder->createNamedParameter(time())),
+                $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->eq('pages.endtime', $queryBuilder->createNamedParameter(0)),
+                    $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(time()))
+                )
+            ]);
+        }
+        $res -> orderBy('uid', 'ASC');
+        $result = $res-> execute();
+
+        foreach($result as $row) {
+            if ($row['sys_language_uid'] > 0) {
+                $row['pl10n'] = $row['uid'];
+                $row['uid'] = $row['l10n_parent'];
+            } else {
+                $row['pl10n'] = $row['uid'];
+            }
+            $row['pid'] = $row['uid'];
+            $row['uid'] = 0;
+            if ( $row["pdeleted"] ) {
+                $row['domain'] = '';
+            } else {
+                $row['domain'] = $this->getDomain($row['pid'], $row['sys_language_uid']);
+            }
+            $row['csvheader'] = '';
+            $row['csvtitle'] = str_replace('"', '\'', $row['title']);
+            $pages[] = $row;
+        }
+        return $pages;
+    }
+
+    /**
      * Get list of pages modified since a given date
      *
      * @param	int		$my_p			pages visibility

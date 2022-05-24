@@ -12,7 +12,7 @@
 
 $EM_CONF[$_EXTKEY] = array (
   'title' => 'Backend tools',
-  'description' => '7 admin tools: extension-list, recent pages & elements, redirects import & check, file-deletion, images with no alt or title and link-list.',
+  'description' => '8 admin tools: extension-list, recent pages & elements, backend layouts, redirects import & check, file-deletion, images with no alt or title and link-list.',
   'category' => 'module',
   'author' => 'Kurt Gusbeth',
   'author_company' => 'fixpunkt werbeagentur gmbh',
@@ -20,7 +20,7 @@ $EM_CONF[$_EXTKEY] = array (
   'state' => 'stable',
   'createDirs' => '',
   'clearCacheOnLoad' => false,
-  'version' => '4.1.3',
+  'version' => '4.2.0',
   'constraints' => array (
     'depends' => array (
         'typo3' => '10.4.6-11.5.99',

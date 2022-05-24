@@ -331,6 +331,95 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     }
 
     /**
+     * action backend layouts
+     *
+     * @return void
+     */
+    public function layoutsAction()
+    {
+        $beuser_id = $GLOBALS['BE_USER']->user['uid'];
+        $result = $this->sessionRepository->findByAction('layouts', $beuser_id);
+        if ($result->count() == 0) {
+            $new = TRUE;
+            $default = GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
+            $default->setAction('layouts');
+            $default->setValue1(0);
+            $default->setValue2(0);
+        } else {
+            $new = FALSE;
+            $default = $result[0];
+        }
+
+        if ($this->request->hasArgument('currentPage')) {
+            $currentPage = intval($this->request->getArgument('currentPage'));
+        } else $currentPage = 1;
+        if ($this->request->hasArgument('my_value')) {
+            $my_value = $this->request->getArgument('my_value');		// date and time
+            $default->setValue1($my_value);
+        } else $my_value = $default->getValue1();
+        if ($this->request->hasArgument('my_p')) {
+            $my_p = intval($this->request->getArgument('my_p'));		// pages visibility
+            $default->setValue2($my_p);
+        } else $my_p = $default->getValue2();
+        if ($this->request->hasArgument('my_page')) {
+            $my_page = intval($this->request->getArgument('my_page'));		// elements per page
+            $default->setPageel($my_page);
+        } else $my_page = $default->getPageel();
+        if (!$my_page) {
+            if (isset($this->settings['pagebrowser']['itemsPerPage'])) {
+                $my_page = $this->settings['pagebrowser']['itemsPerPage'];
+            }
+            if (!$my_page) {
+                $my_page = $this->settings['pagebrowser']['itemsPerPage'] = 25;
+            }
+        } else {
+            $this->settings['pagebrowser']['itemsPerPage'] = $my_page;
+        }
+        if ($this->request->hasArgument('my_outp')) {
+            $my_outp = intval($this->request->getArgument('my_outp'));		// output
+        } else $my_outp = 0;
+        if ($this->request->hasArgument('my_recursive')) {
+            $my_recursive = intval($this->request->getArgument('my_recursive'));		// recursive pid search
+            $default->setPagestart($my_recursive);
+        } else $my_recursive = $default->getPagestart();
+
+        if ($new) {
+            $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+            $backendUserRepository = $objectManager->get(BackendUserRepository::class);
+            /** @var \TYPO3\CMS\Extbase\Domain\Model\BackendUser $user */
+            $user = $backendUserRepository->findByUid($beuser_id);
+            $default->setBeuser($user);
+            $this->sessionRepository->add($default);
+            $persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
+            $persistenceManager->persistAll();
+        } else {
+            $this->sessionRepository->update($default);
+        }
+
+        $pages = $this->sessionRepository->getLayouts( $my_value, $my_p );
+        if ($my_recursive > 0) {
+            $pages = $this->sessionRepository->filterPagesRecursive($pages, $my_recursive);
+        }
+
+        $arrayPaginator = new ArrayPaginator($pages, $currentPage, $this->settings['pagebrowser']['itemsPerPage']);
+        $pagination = new SimplePagination($arrayPaginator);
+
+        // Assign
+        $this->view->assign('my_p', $my_p);
+        $this->view->assign('my_value', $my_value);
+        $this->view->assign('my_page', $my_page);
+        $this->view->assign('my_outp', $my_outp);
+        $this->view->assign('my_recursive', $my_recursive);
+        $this->view->assign('rows', count($pages));
+        $this->view->assign('pages', $pages);
+        $this->view->assign('paginator', $arrayPaginator);
+        $this->view->assign('pagination', $pagination);
+        $this->view->assign('no_pages', range(1, $pagination->getLastPageNumber()));
+        $this->view->assign('settings', $this->settings);
+        $this->view->assign('action', 'layouts');
+    }
+
+    /**
      * action filedeletion
      *
      * @return void

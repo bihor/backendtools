@@ -15,9 +15,3 @@ module.tx_backendtools {
        maximumNumberOfLinks = 25
     }
 }
-
-module.tx_dashboard.view {
-	 templateRootPaths {
-		 44 = EXT:backendtools/Resources/Private/Templates/
-	 }
-}
