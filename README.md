@@ -1,6 +1,6 @@
 # backendtools
 
-version 4.2.0
+version 4.2.1
 
 8 admin tools for extensions, pages, (backend) layouts, slug, redirects, files, images and links:
 extension-list, recent pages and content elements, used (backend) layouts, import redirects, check redirects, 

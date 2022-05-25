@@ -433,10 +433,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         ]) -> from ('pages');
         if ($my_value == 0) {
             $res->where(
-                $queryBuilder->expr()->neq(
-                    'layout',
-                    $queryBuilder->createNamedParameter('')
-                )
+                $queryBuilder->expr()->gt('layout', $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT))
             );
         } else {
             $res->where(
