@@ -26,14 +26,14 @@ class PagesDataProvider implements ChartDataProviderInterface
         return [
             'labels' => [
                 'Enabled',
-                'Hidden in menu',
                 'Hidden',
-                'Deleted'
+                'Deleted',
+                'Hidden in menu'
             ],
             'datasets' => [
                 [
                     'backgroundColor' => WidgetApi::getDefaultChartColors(),
-                    'data' => [$visiblePages, $hideInMenuPages, $hiddenPages, $deletedPages],
+                    'data' => [$visiblePages, $hiddenPages, $deletedPages, $hideInMenuPages],
                 ],
             ],
         ];
