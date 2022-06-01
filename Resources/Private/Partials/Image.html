@@ -1,7 +1,12 @@
 <td>{image.file.uid}</td>
 <td>{image.file.name}</td>
 <td>{image.file.size}</td>
-<td>{image.file.meta_uid}</td>
+<td>
+	{image.file.meta_uid}
+	<ex:editLink action="edit" table="sys_file_metadata" uid="{image.file.meta_uid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=images">
+		<core:icon identifier="actions-open" size="small" />
+	</ex:editLink>
+</td>
 <td>{image.file.meta_width}</td>
 <td>{image.file.meta_height}</td>
 <td>{image.file.meta_title}</td>
