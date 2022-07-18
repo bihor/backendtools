@@ -24,9 +24,6 @@
 		"typo3-ter/backendtools" : "self.version"
 	},
 	"homepage" : "https://www.fixpunkt.com/webentwicklung/typo3/typo3-extensions/",
-	"support" : {
-		"email" : "info@quizpalme.de"
-	},
 	"license" : "GPL-3.0-or-later",
 	"extra": {
 		"typo3/cms": {
