@@ -10,6 +10,9 @@
 
 Changelog
 =========
+Version 4.2.4:
+More infos.
+
 Version 4.2.0:
 New tool: shows you where (backend) layouts are in use.
 4 dashboard widgets added.

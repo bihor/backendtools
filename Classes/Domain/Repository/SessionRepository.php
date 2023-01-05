@@ -292,6 +292,21 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             $row['csvtitle'] = str_replace('"', '\'', $row['title']);
             if (isset($row['tx_gridelements_backend_layout'])) {
                 $row['misc'] = $row['tx_gridelements_backend_layout'];
+                if ($row['misc']=='2cols' || $row['misc']=='3cols' || $row['misc']=='4cols' || $row['misc']=='6cols') {
+                    $pattern = '/<field index="xsCol1">([\n|\r|\t| ]*)<value index="vDEF">(.*)</';
+                    $matches = array();
+                    preg_match($pattern, $subject, $matches);
+                    if (isset($matches[2])) {
+                        $row['misc'] .= ' # xs=' . $matches[2];
+                    } else {
+                        $pattern = '/<field index="smCol1">([\n|\r|\t| ]*)<value index="vDEF">(.*)</';
+                        $matches = array();
+                        preg_match($pattern, $subject, $matches);
+                        if (isset($matches[2])) {
+                            $row['misc'] .= ' # SM=' . $matches[2];
+                        }
+                    }
+                }
             }
             $pages[] = $row;
         }
