@@ -228,9 +228,19 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         }
 
         if ($my_flexform) {
-            $res -> andWhere(
-                $queryBuilder->expr()->like('tt_content.pi_flexform', $queryBuilder->createNamedParameter("%" . $queryBuilder->escapeLikeWildcards($my_flexform) . "%"))
-            );
+            if ($my_value == 'gridelements_pi1' && $my_type == 2) {
+                // wir suchen auch in tx_gridelements_backend_layout
+                $res -> andWhere(...[
+                    $queryBuilder->expr()->orX(
+                        $queryBuilder->expr()->like('tt_content.pi_flexform', $queryBuilder->createNamedParameter("%" . $queryBuilder->escapeLikeWildcards($my_flexform) . "%")),
+                        $queryBuilder->expr()->like('tt_content.tx_gridelements_backend_layout', $queryBuilder->createNamedParameter($queryBuilder->escapeLikeWildcards($my_flexform)))
+                    )
+                ]);
+            } else {
+                $res->andWhere(
+                    $queryBuilder->expr()->like('tt_content.pi_flexform', $queryBuilder->createNamedParameter("%" . $queryBuilder->escapeLikeWildcards($my_flexform) . "%"))
+                );
+            }
         }
 
         $asc = ($my_direction == 1) ? 'DESC' : 'ASC';
@@ -455,12 +465,22 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                 $queryBuilder->expr()->neq(
                     'backend_layout',
                     $queryBuilder->createNamedParameter('')
+                ),
+                $queryBuilder->expr()->neq(
+                    'backend_layout',
+                    $queryBuilder->createNamedParameter('0')
                 )
             )
             ->orWhere(
-                $queryBuilder->expr()->neq(
-                    'backend_layout_next_level',
-                    $queryBuilder->createNamedParameter('')
+                $queryBuilder->expr()->andX(
+                    $queryBuilder->expr()->neq(
+                        'backend_layout_next_level',
+                        $queryBuilder->createNamedParameter('')
+                    ),
+                    $queryBuilder->expr()->neq(
+                        'backend_layout_next_level',
+                        $queryBuilder->createNamedParameter('0')
+                    )
                 )
             );
         }
@@ -1221,6 +1241,9 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
     protected function getDomain($uid, $sys_language_uid = 0)
     {
         $domain = '';
+        if ($sys_language_uid == -1) {
+            $sys_language_uid = 0;
+        }
         $rootLineUtility = new \TYPO3\CMS\Core\Utility\RootlineUtility($uid);
         $rootline = $rootLineUtility->get();
         $root = array_pop($rootline);
