@@ -1026,7 +1026,11 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
                             $errorCount++;
                             $match = true;
                         } else if (is_int($row['uid'])) {
-                            $status = 'OK';
+                            if (isset($row['doktype']) && ($row['doktype']==254 || $row['doktype']==255 || $row['doktype']==198 || $row['doktype']==199)) {
+                                $status = 'doktype=' . $row['doktype'] . ' !';
+                            } else {
+                                $status = 'OK';
+                            }
                         }
                     } else {
                         $status = 'unknown table ' . $table;

@@ -10,9 +10,9 @@
 
 Changelog
 =========
-Version 4.2.5:
+Version 4.3.0:
 More infos and search in tx_gridelements_backend_layout.
-Bugfix for PHP 8.
+Bugfix (for PHP 8).
 
 Version 4.2.0:
 New tool: shows you where (backend) layouts are in use.

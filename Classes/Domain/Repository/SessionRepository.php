@@ -1245,9 +1245,13 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             $sys_language_uid = 0;
         }
         $rootLineUtility = new \TYPO3\CMS\Core\Utility\RootlineUtility($uid);
-        $rootline = $rootLineUtility->get();
-        $root = array_pop($rootline);
-        if ($root['is_siteroot']) {
+        try {
+            $rootline = $rootLineUtility->get();
+            $root = array_pop($rootline);
+        } catch (\Exception $e) {
+            return '';
+        }
+        if (isset($root['is_siteroot'])) {
             try {
                 $site = $this->siteFinder->getSiteByPageId($root['uid']);   // oder $uid;
                 $base = $site->getConfiguration()['base'];
@@ -1268,8 +1272,8 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                         $domain = 'http://' . $domain;
                     }
                 }
-            } catch (SiteNotFoundException $e) {
-                $domain = '';
+            } catch (\Exception $e) {
+                return '';
             }
         }
         return $domain;
