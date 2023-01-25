@@ -1,6 +1,6 @@
 # backendtools
 
-version 4.3.0
+version 4.3.1
 
 8 admin tools for extensions, pages, (backend) layouts, slug, redirects, files, images and links:
 extension-list, recent pages and content elements, used (backend) layouts, import redirects, check redirects, 
@@ -23,6 +23,6 @@ New tool: show where (backend) layouts are used.
 4 dashboard widgets added.
 Bugfix for PHP 8.
 
-Version 4.3.0
+Version 4.3.0/1
 More infos and search in tx_gridelements_backend_layout.
 Bugfix (for PHP 8).

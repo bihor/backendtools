@@ -10,7 +10,7 @@
 
 Changelog
 =========
-Version 4.3.0:
+Version 4.3.0/1:
 More infos and search in tx_gridelements_backend_layout.
 Bugfix (for PHP 8).
 

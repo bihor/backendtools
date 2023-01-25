@@ -991,18 +991,20 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
                     $errorFound = false;
                     foreach ($checkHosts as $checkHost) {
                         $headers = @get_headers($checkHost . $target);
-                        if ($headers && strpos($headers[0], '200')) {
-                            $status = 'OK';
-                            break;
-                        } else {
-                            $code = intval(substr($headers[0], 9, 3));
-                            if ($code) {
-                                $status = $code; //$headers[0];
+                        if (is_array($headers) && isset($headers[0])) {
+                            if (strpos($headers[0], '200')) {
+                                $status = 'OK';
+                                break;
                             } else {
-                                $status = 'none';
-                            }
-                            if (($code >= $my_error) && ($code < ($my_error+100))) {
-                                $errorFound = true;
+                                $code = intval(substr($headers[0], 9, 3));
+                                if ($code) {
+                                    $status = $code; //$headers[0];
+                                } else {
+                                    $status = 'none';
+                                }
+                                if (($code >= $my_error) && ($code < ($my_error+100))) {
+                                    $errorFound = true;
+                                }
                             }
                         }
                     }
@@ -1037,8 +1039,8 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
                     }
                 } else if ((substr($target, 0, 4) == 'http') && ($my_error != 1)) {
                     $headers = @get_headers($target);
-                    if (isset($headers[0])) {
-                        if ($headers && strpos($headers[0], '200')) {
+                    if (is_array($headers) && isset($headers[0])) {
+                        if (strpos($headers[0], '200')) {
                             $status = 'OK';
                         } else {
                             $code = intval(substr($headers[0], 9, 3));
