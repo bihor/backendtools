@@ -277,6 +277,11 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                     preg_match($pattern, $subject, $matches);
                     if (isset($matches[2])) {
                         $row['actions'] = $matches[2];
+                    } elseif ($row['CType'] == 'wst3bootstrap_fluidrow') {
+                        $sections = substr_count($subject,"<section index");
+                        if ($sections > 0) {
+                            $row['actions'] = $sections . ' cols';
+                        }
                     }
                 }
             }
