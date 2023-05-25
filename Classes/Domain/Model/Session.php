@@ -101,7 +101,7 @@ class Session extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     /**
      * beuser
      *
-     * @var \TYPO3\CMS\Extbase\Domain\Model\BackendUser
+     * @var \Fixpunkt\Backendtools\Domain\Model\BackendUser
      */
     protected $beuser = null;
     
@@ -298,7 +298,7 @@ class Session extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     /**
      * Returns the beuser
      *
-     * @return \TYPO3\CMS\Extbase\Domain\Model\BackendUser $beuser
+     * @return \Fixpunkt\Backendtools\Domain\Model\BackendUser $beuser
      */
     public function getBeuser()
     {
@@ -308,10 +308,10 @@ class Session extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     /**
      * Sets the beuser
      *
-     * @param \TYPO3\CMS\Extbase\Domain\Model\BackendUser $beuser
+     * @param \Fixpunkt\Backendtools\Domain\Model\BackendUser $beuser
      * @return void
      */
-    public function setBeuser(\TYPO3\CMS\Extbase\Domain\Model\BackendUser $beuser)
+    public function setBeuser(\Fixpunkt\Backendtools\Domain\Model\BackendUser $beuser)
     {
         $this->beuser = $beuser;
     }

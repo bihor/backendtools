@@ -63,8 +63,12 @@ class ContentDataProvider implements ChartDataProviderInterface
             ->where(
                 $expression
             )
-            ->execute()
-            ->fetchColumn(0);
-//            ->fetchOne();
+            ->executeQuery()
+            ->fetchOne();
+    }
+
+    public function getOptions(): array
+    {
+        return $this->options;
     }
 }

@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Dashboard\Widgets\DoughnutChartWidget;
 use TYPO3\CMS\Dashboard\Widgets\NumberWithIconWidget;
+use TYPO3\CMS\Backend\View\BackendViewFactory;
 
 return function (ContainerConfigurator $configurator, ContainerBuilder $containerBuilder) {
     if ($containerBuilder->hasDefinition(DoughnutChartWidget::class)) {
@@ -15,8 +16,8 @@ return function (ContainerConfigurator $configurator, ContainerBuilder $containe
 
         $services->set('dashboard.widget.fixpunktExtensions')
             ->class(NumberWithIconWidget::class)
-            ->arg('$view', new Reference('dashboard.views.widget'))
             ->arg('$dataProvider', new Reference(\Fixpunkt\Backendtools\Widgets\Provider\NumberOfExtensionsDataProvider::class))
+            ->arg('$backendViewFactory', new Reference(BackendViewFactory::class))
             ->arg('$options', [
                 'title' => 'LLL:EXT:backendtools/Resources/Private/Language/locallang.xlf:number_with_icon_widget.title',
                 'subtitle' => 'LLL:EXT:backendtools/Resources/Private/Language/locallang.xlf:number_with_icon_widget.subtitle',
@@ -37,8 +38,8 @@ return function (ContainerConfigurator $configurator, ContainerBuilder $containe
 
         $services->set('dashboard.widget.fixpunktFiles')
             ->class(NumberWithIconWidget::class)
-            ->arg('$view', new Reference('dashboard.views.widget'))
             ->arg('$dataProvider', new Reference(\Fixpunkt\Backendtools\Widgets\Provider\NumberOfFilesDataProvider::class))
+            ->arg('$backendViewFactory', new Reference(BackendViewFactory::class))
             ->arg('$options', [
                 'title' => 'LLL:EXT:backendtools/Resources/Private/Language/locallang.xlf:number_of_files_widget.title',
                 'subtitle' => 'LLL:EXT:backendtools/Resources/Private/Language/locallang.xlf:number_of_files_widget.subtitle',
@@ -59,8 +60,8 @@ return function (ContainerConfigurator $configurator, ContainerBuilder $containe
 
         $services->set('dashboard.widget.fixpunktPages')
             ->class(DoughnutChartWidget::class)
-            ->arg('$view', new Reference('dashboard.views.widget'))
             ->arg('$dataProvider', new Reference(\Fixpunkt\Backendtools\Widgets\Provider\PagesDataProvider::class))
+            ->arg('$backendViewFactory', new Reference(BackendViewFactory::class))
             ->tag(
                 'dashboard.widget',
                 [
@@ -76,8 +77,8 @@ return function (ContainerConfigurator $configurator, ContainerBuilder $containe
 
         $services->set('dashboard.widget.fixpunktContent')
             ->class(DoughnutChartWidget::class)
-            ->arg('$view', new Reference('dashboard.views.widget'))
             ->arg('$dataProvider', new Reference(\Fixpunkt\Backendtools\Widgets\Provider\ContentDataProvider::class))
+            ->arg('$backendViewFactory', new Reference(BackendViewFactory::class))
             ->tag(
                 'dashboard.widget',
                 [

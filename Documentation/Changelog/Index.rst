@@ -10,6 +10,9 @@
 
 Changelog
 =========
+Version 5.0.0:
+1. version for TYPO3 12 LTS.
+
 Version 4.3.0/1:
 More infos and search in tx_gridelements_backend_layout.
 Bugfix (for PHP 8).
