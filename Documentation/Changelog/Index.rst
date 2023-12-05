@@ -10,6 +10,9 @@
 
 Changelog
 =========
+Version 5.1.0:
+New tool: show where missing images are used.
+
 Version 5.0.0:
 1. version for TYPO3 12 LTS.
 

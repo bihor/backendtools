@@ -1033,6 +1033,146 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
     }
 
     /**
+     * Bilder die fehlen
+     *
+     * @param   integer   not only in tt_content?
+     *
+     * @return  array     Bilder
+     */
+    function getMissingImages($img_other)
+    {
+        $this->siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
+        $fileArray = [];
+        $referenceArray = [];
+        $finalArray = [];
+
+        // sys_file: get images
+        $table = 'sys_file';
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+        $result = $queryBuilder
+            ->select('*')
+            ->from($table)
+            ->where($queryBuilder->expr()->like('mime_type', $queryBuilder->createNamedParameter('image%')))
+            ->andWhere($queryBuilder->expr()->eq('missing', 1))
+            ->orderBy('name', 'ASC')
+            ->executeQuery()->fetchAllAssociative();
+
+        foreach($result as $row) {
+            $uid = $row['uid'];
+            $fileArray[$uid] = $row;
+        }
+
+        // sys_file_metadata
+        $table = 'sys_file_metadata';
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+        $statement = $queryBuilder
+            ->select('*')
+            ->from($table)
+            ->executeQuery()->fetchAllAssociative();
+
+        foreach($result as $row) {
+            if (isset($row['file'])) {
+                $uid = $row['file'];
+                if (isset($fileArray[$uid]) && isset($fileArray[$uid]['uid']) && ($fileArray[$uid]['uid'] == $uid)) {
+                    $fileArray[$uid]['meta_uid'] = $row['uid'];
+                    $fileArray[$uid]['meta_title'] = $row['title'];
+                    $fileArray[$uid]['meta_alt'] = $row['alternative'];
+                    $fileArray[$uid]['meta_width'] = $row['width'];
+                    $fileArray[$uid]['meta_height'] = $row['height'];
+                }
+            }
+        }
+
+        // sys_file_reference und tt_content
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('sys_file_reference')->createQueryBuilder();
+        $res = $queryBuilder ->select(...[
+            'sys_file_reference.uid',
+            'sys_file_reference.title',
+            'sys_file_reference.alternative',
+            'sys_file_reference.uid_local',
+            'sys_file_reference.uid_foreign',
+            'tt_content.pid AS tt_pid',
+            'tt_content.colPos AS tt_pos',
+            'tt_content.sys_language_uid AS tt_lang'
+        ]) -> from ('sys_file_reference')
+            -> join(
+                'sys_file_reference',
+                'tt_content',
+                'tt_content',
+                $queryBuilder->expr()->eq('sys_file_reference.uid_foreign', $queryBuilder->quoteIdentifier('tt_content.uid'))
+            )
+            ->where(
+                $queryBuilder->expr()->eq('sys_file_reference.tablenames', $queryBuilder->createNamedParameter('tt_content'))
+            )
+            ->orderBy('tt_pid', 'ASC');
+        //print_r($queryBuilder->getSQL());
+        $result = $res -> executeQuery()->fetchAllAssociative();
+
+        foreach($result as $row) {
+            $uid = $row['uid'];
+            $uid_file = $row['uid_local'];
+            if (isset($fileArray[$uid_file]) && isset($fileArray[$uid_file]['uid']) && ($fileArray[$uid_file]['uid'] == $uid_file)) {
+                $referenceArray[$uid] = [];
+                $referenceArray[$uid]['ref_uid'] = $uid;
+                $referenceArray[$uid]['ref_title'] = $row['title'];
+                $referenceArray[$uid]['ref_alt'] = $row['alternative'];
+                $referenceArray[$uid]['tt_uid'] = $referenceArray[$uid]['cid'] = $row['uid_foreign'];
+                $referenceArray[$uid]['tt_pid'] = $row['tt_pid'];
+                $referenceArray[$uid]['tt_lang'] = $row['tt_lang'];
+                $referenceArray[$uid]['tt_pos'] = $row['tt_pos'];
+                //$referenceArray[$uid]['file_uid'] = $uid_file;
+                $referenceArray[$uid]['file'] = $fileArray[$uid_file];	// file-array
+                //echo "uid $uid <br>\n";
+            }
+        }
+
+        if ($img_other) {
+            // sys_file_reference ohne tt_content
+            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('sys_file_reference')->createQueryBuilder();
+            $res = $queryBuilder ->select(...[
+                'uid',
+                'title',
+                'alternative',
+                'uid_local',
+                'tablenames'
+            ]) -> from ('sys_file_reference')
+                ->where(
+                    $queryBuilder->expr()->neq('tablenames', $queryBuilder->createNamedParameter('tt_content'))
+                )
+                ->orderBy('uid', 'ASC');
+            //print_r($queryBuilder->getSQL());
+            $result = $res -> executeQuery()->fetchAllAssociative();
+
+            foreach($result as $row) {
+                $uid = $row['uid'];
+                $uid_file = $row['uid_local'];
+                if (isset($fileArray[$uid_file]) && isset($fileArray[$uid_file]['uid']) && !isset($referenceArray[$uid]) && ($fileArray[$uid_file]['uid'] == $uid_file)) {
+                    $referenceArray[$uid] = [];
+                    $referenceArray[$uid]['ref_uid'] = $uid;
+                    $referenceArray[$uid]['ref_title'] = $row['title'];
+                    $referenceArray[$uid]['ref_alt'] = $row['alternative'];
+                    $referenceArray[$uid]['ref_tablenames'] = $row['tablenames'];
+                    //$referenceArray[$uid]['file_uid'] = $uid_file;
+                    $referenceArray[$uid]['file'] = $fileArray[$uid_file];	// file-array
+                    $referenceArray[$uid]['domain'] = '';
+                    //echo "uid $uid <br>\n";
+                }
+            }
+        }
+
+        // Bilder ohne alt oder title
+        foreach ($referenceArray as $uid => $refArray) {
+            if (isset($refArray['tt_pid'])) {
+                $refArray['domain'] = $this->getDomain($refArray['tt_pid'], $refArray['tt_lang']);
+            } else {
+                $refArray['domain'] = '';
+            }
+            $finalArray[] = $refArray;
+        }
+        return $finalArray;
+    }
+
+    /**
      * Bilder ohne Alt- oder Titel-Text
      *
      * @param   integer   Modus

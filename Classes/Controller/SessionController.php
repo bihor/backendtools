@@ -690,6 +690,87 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     }
 
     /**
+     * action missing: missing images
+     *
+     * @return ResponseInterface
+     */
+    public function missingAction(): ResponseInterface
+    {
+        $beuser_id = $GLOBALS['BE_USER']->user['uid'];
+        $result = $this->sessionRepository->findByAction('missing', $beuser_id);
+        if ($result->count() == 0) {
+            $new = TRUE;
+            $default = GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
+            $default->setAction('missing');
+            $default->setValue1(0);
+            $default->setValue2(0);
+        } else {
+            $new = FALSE;
+            $default = $result[0];
+        }
+
+        if ($this->request->hasArgument('currentPage')) {
+            $currentPage = intval($this->request->getArgument('currentPage'));
+        } else $currentPage = 1;
+        if ($this->request->hasArgument('img_other')) {
+            $img_other = intval($this->request->getArgument('img_other'));
+            $default->setValue2($img_other);
+        } else $img_other = $default->getValue2();
+        if ($this->request->hasArgument('my_page')) {
+            $my_page = intval($this->request->getArgument('my_page'));		// elements per page
+            $default->setPageel($my_page);
+        } else $my_page = $default->getPageel();
+        if (!$my_page) {
+            if (isset($this->settings['pagebrowser']['itemsPerPage'])) {
+                $my_page = $this->settings['pagebrowser']['itemsPerPage'];
+            }
+            if (!$my_page) {
+                $my_page = $this->settings['pagebrowser']['itemsPerPage'] = 25;
+            }
+        } else {
+            $this->settings['pagebrowser']['itemsPerPage'] = $my_page;
+        }
+        if ($this->request->hasArgument('my_recursive')) {
+            $my_recursive = intval($this->request->getArgument('my_recursive'));		// recursive pid search
+            $default->setPagestart($my_recursive);
+        } else $my_recursive = $default->getPagestart();
+
+        $finalArray = $this->sessionRepository->getMissingImages($img_other);
+        $replacedArray = [];
+
+        if ($new) {
+            $user = $this->backendUserRepository->findByUid($beuser_id);
+            $default->setBeuser($user);
+            $this->sessionRepository->add($default);
+            $persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
+            $persistenceManager->persistAll();
+        } else {
+            $this->sessionRepository->update($default);
+        }
+
+        if (count($finalArray)>0 && $my_recursive>0) {
+            $finalArray = $this->sessionRepository->filterPagesRecursive($finalArray, $my_recursive);
+        }
+
+        if (!$finalArray) $finalArray = [];
+        $arrayPaginator = new ArrayPaginator($finalArray, $currentPage, $this->settings['pagebrowser']['itemsPerPage']);
+        $pagination = new SimplePagination($arrayPaginator);
+
+        $this->view->assign('img_other', $img_other);
+        $this->view->assign('images', $finalArray);
+        $this->view->assign('imagesReplaced', $replacedArray);
+        $this->view->assign('paginator', $arrayPaginator);
+        $this->view->assign('pagination', $pagination);
+        $this->view->assign('no_pages', range(1, $pagination->getLastPageNumber()));
+        $this->view->assign('my_page', $my_page);
+        $this->view->assign('my_recursive', $my_recursive);
+        $this->view->assign('settings', $this->settings);
+        $this->view->assign('action', 'missing');
+        $this->addDocHeaderDropDown('missing');
+        return $this->defaultRendering();
+    }
+
+    /**
      * action pagesearch: find pages which are linked
      *
      * @return ResponseInterface
@@ -1171,7 +1252,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         $languageService = $this->getLanguageService();
         $actionMenu = $this->moduleTemplate->getDocHeaderComponent()->getMenuRegistry()->makeMenu();
         $actionMenu->setIdentifier('backendtoolsSelector');
-        $actions = ['list', 'latest', 'pagesearch', 'layouts', 'images', 'filedeletion', 'redirects', 'redirectscheck'];
+        $actions = ['list', 'latest', 'pagesearch', 'layouts', 'images', 'missing', 'filedeletion', 'redirects', 'redirectscheck'];
         foreach ($actions as $action) {
             $actionMenu->addMenuItem(
                 $actionMenu->makeMenuItem()

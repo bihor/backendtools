@@ -13,7 +13,7 @@ return [
         'labels' => 'LLL:EXT:backendtools/Resources/Private/Language/locallang_mod1.xlf',
         'extensionName' => 'Backendtools',
         'controllerActions' => [
-            \Fixpunkt\Backendtools\Controller\SessionController::class => 'list, latest, layouts, filedeletion, images, pagesearch, redirects, redirectscheck'
+            \Fixpunkt\Backendtools\Controller\SessionController::class => 'list, latest, layouts, filedeletion, missing, images, pagesearch, redirects, redirectscheck'
         ],
     ],
 ];
