@@ -1136,6 +1136,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                 'title',
                 'alternative',
                 'uid_local',
+                'uid_foreign',
                 'tablenames'
             ]) -> from ('sys_file_reference')
                 ->where(
@@ -1154,6 +1155,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                     $referenceArray[$uid]['ref_title'] = $row['title'];
                     $referenceArray[$uid]['ref_alt'] = $row['alternative'];
                     $referenceArray[$uid]['ref_tablenames'] = $row['tablenames'];
+                    $referenceArray[$uid]['ref_uid_foreign'] = $row['uid_foreign'];
                     //$referenceArray[$uid]['file_uid'] = $uid_file;
                     $referenceArray[$uid]['file'] = $fileArray[$uid_file];	// file-array
                     $referenceArray[$uid]['domain'] = '';
@@ -1285,6 +1287,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                 'title',
                 'alternative',
                 'uid_local',
+                'uid_foreign',
                 'tablenames'
             ]) -> from ('sys_file_reference')
                 ->where(
@@ -1303,6 +1306,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                     $referenceArray[$uid]['ref_title'] = $row['title'];
                     $referenceArray[$uid]['ref_alt'] = $row['alternative'];
                     $referenceArray[$uid]['ref_tablenames'] = $row['tablenames'];
+                    $referenceArray[$uid]['ref_uid_foreign'] = $row['uid_foreign'];
                     //$referenceArray[$uid]['file_uid'] = $uid_file;
                     $referenceArray[$uid]['file'] = $fileArray[$uid_file];	// file-array
                     $referenceArray[$uid]['domain'] = '';

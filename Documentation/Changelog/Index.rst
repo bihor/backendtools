@@ -10,7 +10,7 @@
 
 Changelog
 =========
-Version 5.1.0/1:
+Version 5.1.0/2:
 New tool: show where missing files are used.
 Bugfix: show meta-data again in "Show images without title- or alt-text".
 
