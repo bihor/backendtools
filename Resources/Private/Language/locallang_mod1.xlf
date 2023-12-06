@@ -37,7 +37,7 @@
 				<source>Check the sys_redirect entries</source>
 			</trans-unit>
 			<trans-unit id="module.missing" xml:space="preserve">
-				<source>Show where missing images are used</source>
+				<source>Show where missing files are used</source>
 			</trans-unit>
 		</body>
 	</file>
