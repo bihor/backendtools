@@ -54,11 +54,11 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
      */
     public function findByAction($action, $beuser)
     {
+        $constraints = array();
         $query = $this->createQuery();
-        $query->matching($query->logicalAnd(
-            $query->equals('action', $action),
-            $query->equals('beuser', $beuser)
-        ));
+        $constraints[] = $query->equals('action', $action);
+        $constraints[] = $query->equals('beuser', $beuser);
+        $query->matching($query->logicalAnd($constraints));
         return $query->execute();
     }
 
@@ -93,7 +93,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         $res -> orderBy('list_type', 'ASC') -> addOrderBy('CType');
         //$res -> groupBy('CType');
         //print_r($res->getSQL());
-        $result = $res-> executeQuery()->fetchAllAssociative();
+        $result = $res-> execute();
 
         foreach($result as $row) {
             if ($row['list_type']) {
@@ -260,7 +260,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             $res -> orderBy($sort, $asc) -> addOrderBy('tt_content.pid');
         }
         //print_r($res->getSQL());
-        $result = $res-> executeQuery()->fetchAllAssociative();
+        $result = $res-> execute();
 
         //print_r($queryBuilder->getParameters());
         foreach($result as $row) {
@@ -408,7 +408,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         $res -> orderBy('tt_content.tstamp', 'DESC');
         //$res -> setMaxResults(10);
         //print_r($res->getSQL());
-        $result = $res-> executeQuery()->fetchAllAssociative();
+        $result = $res-> execute();
 
         foreach($result as $row) {
             if ($row['sys_language_uid'] > 0) {
@@ -517,7 +517,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             ]);
         }
         $res -> orderBy('uid', 'ASC');
-        $result = $res-> executeQuery()->fetchAllAssociative();
+        $result = $res-> execute();
 
         foreach($result as $row) {
             if ($row['sys_language_uid'] > 0) {
@@ -593,7 +593,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         $res -> orderBy('tstamp', 'DESC');
         //$res -> setMaxResults(10);
         //print_r($res->getSQL());
-        $result = $res-> executeQuery()->fetchAllAssociative();
+        $result = $res-> execute();
 
         foreach($result as $row) {
             if ($row['sys_language_uid'] > 0) {
@@ -646,7 +646,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             )
         ]);
         //print_r($res->getSQL());
-        $result = $res -> executeQuery()->fetchAllAssociative();
+        $result = $res -> execute();
         //print_r($queryBuilder->getParameters());
 
         foreach($result as $row) {
@@ -730,7 +730,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         //print_r($res->getSQL());
         $result = $res -> orderBy('tt_content.pid')
             -> addOrderBy('tt_content.sorting')
-            -> executeQuery()->fetchAllAssociative();
+            -> execute();
 
         foreach($result as $row) {
             if ( $row["pdeleted"] ) {
@@ -807,7 +807,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         ]);
         $result = $res -> orderBy('pid', 'ASC')
             -> addOrderBy('tstamp', 'DESC')
-            -> executeQuery()->fetchAllAssociative();
+            -> execute();
 
         foreach($result as $row) {
             $uid = $row['uid'];
@@ -860,7 +860,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 
         $result = $res -> orderBy('tx_news_domain_model_news.pid', 'ASC')
             -> addOrderBy('tx_news_domain_model_news.tstamp', 'DESC')
-            -> executeQuery()->fetchAllAssociative();
+            -> execute();
 
         foreach($result as $row) {
             $uid = $row['uid'];
@@ -911,7 +911,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         ]);
         $result = $res -> orderBy('tx_news_domain_model_news.pid', 'ASC')
             -> addOrderBy('tx_news_domain_model_news.tstamp', 'DESC')
-            -> executeQuery()->fetchAllAssociative();
+            -> execute();
 
         foreach($result as $row) {
             $uid = $row['uid'];
@@ -971,7 +971,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         ]);
         $result = $res -> orderBy('pid', 'ASC')
             -> addOrderBy('tstamp', 'DESC')
-            -> executeQuery()->fetchAllAssociative();
+            -> execute();
 
         foreach($result as $row) {
             $uid = $row['uid'];
@@ -1023,7 +1023,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         ]);
         $result = $res -> orderBy('tx_camaliga_domain_model_content.pid', 'ASC')
             -> addOrderBy('tx_camaliga_domain_model_content.tstamp', 'DESC')
-            -> executeQuery()->fetchAllAssociative();
+            -> execute();
 
         foreach($result as $row) {
             $uid = $row['uid'];
@@ -1033,7 +1033,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
     }
 
     /**
-     * Bilder die fehlen
+     * Dateien, die fehlen
      *
      * @param   integer   not only in tt_content?
      *
@@ -1049,15 +1049,13 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         // sys_file: get images
         $table = 'sys_file';
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
-        $result = $queryBuilder
+        $statement = $queryBuilder
             ->select('*')
             ->from($table)
             ->where($queryBuilder->expr()->eq('missing', 1))
             ->orderBy('name', 'ASC')
-            ->executeQuery()->fetchAllAssociative();
-      //  ->where($queryBuilder->expr()->like('mime_type', $queryBuilder->createNamedParameter('image%')))
-
-        foreach($result as $row) {
+            ->execute();
+        while ($row = $statement->fetch()) {
             $uid = $row['uid'];
             $fileArray[$uid] = $row;
             $fileArray[$uid]['used'] = false;
@@ -1066,12 +1064,11 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         // sys_file_metadata
         $table = 'sys_file_metadata';
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
-        $result = $queryBuilder
+        $statement = $queryBuilder
             ->select('*')
             ->from($table)
-            ->executeQuery()->fetchAllAssociative();
-
-        foreach($result as $row) {
+            ->execute();
+        while ($row = $statement->fetch()) {
             if (isset($row['file'])) {
                 $uid = $row['file'];
                 if (isset($fileArray[$uid]) && isset($fileArray[$uid]['uid']) && ($fileArray[$uid]['uid'] == $uid)) {
@@ -1107,8 +1104,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             )
             ->orderBy('tt_pid', 'ASC');
         //print_r($queryBuilder->getSQL());
-        $result = $res -> executeQuery()->fetchAllAssociative();
-
+        $result = $res -> execute();
         foreach($result as $row) {
             $uid = $row['uid'];
             $uid_file = $row['uid_local'];
@@ -1136,6 +1132,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                 'title',
                 'alternative',
                 'uid_local',
+                'uid_foreign',
                 'tablenames'
             ]) -> from ('sys_file_reference')
                 ->where(
@@ -1143,8 +1140,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                 )
                 ->orderBy('uid', 'ASC');
             //print_r($queryBuilder->getSQL());
-            $result = $res -> executeQuery()->fetchAllAssociative();
-
+            $result = $res -> execute();
             foreach($result as $row) {
                 $uid = $row['uid'];
                 $uid_file = $row['uid_local'];
@@ -1154,6 +1150,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                     $referenceArray[$uid]['ref_title'] = $row['title'];
                     $referenceArray[$uid]['ref_alt'] = $row['alternative'];
                     $referenceArray[$uid]['ref_tablenames'] = $row['tablenames'];
+                    $referenceArray[$uid]['ref_uid_foreign'] = $row['uid_foreign'];
                     //$referenceArray[$uid]['file_uid'] = $uid_file;
                     $referenceArray[$uid]['file'] = $fileArray[$uid_file];	// file-array
                     $referenceArray[$uid]['domain'] = '';
@@ -1200,14 +1197,13 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         // sys_file: get images
         $table = 'sys_file';
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
-        $result = $queryBuilder
+        $statement = $queryBuilder
             ->select('*')
             ->from($table)
             ->where($queryBuilder->expr()->like('mime_type', $queryBuilder->createNamedParameter('image%')))
             ->orderBy('name', 'ASC')
-            ->executeQuery()->fetchAllAssociative();
-
-        foreach($result as $row) {
+            ->execute();
+        while ($row = $statement->fetch()) {
             $uid = $row['uid'];
             //$fileOrder[] = $uid;
             $fileArray[$uid] = $row;
@@ -1216,21 +1212,18 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         // sys_file_metadata
         $table = 'sys_file_metadata';
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
-        $result = $queryBuilder
+        $statement = $queryBuilder
             ->select('*')
             ->from($table)
-            ->executeQuery()->fetchAllAssociative();
-
-        foreach($result as $row) {
-            if (isset($row['file'])) {
-                $uid = $row['file'];
-                if (isset($fileArray[$uid]) && isset($fileArray[$uid]['uid']) && ($fileArray[$uid]['uid'] == $uid)) {
-                    $fileArray[$uid]['meta_uid'] = $row['uid'];
-                    $fileArray[$uid]['meta_title'] = $row['title'];
-                    $fileArray[$uid]['meta_alt'] = $row['alternative'];
-                    $fileArray[$uid]['meta_width'] = $row['width'];
-                    $fileArray[$uid]['meta_height'] = $row['height'];
-                }
+            ->execute();
+        while ($row = $statement->fetch()) {
+            $uid = $row['file'];
+            if (isset($fileArray[$uid]) && isset($fileArray[$uid]['uid']) && ($fileArray[$uid]['uid'] == $uid)) {
+                $fileArray[$uid]['meta_uid'] = $row['uid'];
+                $fileArray[$uid]['meta_title'] = $row['title'];
+                $fileArray[$uid]['meta_alt'] = $row['alternative'];
+                $fileArray[$uid]['meta_width'] = $row['width'];
+                $fileArray[$uid]['meta_height'] = $row['height'];
             }
         }
 
@@ -1257,8 +1250,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             )
             ->orderBy('tt_pid', 'ASC');
         //print_r($queryBuilder->getSQL());
-        $result = $res -> executeQuery()->fetchAllAssociative();
-
+        $result = $res -> execute();
         foreach($result as $row) {
             $uid = $row['uid'];
             $uid_file = $row['uid_local'];
@@ -1285,6 +1277,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                 'title',
                 'alternative',
                 'uid_local',
+                'uid_foreign',
                 'tablenames'
             ]) -> from ('sys_file_reference')
                 ->where(
@@ -1292,8 +1285,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                 )
                 ->orderBy('uid', 'ASC');
             //print_r($queryBuilder->getSQL());
-            $result = $res -> executeQuery()->fetchAllAssociative();
-
+            $result = $res -> execute();
             foreach($result as $row) {
                 $uid = $row['uid'];
                 $uid_file = $row['uid_local'];
@@ -1303,6 +1295,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                     $referenceArray[$uid]['ref_title'] = $row['title'];
                     $referenceArray[$uid]['ref_alt'] = $row['alternative'];
                     $referenceArray[$uid]['ref_tablenames'] = $row['tablenames'];
+                    $referenceArray[$uid]['ref_uid_foreign'] = $row['uid_foreign'];
                     //$referenceArray[$uid]['file_uid'] = $uid_file;
                     $referenceArray[$uid]['file'] = $fileArray[$uid_file];	// file-array
                     $referenceArray[$uid]['domain'] = '';
@@ -1315,14 +1308,10 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         foreach ($referenceArray as $uid => $refArray) {
             $imgArray = $refArray['file'];
             //echo $imgArray['meta_alt'] .'#'. $imgArray['ref_alt'];
-            if (((($img_without == 1) || ($img_without == 3)) &&
-                    ((!isset($imgArray['meta_alt']) || $imgArray['meta_alt']=='') && (!isset($refArray['ref_alt']) || $refArray['ref_alt']==''))) ||
-                ((($img_without == 2) || ($img_without == 3)) &&
-                    ((!isset($imgArray['meta_title']) || $imgArray['meta_title']=='') && (!isset($refArray['ref_title']) || $refArray['ref_title']==''))) ||
-                ((($img_without == 4) || ($img_without == 6)) &&
-                    ((isset($imgArray['meta_alt']) && $imgArray['meta_alt']!='') || (isset($refArray['ref_alt']) && $refArray['ref_alt']!=''))) ||
-                ((($img_without == 5) || ($img_without == 6)) &&
-                    ((isset($imgArray['meta_title']) && $imgArray['meta_title']!='') || (isset($refArray['ref_title']) && $refArray['ref_title']!='')))) {
+            if (((($img_without == 1) || ($img_without == 3)) && (($imgArray['meta_alt']=='') && ($refArray['ref_alt']==''))) ||
+                ((($img_without == 2) || ($img_without == 3)) && (($imgArray['meta_title']=='') && ($refArray['ref_title']==''))) ||
+                ((($img_without == 4) || ($img_without == 6)) && (($imgArray['meta_alt']!='') || ($refArray['ref_alt']!=''))) ||
+                ((($img_without == 5) || ($img_without == 6)) && (($imgArray['meta_title']!='') || ($refArray['ref_title']!='')))) {
                 // neu ab version 1.4.3: final-array enthält reference-Daten statt file-Daten
                 if (isset($refArray['tt_pid'])) {
                     $refArray['domain'] = $this->getDomain($refArray['tt_pid'], $refArray['tt_lang']);
@@ -1360,7 +1349,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                     $queryBuilder->expr()->eq('uid', $uid)
                 )
                 ->set($field, $value)
-                ->executeStatement();
+                ->execute();
             return true;
         } else {
             return false;
@@ -1391,7 +1380,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             $queryBuilderPages->expr()->eq('l10n_parent', $queryBuilderPages->createNamedParameter($parent, \PDO::PARAM_INT)),
             $queryBuilderPages->expr()->eq('sys_language_uid', $queryBuilderPages->createNamedParameter($sys_language_uid, \PDO::PARAM_INT))
         ]);
-        return $language_res-> executeQuery()->fetchAllAssociative();
+        return $language_res-> execute();
     }
 
     /**
@@ -1454,11 +1443,8 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
     {
         $tempPages = [];
         foreach ($pages as $page) {
-            $pid = 0;
-            if (isset($page['pid'])) {
-                $pid = $page['pid'];
-            }
-            if (!$pid && isset($page['tt_pid'])) {
+            $pid = $page['pid'];
+            if (!$pid) {
                 $pid = $page['tt_pid'];
             }
             if ($this->isInRootLine($pid, $uid)) {
@@ -1514,16 +1500,16 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         return $queryBuilder
             ->insert('sys_redirect')
             ->values([
-                'source_host' => '*',
                 'source_path' => $from,
                 'target' => $to,
                 'is_regexp' => $regexp,
                 'target_statuscode' => $statuscode,
                 'updatedon' => time(),
-                'createdon' => time()
+                'createdon' => time(),
+                'createdby' => $createdby,
+                'source_host' => '*'
             ])
-            ->executeStatement();
-       // 'createdby' => intval($createdby), klappt nicht mehr in TYPO3 12!
+            ->execute();
     }
 
     /**
@@ -1539,7 +1525,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             ->where(
                 $queryBuilder->expr()->eq('uid', (int) $uid)
             )
-            ->executeStatement();
+            ->execute();
     }
 
     /**
@@ -1556,7 +1542,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             'source_path',
             'target'
         ]) -> from ('sys_redirect')
-            ->executeQuery()->fetchAllAssociative();
+            ->execute();
     }
 
     /**
@@ -1599,6 +1585,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                     $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT)
                 )
             )
-            ->executeQuery()->fetchAssociative();
+            ->execute()
+            ->fetch();
     }
 }

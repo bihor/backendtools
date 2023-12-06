@@ -1,14 +1,14 @@
 {
 	"name" : "fixpunkt/backendtools",
 	"type" : "typo3-cms-extension",
-	"description" : "8 admin tools for extension listing, recent pages, pages with layouts, redirects, unused files, images with no alt- or title-tag and links.",
+	"description" : "9 admin tools for extension listing, recent pages, pages with layouts, redirects, unused files, missing files, images with no alt- or title-tag and links.",
 	"authors" : [{
 			"name" : "Kurt Gusbeth",
 			"role" : "Developer"
 		}
 	],
 	"require" : {
-		"typo3/cms-core" : "~12.4.0"
+		"typo3/cms-core" : "~10.4.6 || ~11.5.0"
 	},
 	"autoload" : {
 		"psr-4" : {

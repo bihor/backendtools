@@ -62,3 +62,4 @@ class EditLinkViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractTagBa
         return $this->tag->render();
     }
 }
+?>

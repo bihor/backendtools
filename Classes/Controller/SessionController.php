@@ -1,22 +1,18 @@
 <?php
 namespace Fixpunkt\Backendtools\Controller;
 
-use TYPO3\CMS\Backend\Template\ModuleTemplate;
-use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Domain\Repository\BackendUserRepository;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Pagination\ArrayPaginator;
 use TYPO3\CMS\Core\Pagination\SimplePagination;
-use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
-use Psr\Http\Message\ResponseInterface;
 
 /***************************************************************
  *
  *  Copyright notice
  *
- *  (c) 2023 Kurt Gusbeth <k.gusbeth@fixpunkt.com>, fixpunkt werbeagentur gmbh
+ *  (c) 2021 Kurt Gusbeth <k.gusbeth@fixpunkt.com>, fixpunkt werbeagentur gmbh
  *
  *  All rights reserved
  *
@@ -43,34 +39,12 @@ use Psr\Http\Message\ResponseInterface;
 class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
 {
 
-    protected int $id;
-
-    protected ModuleTemplate $moduleTemplate;
-
     /**
-     * sessionRepository
+     * contentRepository
      *
      * @var \Fixpunkt\Backendtools\Domain\Repository\SessionRepository
      */
     protected $sessionRepository;
-
-    /**
-     * backendUserRepository
-     *
-     * @var \Fixpunkt\Backendtools\Domain\Repository\BackendUserRepository
-     */
-    protected $backendUserRepository;
-
-    public function __construct(
-        protected readonly ModuleTemplateFactory $moduleTemplateFactory,
-    ) {
-    }
-
-    public function initializeAction()
-    {
-        $this->id = (int)($this->request->getQueryParams()['id'] ?? 0);
-        $this->moduleTemplate = $this->moduleTemplateFactory->create($this->request);
-    }
 
     /**
      * Injects the session-Repository
@@ -83,21 +57,11 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     }
 
     /**
-     * Injects the BackendUserRepository-Repository
-     *
-     * @param \Fixpunkt\Backendtools\Domain\Repository\BackendUserRepository $backendUserRepository
-     */
-    public function injectBackendUserRepository(\Fixpunkt\Backendtools\Domain\Repository\BackendUserRepository $backendUserRepository)
-    {
-        $this->backendUserRepository = $backendUserRepository;
-    }
-
-    /**
      * action list
      *
-     * @return ResponseInterface
+     * @return void
      */
-    public function listAction(): ResponseInterface
+    public function listAction()
     {
         $beuser_id = $GLOBALS['BE_USER']->user['uid'];
         $result = $this->sessionRepository->findByAction('list', $beuser_id);
@@ -172,7 +136,10 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         } else $my_recursive = $default->getPagestart();
 
         if ($new) {
-            $user = $this->backendUserRepository->findByUid($beuser_id);
+            $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+            $backendUserRepository = $objectManager->get(BackendUserRepository::class);
+            /** @var \TYPO3\CMS\Extbase\Domain\Model\BackendUser $user */
+            $user = $backendUserRepository->findByUid($beuser_id);
             $default->setBeuser($user);
             $this->sessionRepository->add($default);
             $persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
@@ -213,16 +180,14 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         $this->view->assign('types', $types);
         $this->view->assign('settings', $this->settings);
         $this->view->assign('action', 'list');
-        $this->addDocHeaderDropDown('list');
-        return $this->defaultRendering();
     }
 
     /**
      * action latest
      *
-     * @return ResponseInterface
+     * @return void
      */
-    public function latestAction(): ResponseInterface
+    public function latestAction()
     {
         $beuser_id = $GLOBALS['BE_USER']->user['uid'];
         $result = $this->sessionRepository->findByAction('latest', $beuser_id);
@@ -281,7 +246,10 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         } else $my_recursive = $default->getPagestart();
 
         if ($new) {
-            $user = $this->backendUserRepository->findByUid($beuser_id);
+            $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+            $backendUserRepository = $objectManager->get(BackendUserRepository::class);
+            /** @var \TYPO3\CMS\Extbase\Domain\Model\BackendUser $user */
+            $user = $backendUserRepository->findByUid($beuser_id);
             $default->setBeuser($user);
             $this->sessionRepository->add($default);
             $persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
@@ -360,16 +328,14 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         $this->view->assign('no_pages', range(1, $pagination->getLastPageNumber()));
         $this->view->assign('settings', $this->settings);
         $this->view->assign('action', 'latest');
-        $this->addDocHeaderDropDown('latest');
-        return $this->defaultRendering();
     }
 
     /**
      * action backend layouts
      *
-     * @return ResponseInterface
+     * @return void
      */
-    public function layoutsAction(): ResponseInterface
+    public function layoutsAction()
     {
         $beuser_id = $GLOBALS['BE_USER']->user['uid'];
         $result = $this->sessionRepository->findByAction('layouts', $beuser_id);
@@ -418,7 +384,10 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         } else $my_recursive = $default->getPagestart();
 
         if ($new) {
-            $user = $this->backendUserRepository->findByUid($beuser_id);
+            $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+            $backendUserRepository = $objectManager->get(BackendUserRepository::class);
+            /** @var \TYPO3\CMS\Extbase\Domain\Model\BackendUser $user */
+            $user = $backendUserRepository->findByUid($beuser_id);
             $default->setBeuser($user);
             $this->sessionRepository->add($default);
             $persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
@@ -448,16 +417,14 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         $this->view->assign('no_pages', range(1, $pagination->getLastPageNumber()));
         $this->view->assign('settings', $this->settings);
         $this->view->assign('action', 'layouts');
-        $this->addDocHeaderDropDown('layouts');
-        return $this->defaultRendering();
     }
 
     /**
      * action filedeletion
      *
-     * @return ResponseInterface
+     * @return void
      */
-    public function filedeletionAction(): ResponseInterface
+    public function filedeletionAction()
     {
         $beuser_id = $GLOBALS['BE_USER']->user['uid'];
         $result = $this->sessionRepository->findByAction('filedeletion', $beuser_id);
@@ -494,7 +461,10 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 
 
         if ($new) {
-            $user = $this->backendUserRepository->findByUid($beuser_id);
+            $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+            $backendUserRepository = $objectManager->get(BackendUserRepository::class);
+            /** @var \TYPO3\CMS\Extbase\Domain\Model\BackendUser $user */
+            $user = $backendUserRepository->findByUid($beuser_id);
             $default->setBeuser($user);
             $this->sessionRepository->add($default);
             $persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
@@ -546,17 +516,104 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         $this->view->assign('convert', $convert);
         $this->view->assign('delfile', $delfile);
         $this->view->assign('message', $content);
-        $this->view->assign('action', 'filedeletion');
-        $this->addDocHeaderDropDown('filedeletion');
-        return $this->defaultRendering();
+    }
+
+    /**
+     * action missing: missing files list
+     *
+     * @return void
+     */
+    public function missingAction()
+    {
+        $beuser_id = $GLOBALS['BE_USER']->user['uid'];
+        $result = $this->sessionRepository->findByAction('images', $beuser_id);
+        if ($result->count() == 0) {
+            $new = TRUE;
+            $default = GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
+            $default->setAction('images');
+            $default->setValue1(0);
+            $default->setValue2(0);
+        } else {
+            $new = FALSE;
+            $default = $result[0];
+        }
+
+        if ($this->request->hasArgument('currentPage')) {
+            $currentPage = intval($this->request->getArgument('currentPage'));
+        } else $currentPage = 1;
+        if ($this->request->hasArgument('img_other')) {
+            $img_other = intval($this->request->getArgument('img_other'));
+            $default->setValue2($img_other);
+        } else $img_other = $default->getValue2();
+        if ($this->request->hasArgument('my_page')) {
+            $my_page = intval($this->request->getArgument('my_page'));		// elements per page
+            $default->setPageel($my_page);
+        } else $my_page = $default->getPageel();
+        if (!$my_page) {
+            if (isset($this->settings['pagebrowser']['itemsPerPage'])) {
+                $my_page = $this->settings['pagebrowser']['itemsPerPage'];
+            }
+            if (!$my_page) {
+                $my_page = $this->settings['pagebrowser']['itemsPerPage'] = 25;
+            }
+        } else {
+            $this->settings['pagebrowser']['itemsPerPage'] = $my_page;
+        }
+        if ($this->request->hasArgument('my_recursive')) {
+            $my_recursive = intval($this->request->getArgument('my_recursive'));		// recursive pid search
+            $default->setPagestart($my_recursive);
+        } else $my_recursive = $default->getPagestart();
+
+        $doubleArray = $this->sessionRepository->getMissingImages($img_other);
+        $finalArray = $doubleArray[1];
+        $notUsedImages = [];
+        foreach ($doubleArray[0] as $image) {
+            if (!$image['used']) {
+                $notUsedImages[] = $image;
+            }
+        }
+        $count = count($notUsedImages);
+
+        if ($new) {
+            $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+            $backendUserRepository = $objectManager->get(BackendUserRepository::class);
+            /** @var \TYPO3\CMS\Extbase\Domain\Model\BackendUser $user */
+            $user = $backendUserRepository->findByUid($beuser_id);
+            $default->setBeuser($user);
+            $this->sessionRepository->add($default);
+            $persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
+            $persistenceManager->persistAll();
+        } else {
+            $this->sessionRepository->update($default);
+        }
+
+        if (count($finalArray)>0 && $my_recursive>0) {
+            $finalArray = $this->sessionRepository->filterPagesRecursive($finalArray, $my_recursive);
+        }
+
+        if (!$finalArray) $finalArray = [];
+        $arrayPaginator = new ArrayPaginator($finalArray, $currentPage, $this->settings['pagebrowser']['itemsPerPage']);
+        $pagination = new SimplePagination($arrayPaginator);
+
+        $this->view->assign('count', $count);
+        $this->view->assign('img_other', $img_other);
+        $this->view->assign('images', $finalArray);
+        $this->view->assign('fileArray', $notUsedImages);
+        $this->view->assign('paginator', $arrayPaginator);
+        $this->view->assign('pagination', $pagination);
+        $this->view->assign('no_pages', range(1, $pagination->getLastPageNumber()));
+        $this->view->assign('my_page', $my_page);
+        $this->view->assign('my_recursive', $my_recursive);
+        $this->view->assign('settings', $this->settings);
+        $this->view->assign('action', 'missing');
     }
 
     /**
      * action images: images without alt- or title-tag
      *
-     * @return ResponseInterface
+     * @return void
      */
-    public function imagesAction(): ResponseInterface
+    public function imagesAction()
     {
         $beuser_id = $GLOBALS['BE_USER']->user['uid'];
         $result = $this->sessionRepository->findByAction('images', $beuser_id);
@@ -609,7 +666,10 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         $replacedArray = [];
 
         if ($new) {
-            $user = $this->backendUserRepository->findByUid($beuser_id);
+            $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+            $backendUserRepository = $objectManager->get(BackendUserRepository::class);
+            /** @var \TYPO3\CMS\Extbase\Domain\Model\BackendUser $user */
+            $user = $backendUserRepository->findByUid($beuser_id);
             $default->setBeuser($user);
             $this->sessionRepository->add($default);
             $persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
@@ -685,105 +745,14 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         $this->view->assign('my_recursive', $my_recursive);
         $this->view->assign('settings', $this->settings);
         $this->view->assign('action', 'images');
-        $this->addDocHeaderDropDown('images');
-        return $this->defaultRendering();
-    }
-
-    /**
-     * action missing: missing images
-     *
-     * @return ResponseInterface
-     */
-    public function missingAction(): ResponseInterface
-    {
-        $beuser_id = $GLOBALS['BE_USER']->user['uid'];
-        $result = $this->sessionRepository->findByAction('missing', $beuser_id);
-        if ($result->count() == 0) {
-            $new = TRUE;
-            $default = GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
-            $default->setAction('missing');
-            $default->setValue1(0);
-            $default->setValue2(0);
-        } else {
-            $new = FALSE;
-            $default = $result[0];
-        }
-
-        if ($this->request->hasArgument('currentPage')) {
-            $currentPage = intval($this->request->getArgument('currentPage'));
-        } else $currentPage = 1;
-        if ($this->request->hasArgument('img_other')) {
-            $img_other = intval($this->request->getArgument('img_other'));
-            $default->setValue2($img_other);
-        } else $img_other = $default->getValue2();
-        if ($this->request->hasArgument('my_page')) {
-            $my_page = intval($this->request->getArgument('my_page'));		// elements per page
-            $default->setPageel($my_page);
-        } else $my_page = $default->getPageel();
-        if (!$my_page) {
-            if (isset($this->settings['pagebrowser']['itemsPerPage'])) {
-                $my_page = $this->settings['pagebrowser']['itemsPerPage'];
-            }
-            if (!$my_page) {
-                $my_page = $this->settings['pagebrowser']['itemsPerPage'] = 25;
-            }
-        } else {
-            $this->settings['pagebrowser']['itemsPerPage'] = $my_page;
-        }
-        if ($this->request->hasArgument('my_recursive')) {
-            $my_recursive = intval($this->request->getArgument('my_recursive'));		// recursive pid search
-            $default->setPagestart($my_recursive);
-        } else $my_recursive = $default->getPagestart();
-
-        $doubleArray = $this->sessionRepository->getMissingImages($img_other);
-        $finalArray = $doubleArray[1];
-        $notUsedImages = [];
-        foreach ($doubleArray[0] as $image) {
-            if (!$image['used']) {
-                $notUsedImages[] = $image;
-            }
-        }
-        $count = count($notUsedImages);
-
-        if ($new) {
-            $user = $this->backendUserRepository->findByUid($beuser_id);
-            $default->setBeuser($user);
-            $this->sessionRepository->add($default);
-            $persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
-            $persistenceManager->persistAll();
-        } else {
-            $this->sessionRepository->update($default);
-        }
-
-        if (count($finalArray)>0 && $my_recursive>0) {
-            $finalArray = $this->sessionRepository->filterPagesRecursive($finalArray, $my_recursive);
-        }
-
-        if (!$finalArray) $finalArray = [];
-        $arrayPaginator = new ArrayPaginator($finalArray, $currentPage, $this->settings['pagebrowser']['itemsPerPage']);
-        $pagination = new SimplePagination($arrayPaginator);
-
-        $this->view->assign('count', $count);
-        $this->view->assign('img_other', $img_other);
-        $this->view->assign('images', $finalArray);
-        $this->view->assign('fileArray', $notUsedImages);
-        $this->view->assign('paginator', $arrayPaginator);
-        $this->view->assign('pagination', $pagination);
-        $this->view->assign('no_pages', range(1, $pagination->getLastPageNumber()));
-        $this->view->assign('my_page', $my_page);
-        $this->view->assign('my_recursive', $my_recursive);
-        $this->view->assign('settings', $this->settings);
-        $this->view->assign('action', 'missing');
-        $this->addDocHeaderDropDown('missing');
-        return $this->defaultRendering();
     }
 
     /**
      * action pagesearch: find pages which are linked
      *
-     * @return ResponseInterface
+     * @return void
      */
-    public function pagesearchAction(): ResponseInterface
+    public function pagesearchAction()
     {
         $beuser_id = $GLOBALS['BE_USER']->user['uid'];
         $result = $this->sessionRepository->findByAction('pagesearch', $beuser_id);
@@ -837,7 +806,10 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         } else $my_recursive = $default->getPagestart();
 
         if ($new) {
-            $user = $this->backendUserRepository->findByUid($beuser_id);
+            $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+            $backendUserRepository = $objectManager->get(BackendUserRepository::class);
+            /** @var \TYPO3\CMS\Extbase\Domain\Model\BackendUser $user */
+            $user = $backendUserRepository->findByUid($beuser_id);
             $default->setBeuser($user);
             $this->sessionRepository->add($default);
             $persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
@@ -882,16 +854,14 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         $this->view->assign('my_recursive', $my_recursive);
         $this->view->assign('settings', $this->settings);
         $this->view->assign('action', 'pagesearch');
-        $this->addDocHeaderDropDown('pagesearch');
-        return $this->defaultRendering();
     }
 
     /**
      * action redirects import
      *
-     * @return ResponseInterface
+     * @return void
      */
-    public function redirectsAction(): ResponseInterface
+    public function redirectsAction()
     {
         $content = '';
         $beuser_id = $GLOBALS['BE_USER']->user['uid'];
@@ -933,7 +903,10 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 
 
         if ($new) {
-            $user = $this->backendUserRepository->findByUid($beuser_id);
+            $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+            $backendUserRepository = $objectManager->get(BackendUserRepository::class);
+            /** @var \TYPO3\CMS\Extbase\Domain\Model\BackendUser $user */
+            $user = $backendUserRepository->findByUid($beuser_id);
             $default->setBeuser($user);
             $this->sessionRepository->add($default);
             $persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
@@ -1003,17 +976,14 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         $this->view->assign('convert', $convert);
         $this->view->assign('impfile', $impfile);
         $this->view->assign('message', $content);
-        $this->view->assign('action', 'redirects');
-        $this->addDocHeaderDropDown('redirects');
-        return $this->defaultRendering();
     }
 
     /**
      * action redirects check
      *
-     * @return ResponseInterface
+     * @return void
      */
-    public function redirectscheckAction(): ResponseInterface
+    public function redirectscheckAction()
     {
         $content = '';
         $beuser_id = $GLOBALS['BE_USER']->user['uid'];
@@ -1058,7 +1028,10 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         $limit_to = $currentPage * $my_page;
 
         if ($new) {
-            $user = $this->backendUserRepository->findByUid($beuser_id);
+            $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+            $backendUserRepository = $objectManager->get(BackendUserRepository::class);
+            /** @var \TYPO3\CMS\Extbase\Domain\Model\BackendUser $user */
+            $user = $backendUserRepository->findByUid($beuser_id);
             $default->setBeuser($user);
             $this->sessionRepository->add($default);
             $persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
@@ -1138,7 +1111,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
                     $table = substr($pre, 5);
                     if ($rowid && (($table == 'file') || ($table == 'page'))) {
                         $tableName = ($table == 'page') ? 'pages' : 'sys_file';
-                        // First check, if we find a not disabled record if the check for hidden records is enabled.
+                        // First check, if we find a non disabled record if the check for hidden records is enabled.
                         $row = $this->sessionRepository->getRecordRow($tableName, $rowid, 'disabled');
                         if ($row === false) {
                             $status = 'target disabled or deleted!';
@@ -1203,8 +1176,6 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         $this->view->assign('page', $currentPage);
         $this->view->assign('settings', $this->settings);
         $this->view->assign('action', 'redirectscheck');
-        $this->addDocHeaderDropDown('redirectscheck');
-        return $this->defaultRendering();
     }
 
 
@@ -1242,46 +1213,5 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             $host = substr($host,0,-1);
         }
         return $host;
-    }
-
-    protected function getLanguageService(): LanguageService
-    {
-        return $GLOBALS['LANG'];
-    }
-
-    protected function defaultRendering(): ResponseInterface
-    {
-        $this->moduleTemplate->setContent($this->view->render());
-        return $this->htmlResponse($this->moduleTemplate->renderContent());
-    }
-
-    protected function addDocHeaderDropDown(string $currentAction): void
-    {
-        $languageService = $this->getLanguageService();
-        $actionMenu = $this->moduleTemplate->getDocHeaderComponent()->getMenuRegistry()->makeMenu();
-        $actionMenu->setIdentifier('backendtoolsSelector');
-        $actions = ['list', 'latest', 'pagesearch', 'layouts', 'images', 'missing', 'filedeletion', 'redirects', 'redirectscheck'];
-        foreach ($actions as $action) {
-            $actionMenu->addMenuItem(
-                $actionMenu->makeMenuItem()
-                    ->setTitle($languageService->sL(
-                        'LLL:EXT:backendtools/Resources/Private/Language/locallang_mod1.xlf:module.' . $action
-                    ))
-                    ->setHref($this->getModuleUri($action))
-                    ->setActive($currentAction === $action)
-            );
-        }
-        $this->moduleTemplate->getDocHeaderComponent()->getMenuRegistry()->addMenu($actionMenu);
-    }
-
-    protected function getModuleUri(string $action = null, array $additionalPramaters = []): string
-    {
-        $parameters = [
-            'id' => $this->id,
-        ];
-        if ($action !== null) {
-            $parameters['action'] = $action;
-        }
-        return $this->uriBuilder->uriFor($action,null, 'Session', 'mod1');
     }
 }

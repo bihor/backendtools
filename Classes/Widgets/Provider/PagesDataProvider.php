@@ -72,12 +72,8 @@ class PagesDataProvider implements ChartDataProviderInterface
             ->where(
                 $expression
             )
-            ->executeQuery()
-            ->fetchOne();
-    }
-
-    public function getOptions(): array
-    {
-        return $this->options;
+            ->execute()
+            ->fetchColumn(0);
+//            ->fetchOne();
     }
 }

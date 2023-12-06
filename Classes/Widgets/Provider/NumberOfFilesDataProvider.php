@@ -22,12 +22,8 @@ class NumberOfFilesDataProvider implements NumberWithIconDataProviderInterface
             ->where(
                 $queryBuilder->expr()->eq('missing', $queryBuilder->createNamedParameter(1))
             )
-            ->executeQuery()
-            ->fetchOne();
+            ->execute()
+            ->fetchColumn(0);
     }
 
-    public function getOptions(): array
-    {
-        return $this->options;
-    }
 }

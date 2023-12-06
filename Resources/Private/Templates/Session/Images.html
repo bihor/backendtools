@@ -6,11 +6,25 @@
 		data-namespace-typo3-fluid="true">
 <f:layout name="Default" />
 <f:section name="Content">
+<style>
+	:root {
+		--shadow: 0.3rem 0.3rem 0.6rem #aaddff,
+		-0.2rem -0.2rem 0.5rem #ffffff;
+	}
+	.f3-widget-paginator { padding-left:0; }
+	.f3-widget-paginator li { display:inline-block; }
+	.f3-widget-paginator li.current { font-weight: bold; }
+	#typo3-inner-docbody {padding-top: 4px;}
+	input,select,table.table {
+		-webkit-box-shadow: var(--shadow);
+		box-shadow: var(--shadow);
+	}
+</style>
 <h1>Find used images without title- or alt-text</h1>
 <f:flashMessages />
 <f:form action="images" class="form-inline">
 <div class="row"><div class="col-md-8">
-<div style="margin: 10px 0;">Show images
+<div style="margin: 10px 0;">Show images 
   <label class="checkbox-inline">
 	<f:form.radio name="img_without" value="1" checked="{img_without} == 1" /> without alt-tag &nbsp; or
   </label>

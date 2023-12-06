@@ -13,9 +13,4 @@ class NumberOfExtensionsDataProvider implements NumberWithIconDataProviderInterf
         $dir = \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/typo3conf/ext/*';
         return count(array_filter(glob($dir), "is_dir"));
     }
-
-    public function getOptions(): array
-    {
-        return $this->options;
-    }
 }

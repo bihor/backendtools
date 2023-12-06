@@ -10,12 +10,9 @@
 
 Changelog
 =========
-Version 5.1.0/1:
-New tool: show where missing files are used.
-Bugfix: show meta-data again in "Show images without title- or alt-text".
 
-Version 5.0.0:
-Version for TYPO3 12 LTS.
+Version 4.4.0:
+New tool: show where missing files are used.
 
 Version 4.3.0/1:
 More infos and search in tx_gridelements_backend_layout.

@@ -8,9 +8,6 @@ return [
         'cruser_id' => 'cruser_id',
         'enablecolumns' => [
         ],
-        'security' => [
-            'ignorePageTypeRestriction' => true,
-        ],
         'searchFields' => 'action',
         'iconfile' => 'EXT:backendtools/Resources/Public/Icons/tx_backendtools_domain_model_session.gif'
     ],

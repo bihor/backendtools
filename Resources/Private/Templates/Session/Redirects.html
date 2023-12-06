@@ -7,6 +7,18 @@
 <f:section name="Content">
 <h1>Add simple .htaccess-redirects to the table sys_redirect</h1>
 <f:flashMessages />
+<style>
+	:root {
+		--shadow: 0.3rem 0.3rem 0.6rem #aaddff,
+		-0.2rem -0.2rem 0.5rem #ffffff;
+	}
+	th, td {  padding: 5px;}
+	#typo3-inner-docbody {padding-top: 4px;}
+	input,select,table.table {
+		-webkit-box-shadow: var(--shadow);
+		box-shadow: var(--shadow);
+	}
+</style>
 <f:form action="redirects">
 	<div style="margin: 10px 0;">
 		<p><strong>Choose a file...</strong> ... from here (relative path and file name):</p>

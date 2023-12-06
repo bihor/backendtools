@@ -34,7 +34,7 @@ Tool 5: helps you to find pages that link to another page. You can find any cont
 
 Tool 6: helps you to find images with no title- oder alternative-text. This tool can set that values for you too.
 
-Tool 7: helps you to find missing files/images. This tool shows you where they are used.
+Tool 7: helps you to find content-elements where missing files are used.
 
 Tool 8: you can import simple redirect rules form your .htaccess to the table sys_redirect.
 
@@ -44,7 +44,7 @@ Tool 10: shows differences between RealURL-pagepath (in tx_realurl_pathdata) and
 Note: the old RealURL-tables must be present!
 Note: this tool was removed in version 4.0.0.
 
-Tool 11: unzip a zig file in the fileadmin-folder.
+Tool 11: unzip a zip file in the fileadmin-folder.
 Note: this tool was removed in version 3.0.0.
 
 Since version 4.2.0 there are some dashboard widgets available too.
@@ -79,7 +79,7 @@ Made in...
 ----------
 
 Thanks to the
-`fixpunkt für digitales GmbH, Bonn <https://www.fixpunkt.com/webentwicklung/typo3/>`_
+`fixpunkt werbeagentur gmbh, Bonn <https://www.fixpunkt.com/webentwicklung/typo3/>`_
 for giving me the possibility to realize
 `this extension <https://www.fixpunkt.com/webentwicklung/typo3/typo3-extensions/>`_
 and share it with the TYPO3 community.
