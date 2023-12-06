@@ -1060,12 +1060,13 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         foreach($result as $row) {
             $uid = $row['uid'];
             $fileArray[$uid] = $row;
+            $fileArray[$uid]['used'] = false;
         }
 
         // sys_file_metadata
         $table = 'sys_file_metadata';
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
-        $statement = $queryBuilder
+        $result = $queryBuilder
             ->select('*')
             ->from($table)
             ->executeQuery()->fetchAllAssociative();
@@ -1122,6 +1123,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                 $referenceArray[$uid]['tt_pos'] = $row['tt_pos'];
                 //$referenceArray[$uid]['file_uid'] = $uid_file;
                 $referenceArray[$uid]['file'] = $fileArray[$uid_file];	// file-array
+                $fileArray[$uid_file]['used'] = true;
                 //echo "uid $uid <br>\n";
             }
         }
@@ -1155,21 +1157,27 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                     //$referenceArray[$uid]['file_uid'] = $uid_file;
                     $referenceArray[$uid]['file'] = $fileArray[$uid_file];	// file-array
                     $referenceArray[$uid]['domain'] = '';
+                    $fileArray[$uid_file]['used'] = true;
                     //echo "uid $uid <br>\n";
                 }
             }
         }
 
-        // Bilder ohne alt oder title
+        // Bilder mit Domain
+        $i = 0;
         foreach ($referenceArray as $uid => $refArray) {
             if (isset($refArray['tt_pid'])) {
                 $refArray['domain'] = $this->getDomain($refArray['tt_pid'], $refArray['tt_lang']);
             } else {
                 $refArray['domain'] = '';
             }
-            $finalArray[] = $refArray;
+            $finalArray[$i] = $refArray;
+            $i++;
         }
-        return $finalArray;
+        $doubleArray = [];
+        $doubleArray[0] = $fileArray;
+        $doubleArray[1] = $finalArray;
+        return $doubleArray;
     }
 
     /**
@@ -1208,7 +1216,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         // sys_file_metadata
         $table = 'sys_file_metadata';
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
-        $statement = $queryBuilder
+        $result = $queryBuilder
             ->select('*')
             ->from($table)
             ->executeQuery()->fetchAllAssociative();
@@ -1446,8 +1454,11 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
     {
         $tempPages = [];
         foreach ($pages as $page) {
-            $pid = $page['pid'];
-            if (!$pid) {
+            $pid = 0;
+            if (isset($page['pid'])) {
+                $pid = $page['pid'];
+            }
+            if (!$pid && isset($page['tt_pid'])) {
                 $pid = $page['tt_pid'];
             }
             if ($this->isInRootLine($pid, $uid)) {

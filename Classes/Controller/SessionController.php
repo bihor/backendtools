@@ -735,8 +735,15 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             $default->setPagestart($my_recursive);
         } else $my_recursive = $default->getPagestart();
 
-        $finalArray = $this->sessionRepository->getMissingImages($img_other);
-        $replacedArray = [];
+        $doubleArray = $this->sessionRepository->getMissingImages($img_other);
+        $finalArray = $doubleArray[1];
+        $notUsedImages = [];
+        foreach ($doubleArray[0] as $image) {
+            if (!$image['used']) {
+                $notUsedImages[] = $image;
+            }
+        }
+        $count = count($notUsedImages);
 
         if ($new) {
             $user = $this->backendUserRepository->findByUid($beuser_id);
@@ -756,9 +763,10 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         $arrayPaginator = new ArrayPaginator($finalArray, $currentPage, $this->settings['pagebrowser']['itemsPerPage']);
         $pagination = new SimplePagination($arrayPaginator);
 
+        $this->view->assign('count', $count);
         $this->view->assign('img_other', $img_other);
         $this->view->assign('images', $finalArray);
-        $this->view->assign('imagesReplaced', $replacedArray);
+        $this->view->assign('fileArray', $notUsedImages);
         $this->view->assign('paginator', $arrayPaginator);
         $this->view->assign('pagination', $pagination);
         $this->view->assign('no_pages', range(1, $pagination->getLastPageNumber()));
