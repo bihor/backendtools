@@ -34,7 +34,7 @@ Tool 5: helps you to find pages that link to another page. You can find any cont
 
 Tool 6: helps you to find images with no title- oder alternative-text. This tool can set that values for you too.
 
-Tool 7: helps you to find missing images. This tool shows you where they are used.
+Tool 7: helps you to find missing files/images. This tool shows you where they are used.
 
 Tool 8: you can import simple redirect rules form your .htaccess to the table sys_redirect.
 

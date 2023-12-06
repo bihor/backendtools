@@ -1052,10 +1052,10 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         $result = $queryBuilder
             ->select('*')
             ->from($table)
-            ->where($queryBuilder->expr()->like('mime_type', $queryBuilder->createNamedParameter('image%')))
-            ->andWhere($queryBuilder->expr()->eq('missing', 1))
+            ->where($queryBuilder->expr()->eq('missing', 1))
             ->orderBy('name', 'ASC')
             ->executeQuery()->fetchAllAssociative();
+      //  ->where($queryBuilder->expr()->like('mime_type', $queryBuilder->createNamedParameter('image%')))
 
         foreach($result as $row) {
             $uid = $row['uid'];

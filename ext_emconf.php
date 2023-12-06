@@ -12,10 +12,10 @@
 
 $EM_CONF[$_EXTKEY] = array (
   'title' => 'Backend tools',
-  'description' => '9 admin tools: extension-list, recent pages & elements, backend layouts, redirects import & check, file-deletion, missing images, images with no alt or title and link-list.',
+  'description' => '9 admin tools: extension-list, recent pages & elements, backend layouts, redirects import & check, file-deletion, missing files, images with no alt or title and link-list.',
   'category' => 'module',
   'author' => 'Kurt Gusbeth',
-  'author_company' => 'fixpunkt werbeagentur gmbh',
+  'author_company' => 'fixpunkt für digitales GmbH',
   'state' => 'stable',
   'createDirs' => '',
   'clearCacheOnLoad' => false,

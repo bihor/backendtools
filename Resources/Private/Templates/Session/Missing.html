@@ -6,7 +6,7 @@
 		data-namespace-typo3-fluid="true">
 <f:layout name="Default" />
 <f:section name="Content">
-<h1>Find missing images and show where they are used</h1>
+<h1>Find missing files and show where they are used</h1>
 <f:flashMessages />
 <f:form action="missing" class="form-inline">
 <div class="row"><div class="col-md-8">
@@ -87,12 +87,12 @@
 
 </f:then>
 <f:else>
-	<p>0 images found!</p>
+	<p>0 files found!</p>
 </f:else>
 </f:if>
 
 <f:if condition="{count} > 0">
-	<h4>{count} missing image(s) is/are not used:</h4>
+	<h4>{count} missing file(s) is/are not used:</h4>
 	
 	<table class="table">
 	<thead>
