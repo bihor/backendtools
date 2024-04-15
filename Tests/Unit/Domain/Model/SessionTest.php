@@ -2,6 +2,8 @@
 
 namespace Fixpunkt\Backendtools\Tests\Unit\Domain\Model;
 
+use TYPO3\CMS\Core\Tests\UnitTestCase;
+use Fixpunkt\Backendtools\Domain\Model\Session;
 /***************************************************************
  *  Copyright notice
  *
@@ -25,7 +27,6 @@ namespace Fixpunkt\Backendtools\Tests\Unit\Domain\Model;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
 /**
  * Test case for class \Fixpunkt\Backendtools\Domain\Model\Session.
  *
@@ -34,16 +35,16 @@ namespace Fixpunkt\Backendtools\Tests\Unit\Domain\Model;
  *
  * @author Kurt Gusbeth <k.gusbeth@fixpunkt.com>
  */
-class SessionTest extends \TYPO3\CMS\Core\Tests\UnitTestCase
+class SessionTest extends UnitTestCase
 {
 	/**
-	 * @var \Fixpunkt\Backendtools\Domain\Model\Session
-	 */
-	protected $subject = NULL;
+  * @var Session
+  */
+ protected $subject = NULL;
 
 	public function setUp()
 	{
-		$this->subject = new \Fixpunkt\Backendtools\Domain\Model\Session();
+		$this->subject = new Session();
 	}
 
 	public function tearDown()

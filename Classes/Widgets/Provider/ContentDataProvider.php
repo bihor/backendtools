@@ -45,15 +45,9 @@ class ContentDataProvider implements ChartDataProviderInterface
             ->getRestrictions()
             ->removeAll();
         if (!$mode) {
-            $expression = $queryBuilder->expr()->andX(
-                $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(0)),
-                $queryBuilder->expr()->eq('hidden', $queryBuilder->createNamedParameter(0))
-            );
+            $expression = $queryBuilder->expr()->and($queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(0)), $queryBuilder->expr()->eq('hidden', $queryBuilder->createNamedParameter(0)));
         } elseif ($mode == 2) {
-            $expression = $queryBuilder->expr()->andX(
-                $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(0)),
-                $queryBuilder->expr()->eq('hidden', $queryBuilder->createNamedParameter(1))
-            );
+            $expression = $queryBuilder->expr()->and($queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(0)), $queryBuilder->expr()->eq('hidden', $queryBuilder->createNamedParameter(1)));
         } elseif ($mode == 3) {
             $expression = $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(1));
         }

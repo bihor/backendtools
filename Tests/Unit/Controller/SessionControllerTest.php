@@ -1,5 +1,9 @@
 <?php
 namespace Fixpunkt\Backendtools\Tests\Unit\Controller;
+
+use TYPO3\CMS\Core\Tests\UnitTestCase;
+use Fixpunkt\Backendtools\Controller\SessionController;
+use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
 /***************************************************************
  *  Copyright notice
  *
@@ -23,23 +27,22 @@ namespace Fixpunkt\Backendtools\Tests\Unit\Controller;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
 /**
  * Test case for class Fixpunkt\Backendtools\Controller\SessionController.
  *
  * @author Kurt Gusbeth <k.gusbeth@fixpunkt.com>
  */
-class SessionControllerTest extends \TYPO3\CMS\Core\Tests\UnitTestCase
+class SessionControllerTest extends UnitTestCase
 {
 
 	/**
-	 * @var \Fixpunkt\Backendtools\Controller\SessionController
-	 */
-	protected $subject = NULL;
+  * @var SessionController
+  */
+ protected $subject = NULL;
 
 	public function setUp()
 	{
-		$this->subject = $this->getMock('Fixpunkt\\Backendtools\\Controller\\SessionController', array('redirect', 'forward', 'addFlashMessage'), array(), '', FALSE);
+		$this->subject = $this->getMock(SessionController::class, ['redirect', 'forward', 'addFlashMessage'], [], '', FALSE);
 	}
 
 	public function tearDown()
@@ -53,9 +56,9 @@ class SessionControllerTest extends \TYPO3\CMS\Core\Tests\UnitTestCase
 	public function listActionFetchesAllSessionsFromRepositoryAndAssignsThemToView()
 	{
 
-		$allSessions = $this->getMock('TYPO3\\CMS\\Extbase\\Persistence\\ObjectStorage', array(), array(), '', FALSE);
+		$allSessions = $this->getMock(ObjectStorage::class, [], [], '', FALSE);
 
-		$sessionRepository = $this->getMock('', array('findAll'), array(), '', FALSE);
+		$sessionRepository = $this->getMock('', ['findAll'], [], '', FALSE);
 		$sessionRepository->expects($this->once())->method('findAll')->will($this->returnValue($allSessions));
 		$this->inject($this->subject, 'sessionRepository', $sessionRepository);
 

@@ -1,6 +1,11 @@
 <?php
 namespace Fixpunkt\Backendtools\Controller;
 
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use Fixpunkt\Backendtools\Domain\Repository\SessionRepository;
+use Fixpunkt\Backendtools\Domain\Model\Session;
+use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -40,7 +45,7 @@ use Psr\Http\Message\ResponseInterface;
 /**
  * SessionController
  */
-class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
+class SessionController extends ActionController
 {
 
     protected int $id;
@@ -50,7 +55,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     /**
      * sessionRepository
      *
-     * @var \Fixpunkt\Backendtools\Domain\Repository\SessionRepository
+     * @var SessionRepository
      */
     protected $sessionRepository;
 
@@ -74,18 +79,14 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 
     /**
      * Injects the session-Repository
-     *
-     * @param \Fixpunkt\Backendtools\Domain\Repository\SessionRepository $sessionRepository
      */
-    public function injectSessionRepository(\Fixpunkt\Backendtools\Domain\Repository\SessionRepository $sessionRepository)
+    public function injectSessionRepository(SessionRepository $sessionRepository)
     {
         $this->sessionRepository = $sessionRepository;
     }
 
     /**
      * Injects the BackendUserRepository-Repository
-     *
-     * @param \Fixpunkt\Backendtools\Domain\Repository\BackendUserRepository $backendUserRepository
      */
     public function injectBackendUserRepository(\Fixpunkt\Backendtools\Domain\Repository\BackendUserRepository $backendUserRepository)
     {
@@ -103,7 +104,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         $result = $this->sessionRepository->findByAction('list', $beuser_id);
         if ($result->count() == 0) {
             $new = TRUE;
-            $default = GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
+            $default = GeneralUtility::makeInstance(Session::class);
             $default->setAction('list');
             $default->setValue1(0);
             $default->setValue2(0);
@@ -175,7 +176,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             $user = $this->backendUserRepository->findByUid($beuser_id);
             $default->setBeuser($user);
             $this->sessionRepository->add($default);
-            $persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
+            $persistenceManager = GeneralUtility::makeInstance(PersistenceManager::class);
             $persistenceManager->persistAll();
         } else {
             $this->sessionRepository->update($default);
@@ -228,7 +229,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         $result = $this->sessionRepository->findByAction('latest', $beuser_id);
         if ($result->count() == 0) {
             $new = TRUE;
-            $default = GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
+            $default = GeneralUtility::makeInstance(Session::class);
             $default->setAction('latest');
             $default->setValue1(0);
             $default->setValue2(0);
@@ -284,7 +285,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             $user = $this->backendUserRepository->findByUid($beuser_id);
             $default->setBeuser($user);
             $this->sessionRepository->add($default);
-            $persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
+            $persistenceManager = GeneralUtility::makeInstance(PersistenceManager::class);
             $persistenceManager->persistAll();
         } else {
             $this->sessionRepository->update($default);
@@ -338,9 +339,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
                 $pages[$key]['sorting'] = $page['ptstamp'];
             }
         }
-        usort($pages, function($a, $b) {
-            return $b['sorting'] <=> $a['sorting'];
-        });
+        usort($pages, fn($a, $b) => $b['sorting'] <=> $a['sorting']);
 
         $arrayPaginator = new ArrayPaginator($pages, $currentPage, $this->settings['pagebrowser']['itemsPerPage']);
         $pagination = new SimplePagination($arrayPaginator);
@@ -375,7 +374,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         $result = $this->sessionRepository->findByAction('layouts', $beuser_id);
         if ($result->count() == 0) {
             $new = TRUE;
-            $default = GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
+            $default = GeneralUtility::makeInstance(Session::class);
             $default->setAction('layouts');
             $default->setValue1(0);
             $default->setValue2(0);
@@ -421,7 +420,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             $user = $this->backendUserRepository->findByUid($beuser_id);
             $default->setBeuser($user);
             $this->sessionRepository->add($default);
-            $persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
+            $persistenceManager = GeneralUtility::makeInstance(PersistenceManager::class);
             $persistenceManager->persistAll();
         } else {
             $this->sessionRepository->update($default);
@@ -463,7 +462,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         $result = $this->sessionRepository->findByAction('filedeletion', $beuser_id);
         if ($result->count() == 0) {
             $new = TRUE;
-            $default = GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
+            $default = GeneralUtility::makeInstance(Session::class);
             $default->setAction('filedeletion');
             $default->setValue1(0);
             $default->setValue2(0);
@@ -497,7 +496,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             $user = $this->backendUserRepository->findByUid($beuser_id);
             $default->setBeuser($user);
             $this->sessionRepository->add($default);
-            $persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
+            $persistenceManager = GeneralUtility::makeInstance(PersistenceManager::class);
             $persistenceManager->persistAll();
         } else {
             $this->sessionRepository->update($default);
@@ -510,7 +509,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         if ($delfile) {
             $total=0;
             $success=0;
-            $filename = \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/' . 'fileadmin/' . $delfile;
+            $filename = Environment::getPublicPath() . '/' . 'fileadmin/' . $delfile;
             if (is_file($filename) && file_exists($filename)) {
                 if (!$method) $content .= "This is the file content:<br />\n";
                 $filecontent = fopen($filename,"r");
@@ -562,7 +561,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         $result = $this->sessionRepository->findByAction('images', $beuser_id);
         if ($result->count() == 0) {
             $new = TRUE;
-            $default = GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
+            $default = GeneralUtility::makeInstance(Session::class);
             $default->setAction('images');
             $default->setValue1(0);
             $default->setValue2(0);
@@ -612,7 +611,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             $user = $this->backendUserRepository->findByUid($beuser_id);
             $default->setBeuser($user);
             $this->sessionRepository->add($default);
-            $persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
+            $persistenceManager = GeneralUtility::makeInstance(PersistenceManager::class);
             $persistenceManager->persistAll();
         } else {
             $this->sessionRepository->update($default);
@@ -630,10 +629,10 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
                 else if ($imgArray['meta_title'])
                     $finalArray[$key]['ref_alt'] = $imgArray['meta_title'];
                 else {
-                    if (strrpos($imgArray['name'], '.') > 0)
-                        $finalArray[$key]['ref_alt'] = trim(str_replace('_', ' ', substr($imgArray['name'], 0, strrpos($imgArray['name'], '.'))));
+                    if (strrpos((string) $imgArray['name'], '.') > 0)
+                        $finalArray[$key]['ref_alt'] = trim(str_replace('_', ' ', substr((string) $imgArray['name'], 0, strrpos((string) $imgArray['name'], '.'))));
                     else
-                        $finalArray[$key]['ref_alt'] = trim(str_replace('_', ' ', $imgArray['name']));
+                        $finalArray[$key]['ref_alt'] = trim(str_replace('_', ' ', (string) $imgArray['name']));
                 }
                 $success = $this->sessionRepository->setAltOrTitle($uid, $finalArray[$key]['ref_alt'], '');
                 if ($success) {
@@ -652,10 +651,10 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
                 else if ($imgArray['meta_alt'])
                     $finalArray[$key]['ref_title'] = $imgArray['meta_alt'];
                 else {
-                    if (strrpos($imgArray['name'], '.') > 0)
-                        $finalArray[$key]['ref_title'] = trim(str_replace('_', ' ', substr($imgArray['name'], 0, strrpos($imgArray['name'], '.'))));
+                    if (strrpos((string) $imgArray['name'], '.') > 0)
+                        $finalArray[$key]['ref_title'] = trim(str_replace('_', ' ', substr((string) $imgArray['name'], 0, strrpos((string) $imgArray['name'], '.'))));
                     else
-                        $finalArray[$key]['ref_title'] = trim(str_replace('_', ' ', $imgArray['name']));
+                        $finalArray[$key]['ref_title'] = trim(str_replace('_', ' ', (string) $imgArray['name']));
                 }
                 $success = $this->sessionRepository->setAltOrTitle($uid, '', $finalArray[$key]['ref_title']);
                 if ($success) {
@@ -700,7 +699,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         $result = $this->sessionRepository->findByAction('missing', $beuser_id);
         if ($result->count() == 0) {
             $new = TRUE;
-            $default = GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
+            $default = GeneralUtility::makeInstance(Session::class);
             $default->setAction('missing');
             $default->setValue1(0);
             $default->setValue2(0);
@@ -749,7 +748,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             $user = $this->backendUserRepository->findByUid($beuser_id);
             $default->setBeuser($user);
             $this->sessionRepository->add($default);
-            $persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
+            $persistenceManager = GeneralUtility::makeInstance(PersistenceManager::class);
             $persistenceManager->persistAll();
         } else {
             $this->sessionRepository->update($default);
@@ -789,7 +788,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         $result = $this->sessionRepository->findByAction('pagesearch', $beuser_id);
         if ($result->count() == 0) {
             $new = TRUE;
-            $default = GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
+            $default = GeneralUtility::makeInstance(Session::class);
             $default->setAction('pagesearch');
             $default->setValue1(0);
         } else {
@@ -840,7 +839,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             $user = $this->backendUserRepository->findByUid($beuser_id);
             $default->setBeuser($user);
             $this->sessionRepository->add($default);
-            $persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
+            $persistenceManager = GeneralUtility::makeInstance(PersistenceManager::class);
             $persistenceManager->persistAll();
         } else {
             $this->sessionRepository->update($default);
@@ -852,10 +851,10 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         if ($linkto_uid > 0) {
             $pages = $this->sessionRepository->getPageLinks($my_c, $my_p, $linkto_uid);
             if ($exttoo) {
-                if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('news')) {
+                if (ExtensionManagementUtility::isLoaded('news')) {
                     $news = $this->sessionRepository->getNewsLinks($my_c, $my_p, $linkto_uid);
                 }
-                if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('camaliga')) {
+                if (ExtensionManagementUtility::isLoaded('camaliga')) {
                     $camaliga = $this->sessionRepository->getCamaligaLinks($my_c, $my_p, $linkto_uid);
                 }
             }
@@ -898,7 +897,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         $result = $this->sessionRepository->findByAction('redirects', $beuser_id);
         if ($result->count() == 0) {
             $new = TRUE;
-            $default = GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
+            $default = GeneralUtility::makeInstance(Session::class);
             $default->setAction('redirects');
             $default->setValue1(0);
             $default->setValue2(0);
@@ -936,7 +935,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             $user = $this->backendUserRepository->findByUid($beuser_id);
             $default->setBeuser($user);
             $this->sessionRepository->add($default);
-            $persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
+            $persistenceManager = GeneralUtility::makeInstance(PersistenceManager::class);
             $persistenceManager->persistAll();
         } else {
             $this->sessionRepository->update($default);
@@ -948,7 +947,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             $regexp = ($regex) ? 1 : 0;
             $treffer = [];
             $rewrites = [];
-            $filename = \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/' . 'fileadmin/' . $impfile;
+            $filename = Environment::getPublicPath() . '/' . 'fileadmin/' . $impfile;
             if (is_file($filename) && file_exists($filename)) {
                 $content .= "This is the result of the file content:<br /><table>\n";
                 $filecontent = fopen($filename,"r");
@@ -957,13 +956,13 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
                     if ($convert == 'iso') $row = utf8_decode ( $row );
                     if ($convert == 'utf8') $row = utf8_encode ( $row );
                     $row = preg_replace('/[ ]{2,}|[\t]/', ' ', trim($row));	// tab und/oder mehrere Spaces zu einem Space umwandeln
-                    $rewrites = explode(' ', $row);
+                    $rewrites = explode(' ', (string) $row);
                     preg_match('/R=(\d+)/', $rewrites[3], $treffer);
                     $statuscode = $treffer[1];
                     if (!$statuscode) {
                         $statuscode = intval($defaultstatuscode);
                     }
-                    if ($rewrites[1] && (substr($rewrites[1], 0, 2) != '^/') && (substr($rewrites[1], 0, 1) == '^')) {
+                    if ($rewrites[1] && (!str_starts_with($rewrites[1], '^/')) && (str_starts_with($rewrites[1], '^'))) {
                         if ($regexp) {
                             $rewrites[1] = '^/' . substr($rewrites[1], 1);    // aus ^xyz wird ^/xyz
                         } else {
@@ -1020,7 +1019,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         $result = $this->sessionRepository->findByAction('redirectscheck', $beuser_id);
         if ($result->count() == 0) {
             $new = TRUE;
-            $default = GeneralUtility::makeInstance('Fixpunkt\\Backendtools\\Domain\\Model\\Session');
+            $default = GeneralUtility::makeInstance(Session::class);
             $default->setAction('redirectscheck');
             $default->setValue1(0);
             $default->setValue2(0);
@@ -1061,7 +1060,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             $user = $this->backendUserRepository->findByUid($beuser_id);
             $default->setBeuser($user);
             $this->sessionRepository->add($default);
-            $persistenceManager = GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
+            $persistenceManager = GeneralUtility::makeInstance(PersistenceManager::class);
             $persistenceManager->persistAll();
         } else {
             $this->sessionRepository->update($default);
@@ -1099,7 +1098,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             $target = $redirect['target'];
             // Wir überprüfen den Status nur für die aktuelle Seite!
             if (($i >= $limit_from) && ($i < $limit_to)) {
-                if ((substr($target, 0, 1) == '/') && ($my_error != 1)) {
+                if ((str_starts_with((string) $target, '/')) && ($my_error != 1)) {
                     if ($host == '*') {
                         $checkHosts = $hostsArray;
                     } else {
@@ -1109,11 +1108,11 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
                     foreach ($checkHosts as $checkHost) {
                         $headers = @get_headers($checkHost . $target);
                         if (is_array($headers) && isset($headers[0])) {
-                            if (strpos($headers[0], '200')) {
+                            if (strpos((string) $headers[0], '200')) {
                                 $status = 'OK';
                                 break;
                             } else {
-                                $code = intval(substr($headers[0], 9, 3));
+                                $code = intval(substr((string) $headers[0], 9, 3));
                                 if ($code) {
                                     $status = $code; //$headers[0];
                                 } else {
@@ -1129,8 +1128,8 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
                         $errorCount++;
                         $match = true;
                     }
-                } else if ((substr($target, 0, 3) == 't3:') && ($my_error < 2)) {
-                    $parts = explode('=', $target);
+                } else if ((str_starts_with((string) $target, 't3:')) && ($my_error < 2)) {
+                    $parts = explode('=', (string) $target);
                     [$pre, $rowid] = $parts;
                     $rowid = (int)$rowid;
                     $parts = explode('?', $pre);
@@ -1154,13 +1153,13 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
                     } else {
                         $status = 'unknown table ' . $table;
                     }
-                } else if ((substr($target, 0, 4) == 'http') && ($my_error != 1)) {
+                } else if ((str_starts_with((string) $target, 'http')) && ($my_error != 1)) {
                     $headers = @get_headers($target);
                     if (is_array($headers) && isset($headers[0])) {
-                        if (strpos($headers[0], '200')) {
+                        if (strpos((string) $headers[0], '200')) {
                             $status = 'OK';
                         } else {
-                            $code = intval(substr($headers[0], 9, 3));
+                            $code = intval(substr((string) $headers[0], 9, 3));
                             if ($code) {
                                 $status = $code; //$headers[0];
                             } else {
@@ -1220,9 +1219,9 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     function formatBytes($size, $precision = 2)
     {
         $base = log($size) / log(1024);
-        $suffixes = array('', 'k', 'M', 'G', 'T');
+        $suffixes = ['', 'k', 'M', 'G', 'T'];
 
-        return round(pow(1024, $base - floor($base)), $precision) .' '. $suffixes[floor($base)] .'B';
+        return round(1024 ** ($base - floor($base)), $precision) .' '. $suffixes[floor($base)] .'B';
     }
 
     /**
@@ -1234,11 +1233,11 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
      */
     function formatHost($host, $http)
     {
-        if ((strlen($host) > 2) && (substr($host,0, 4) != 'http')) {
+        if ((strlen($host) > 2) && (!str_starts_with($host, 'http'))) {
             $pre = ($http) ? 'http://' : 'https://';
             $host = $pre . $host;
         }
-        if (substr($host, -1) == '/') {
+        if (str_ends_with($host, '/')) {
             $host = substr($host,0,-1);
         }
         return $host;

@@ -1,6 +1,9 @@
 <?php
 namespace Fixpunkt\Backendtools\Domain\Repository;
 
+use TYPO3\CMS\Extbase\Persistence\Repository;
+use TYPO3\CMS\Core\Utility\RootlineUtility;
+use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -37,12 +40,12 @@ use TYPO3\CMS\Core\Database\Connection;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  *
  */
-class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
+class SessionRepository extends Repository
 {
     /**
      * Site finder
      *
-     * @var \TYPO3\CMS\Core\Site\SiteFinder
+     * @var SiteFinder
      */
     protected $siteFinder = null;
 
@@ -169,7 +172,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 
         if ($my_c==1) {
             $res -> andWhere(...[
-                $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('tt_content.deleted', $queryBuilder->createNamedParameter(1)),
                     $queryBuilder->expr()->eq('tt_content.hidden', $queryBuilder->createNamedParameter(1))
                 )
@@ -182,11 +185,11 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         }
         if ($my_p==1) {
             $res -> andWhere(...[
-                $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(1)),
                     $queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(1)),
                     $queryBuilder->expr()->gt('pages.starttime', $queryBuilder->createNamedParameter(time())),
-                    $queryBuilder->expr()->andX(
+                    $queryBuilder->expr()->and(
                         $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(0)),
                         $queryBuilder->expr()->lte('pages.endtime', $queryBuilder->createNamedParameter(time()))
                     )
@@ -197,7 +200,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                 $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(0)),
                 $queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(0)),
                 $queryBuilder->expr()->lte('pages.starttime', $queryBuilder->createNamedParameter(time())),
-                $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('pages.endtime', $queryBuilder->createNamedParameter(0)),
                     $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(time()))
                 )
@@ -217,13 +220,11 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             }
         } else {
             $res -> andWhere(...[
-                $queryBuilder->expr()->orX(
-                    $queryBuilder->expr()->andX(
-                        $queryBuilder->expr()->neq('tt_content.list_type', $queryBuilder->createNamedParameter('')),
-                        $queryBuilder->expr()->neq('tt_content.list_type', $queryBuilder->createNamedParameter('0'))
-                    ),
-                    $queryBuilder->expr()->notIn('tt_content.CType', $queryBuilder->createNamedParameter($exclude_ctypes, Connection::PARAM_STR_ARRAY))
-                )
+                $queryBuilder->expr()->or($queryBuilder->expr()->and(
+                    $queryBuilder->expr()->neq('tt_content.list_type', $queryBuilder->createNamedParameter('')),
+                    $queryBuilder->expr()->neq('tt_content.list_type', $queryBuilder->createNamedParameter('0'))
+                ),
+                $queryBuilder->expr()->notIn('tt_content.CType', $queryBuilder->createNamedParameter($exclude_ctypes, Connection::PARAM_STR_ARRAY)))
             ]);
         }
 
@@ -231,7 +232,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             if ($my_value == 'gridelements_pi1' && $my_type == 2) {
                 // wir suchen auch in tx_gridelements_backend_layout
                 $res -> andWhere(...[
-                    $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->or(
                         $queryBuilder->expr()->like('tt_content.pi_flexform', $queryBuilder->createNamedParameter("%" . $queryBuilder->escapeLikeWildcards($my_flexform) . "%")),
                         $queryBuilder->expr()->like('tt_content.tx_gridelements_backend_layout', $queryBuilder->createNamedParameter($queryBuilder->escapeLikeWildcards($my_flexform)))
                     )
@@ -244,16 +245,16 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         }
 
         $asc = ($my_direction == 1) ? 'DESC' : 'ASC';
-        switch ($my_orderby) {
-            case 1: $sort = 'tt_content.uid'; break;
-            case 2: $sort = 'tt_content.sys_language_uid'; break;
-            case 3: $sort = 'tt_content.colPos'; break;
-            case 4: $sort = 'tt_content.header'; break;
-            case 5: $sort = 'tt_content.CType'; break;
-            case 6: $sort = 'tt_content.list_type'; break;
-            case 7: $sort = 'pages.title'; break;
-            default: $sort = 'tt_content.pid';
-        }
+        $sort = match ($my_orderby) {
+            1 => 'tt_content.uid',
+            2 => 'tt_content.sys_language_uid',
+            3 => 'tt_content.colPos',
+            4 => 'tt_content.header',
+            5 => 'tt_content.CType',
+            6 => 'tt_content.list_type',
+            7 => 'pages.title',
+            default => 'tt_content.pid',
+        };
         if ($my_orderby == 0) {
             $res -> orderBy($sort, $asc) -> addOrderBy('tt_content.sorting');
         } else {
@@ -267,18 +268,18 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             $subject = $row['pi_flexform'];
             if ($subject) {
                 $pattern = '/<field index="switchableControllerActions">([\n|\r|\t| ]*)<value index="vDEF">(.*)</';
-                $matches = array();
-                preg_match($pattern, $subject, $matches);
+                $matches = [];
+                preg_match($pattern, (string) $subject, $matches);
                 if (isset($matches[2])) {
                     $row['actions'] = str_replace('###', '&gt;', str_replace(';', ', ', str_replace('&gt;', '###', $matches[2])));
                 } else {
                     $pattern = '/<field index="what_to_display">([\n|\r|\t| ]*)<value index="vDEF">(.*)</';
-                    $matches = array();
-                    preg_match($pattern, $subject, $matches);
+                    $matches = [];
+                    preg_match($pattern, (string) $subject, $matches);
                     if (isset($matches[2])) {
                         $row['actions'] = $matches[2];
                     } elseif ($row['CType'] == 'wst3bootstrap_fluidrow') {
-                        $sections = substr_count($subject,"<section index");
+                        $sections = substr_count((string) $subject,"<section index");
                         if ($sections > 0) {
                             $row['actions'] = $sections . ' cols';
                         }
@@ -303,20 +304,20 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             } else {
                 $row['domain'] = $this->getDomain($row['pid'], $row['sys_language_uid']);
             }
-            $row['csvheader'] = str_replace('"', '\'', $row['header']);
-            $row['csvtitle'] = str_replace('"', '\'', $row['title']);
+            $row['csvheader'] = str_replace('"', '\'', (string) $row['header']);
+            $row['csvtitle'] = str_replace('"', '\'', (string) $row['title']);
             if (isset($row['tx_gridelements_backend_layout'])) {
                 $row['misc'] = $row['tx_gridelements_backend_layout'];
                 if ($row['misc']=='2cols' || $row['misc']=='3cols' || $row['misc']=='4cols' || $row['misc']=='6cols') {
                     $pattern = '/<field index="xsCol1">([\n|\r|\t| ]*)<value index="vDEF">(.*)</';
-                    $matches = array();
-                    preg_match($pattern, $subject, $matches);
+                    $matches = [];
+                    preg_match($pattern, (string) $subject, $matches);
                     if (isset($matches[2])) {
                         $row['misc'] .= ' # xs=' . $matches[2];
                     } else {
                         $pattern = '/<field index="smCol1">([\n|\r|\t| ]*)<value index="vDEF">(.*)</';
-                        $matches = array();
-                        preg_match($pattern, $subject, $matches);
+                        $matches = [];
+                        preg_match($pattern, (string) $subject, $matches);
                         if (isset($matches[2])) {
                             $row['misc'] .= ' # SM=' . $matches[2];
                         }
@@ -371,7 +372,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             ->removeAll();
         if ($my_c==1) {
             $res -> andWhere(...[
-                $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('tt_content.deleted', $queryBuilder->createNamedParameter(1)),
                     $queryBuilder->expr()->eq('tt_content.hidden', $queryBuilder->createNamedParameter(1))
                 )
@@ -384,11 +385,11 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         }
         if ($my_p==1) {
             $res -> andWhere(...[
-                $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(1)),
                     $queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(1)),
                     $queryBuilder->expr()->gt('pages.starttime', $queryBuilder->createNamedParameter(time())),
-                    $queryBuilder->expr()->andX(
+                    $queryBuilder->expr()->and(
                         $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(0)),
                         $queryBuilder->expr()->lte('pages.endtime', $queryBuilder->createNamedParameter(time()))
                     )
@@ -399,7 +400,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                 $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(0)),
                 $queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(0)),
                 $queryBuilder->expr()->lte('pages.starttime', $queryBuilder->createNamedParameter(time())),
-                $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('pages.endtime', $queryBuilder->createNamedParameter(0)),
                     $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(time()))
                 )
@@ -429,8 +430,8 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             } else {
                 $row['domain'] = $this->getDomain($row['pid'], $row['sys_language_uid']);
             }
-            $row['csvheader'] = str_replace('"', '\'', $row['header']);
-            $row['csvtitle'] = str_replace('"', '\'', $row['title']);
+            $row['csvheader'] = str_replace('"', '\'', (string) $row['header']);
+            $row['csvtitle'] = str_replace('"', '\'', (string) $row['title']);
             $pages[] = $row;
         }
         return $pages;
@@ -477,16 +478,13 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                 )
             )
             ->orWhere(
-                $queryBuilder->expr()->andX(
-                    $queryBuilder->expr()->neq(
-                        'backend_layout_next_level',
-                        $queryBuilder->createNamedParameter('')
-                    ),
-                    $queryBuilder->expr()->neq(
-                        'backend_layout_next_level',
-                        $queryBuilder->createNamedParameter('0')
-                    )
-                )
+                $queryBuilder->expr()->and($queryBuilder->expr()->neq(
+                    'backend_layout_next_level',
+                    $queryBuilder->createNamedParameter('')
+                ), $queryBuilder->expr()->neq(
+                    'backend_layout_next_level',
+                    $queryBuilder->createNamedParameter('0')
+                ))
             );
         }
         // Restricions
@@ -495,11 +493,11 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             ->removeAll();
         if ($my_p==1) {
             $res -> andWhere(...[
-                $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(1)),
                     $queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(1)),
                     $queryBuilder->expr()->gt('pages.starttime', $queryBuilder->createNamedParameter(time())),
-                    $queryBuilder->expr()->andX(
+                    $queryBuilder->expr()->and(
                         $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(0)),
                         $queryBuilder->expr()->lte('pages.endtime', $queryBuilder->createNamedParameter(time()))
                     )
@@ -510,7 +508,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                 $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(0)),
                 $queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(0)),
                 $queryBuilder->expr()->lte('pages.starttime', $queryBuilder->createNamedParameter(time())),
-                $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('pages.endtime', $queryBuilder->createNamedParameter(0)),
                     $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(time()))
                 )
@@ -534,7 +532,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                 $row['domain'] = $this->getDomain($row['pid'], $row['sys_language_uid']);
             }
             $row['csvheader'] = '';
-            $row['csvtitle'] = str_replace('"', '\'', $row['title']);
+            $row['csvtitle'] = str_replace('"', '\'', (string) $row['title']);
             $pages[] = $row;
         }
         return $pages;
@@ -569,11 +567,11 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             ->removeAll();
         if ($my_p==1) {
             $res -> andWhere(...[
-                $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(1)),
                     $queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(1)),
                     $queryBuilder->expr()->gt('pages.starttime', $queryBuilder->createNamedParameter(time())),
-                    $queryBuilder->expr()->andX(
+                    $queryBuilder->expr()->and(
                         $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(0)),
                         $queryBuilder->expr()->lte('pages.endtime', $queryBuilder->createNamedParameter(time()))
                     )
@@ -584,7 +582,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                 $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(0)),
                 $queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(0)),
                 $queryBuilder->expr()->lte('pages.starttime', $queryBuilder->createNamedParameter(time())),
-                $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('pages.endtime', $queryBuilder->createNamedParameter(0)),
                     $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(time()))
                 )
@@ -610,7 +608,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                 $row['domain'] = $this->getDomain($row['pid'], $row['sys_language_uid']);
             }
             $row['csvheader'] = '';
-            $row['csvtitle'] = str_replace('"', '\'', $row['title']);
+            $row['csvtitle'] = str_replace('"', '\'', (string) $row['title']);
             $pages[] = $row;
         }
         return $pages;
@@ -640,7 +638,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             $queryBuilder->expr()->eq('tablenames', $queryBuilder->createNamedParameter('tt_content'))
         );
         $res -> andWhere(...[
-            $queryBuilder->expr()->orX(
+            $queryBuilder->expr()->or(
                 $queryBuilder->expr()->eq('link', $queryBuilder->createNamedParameter("t3://page?uid=" . $linkto_uid)),
                 $queryBuilder->expr()->like('link', $queryBuilder->createNamedParameter("t3://page?uid=" . $linkto_uid . " %"))
             )
@@ -683,7 +681,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 
         if ($my_c==1) {
             $res -> andWhere(...[
-                $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('tt_content.deleted', $queryBuilder->createNamedParameter(1)),
                     $queryBuilder->expr()->eq('tt_content.hidden', $queryBuilder->createNamedParameter(1))
                 )
@@ -696,11 +694,11 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         }
         if ($my_p==1) {
             $res -> andWhere(...[
-                $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(1)),
                     $queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(1)),
                     $queryBuilder->expr()->gt('pages.starttime', $queryBuilder->createNamedParameter(time())),
-                    $queryBuilder->expr()->andX(
+                    $queryBuilder->expr()->and(
                         $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(0)),
                         $queryBuilder->expr()->lte('pages.endtime', $queryBuilder->createNamedParameter(time()))
                     )
@@ -711,7 +709,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                 $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(0)),
                 $queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(0)),
                 $queryBuilder->expr()->lte('pages.starttime', $queryBuilder->createNamedParameter(time())),
-                $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('pages.endtime', $queryBuilder->createNamedParameter(0)),
                     $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(time()))
                 )
@@ -720,7 +718,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 
         // Das Haupt-Where
         $res -> andWhere(...[
-            $queryBuilder->expr()->orX(
+            $queryBuilder->expr()->or(
                 $queryBuilder->expr()->like('tt_content.bodytext', $queryBuilder->createNamedParameter('%"t3://page?uid=' . $linkto_uid . '"%')),
                 $queryBuilder->expr()->eq('tt_content.header_link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid)),
                 $queryBuilder->expr()->like('tt_content.header_link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid . ' %')),
@@ -787,7 +785,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 
         if ($my_c==1) {
             $res -> andWhere(...[
-                $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(1)),
                     $queryBuilder->expr()->eq('hidden', $queryBuilder->createNamedParameter(1))
                 )
@@ -799,7 +797,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             ]);
         }
         $res -> andWhere(...[
-            $queryBuilder->expr()->orX(
+            $queryBuilder->expr()->or(
                 $queryBuilder->expr()->like('bodytext', $queryBuilder->createNamedParameter('%"t3://page?uid=' . $linkto_uid . '"%')),
                 $queryBuilder->expr()->eq('internalurl', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid)),
                 $queryBuilder->expr()->like('internalurl', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid . ' %'))
@@ -840,7 +838,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 
         if ($my_c==1) {
             $res -> andWhere(...[
-                $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('tx_news_domain_model_news.deleted', $queryBuilder->createNamedParameter(1)),
                     $queryBuilder->expr()->eq('tx_news_domain_model_news.hidden', $queryBuilder->createNamedParameter(1))
                 )
@@ -852,7 +850,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             ]);
         }
         $res -> andWhere(...[
-            $queryBuilder->expr()->orX(
+            $queryBuilder->expr()->or(
                 $queryBuilder->expr()->eq('ref.link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid)),
                 $queryBuilder->expr()->like('ref.link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid . ' %'))
             )
@@ -891,7 +889,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 
         if ($my_c==1) {
             $res -> andWhere(...[
-                $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('tx_news_domain_model_news.deleted', $queryBuilder->createNamedParameter(1)),
                     $queryBuilder->expr()->eq('tx_news_domain_model_news.hidden', $queryBuilder->createNamedParameter(1))
                 )
@@ -904,7 +902,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         }
         //$res -> andWhere("tx_news_domain_model_link.uri='t3://page?uid=".$linkto_uid."' OR tx_news_domain_model_link.uri LIKE 't3://page?uid=".$linkto_uid." %'");
         $res -> andWhere(...[
-            $queryBuilder->expr()->orX(
+            $queryBuilder->expr()->or(
                 $queryBuilder->expr()->eq('tx_news_domain_model_link.uri', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid)),
                 $queryBuilder->expr()->like('tx_news_domain_model_link.uri', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid . ' %'))
             )
@@ -951,7 +949,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 
         if ($my_c==1) {
             $res -> andWhere(...[
-                $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(1)),
                     $queryBuilder->expr()->eq('hidden', $queryBuilder->createNamedParameter(1))
                 )
@@ -963,7 +961,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             ]);
         }
         $res -> andWhere(...[
-            $queryBuilder->expr()->orX(
+            $queryBuilder->expr()->or(
                 $queryBuilder->expr()->like('longdesc', $queryBuilder->createNamedParameter('%"t3://page?uid=' . $linkto_uid . '"%')),
                 $queryBuilder->expr()->eq('link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid)),
                 $queryBuilder->expr()->like('link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid . ' %'))
@@ -1004,7 +1002,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 
         if ($my_c==1) {
             $res -> andWhere(...[
-                $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('tx_camaliga_domain_model_content.deleted', $queryBuilder->createNamedParameter(1)),
                     $queryBuilder->expr()->eq('tx_camaliga_domain_model_content.hidden', $queryBuilder->createNamedParameter(1))
                 )
@@ -1016,7 +1014,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             ]);
         }
         $res -> andWhere(...[
-            $queryBuilder->expr()->orX(
+            $queryBuilder->expr()->or(
                 $queryBuilder->expr()->eq('ref.link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid)),
                 $queryBuilder->expr()->like('ref.link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid . ' %'))
             )
@@ -1411,11 +1409,11 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         if ($sys_language_uid == -1) {
             $sys_language_uid = 0;
         }
-        $rootLineUtility = new \TYPO3\CMS\Core\Utility\RootlineUtility($uid);
+        $rootLineUtility = new RootlineUtility($uid);
         try {
             $rootline = $rootLineUtility->get();
             $root = array_pop($rootline);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return '';
         }
         if (isset($root['is_siteroot'])) {
@@ -1424,22 +1422,22 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                 $base = $site->getConfiguration()['base'];
                 $lang = $site->getConfiguration()['languages'];
                 $lang = $lang[$sys_language_uid]['base'];
-                if ((substr($base, 0, 4) == 'http') && (substr($lang, 0, 4) == 'http')) {
+                if ((str_starts_with((string) $base, 'http')) && (str_starts_with((string) $lang, 'http'))) {
                     // wenn die Domain beides mal benutzt wird, entfernen wir sie bei der Sprache
-                    $parse_url = parse_url($lang);
+                    $parse_url = parse_url((string) $lang);
                     $lang = $parse_url['path'];
                 }
-                $domain = rtrim($base, '/') . rtrim($lang, '/');
-                if ((substr($base, 0, 4) != 'http') && (strlen($base) > 4)) {
-                    if (substr($base, 0, 2) == '//') {
+                $domain = rtrim((string) $base, '/') . rtrim((string) $lang, '/');
+                if ((!str_starts_with((string) $base, 'http')) && (strlen((string) $base) > 4)) {
+                    if (str_starts_with((string) $base, '//')) {
                         // muss nicht sein:   $domain = 'http:' . $domain;
-                    } else if (substr($base, 0, 1) == '/') {
+                    } else if (str_starts_with((string) $base, '/')) {
                         $domain = 'http:/' . $domain;
                     } else {
                         $domain = 'http://' . $domain;
                     }
                 }
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 return '';
             }
         }
@@ -1481,7 +1479,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
      */
     public function isInRootLine($uid, $searchUid)
     {
-        $rootLineUtility = new \TYPO3\CMS\Core\Utility\RootlineUtility($uid);
+        $rootLineUtility = new RootlineUtility($uid);
         $rootline = $rootLineUtility->get();
         foreach ($rootline as $page) {
             if ($page['uid'] == $searchUid) {
@@ -1588,7 +1586,7 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             case 'deleted':
                 $queryBuilder->getRestrictions()
                     ->removeAll()
-                    ->add(GeneralUtility::makeInstance(\TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction::class));
+                    ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
                 break;
             default:
                 $queryBuilder->getRestrictions()->removeAll();

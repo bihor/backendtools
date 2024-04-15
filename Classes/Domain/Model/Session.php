@@ -1,6 +1,7 @@
 <?php
 namespace Fixpunkt\Backendtools\Domain\Model;
 
+use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 use TYPO3\CMS\Extbase\Annotation as Extbase;
 
 /***************************************************************
@@ -31,15 +32,15 @@ use TYPO3\CMS\Extbase\Annotation as Extbase;
 /**
  * Session
  */
-class Session extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
+class Session extends AbstractEntity
 {
 
     /**
      * Key (action)
      *
-     * @Extbase\Validate("NotEmpty")
      * @var string
      */
+    #[Extbase\Validate(['validator' => 'NotEmpty'])]
     protected $action = '';
     
     /**
@@ -101,7 +102,7 @@ class Session extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     /**
      * beuser
      *
-     * @var \Fixpunkt\Backendtools\Domain\Model\BackendUser
+     * @var BackendUser
      */
     protected $beuser = null;
     
@@ -298,7 +299,7 @@ class Session extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     /**
      * Returns the beuser
      *
-     * @return \Fixpunkt\Backendtools\Domain\Model\BackendUser $beuser
+     * @return BackendUser $beuser
      */
     public function getBeuser()
     {
@@ -308,10 +309,9 @@ class Session extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     /**
      * Sets the beuser
      *
-     * @param \Fixpunkt\Backendtools\Domain\Model\BackendUser $beuser
      * @return void
      */
-    public function setBeuser(\Fixpunkt\Backendtools\Domain\Model\BackendUser $beuser)
+    public function setBeuser(BackendUser $beuser)
     {
         $this->beuser = $beuser;
     }

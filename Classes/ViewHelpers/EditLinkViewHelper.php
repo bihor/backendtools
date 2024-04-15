@@ -1,9 +1,11 @@
 <?php
 namespace Fixpunkt\Backendtools\ViewHelpers;
 
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractTagBasedViewHelper;
+use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class EditLinkViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractTagBasedViewHelper {
+class EditLinkViewHelper extends AbstractTagBasedViewHelper {
 	
 	/**
 	 * @var string
@@ -49,7 +51,7 @@ class EditLinkViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractTagBa
             $urlParameters['overrideVals']['pages']['sys_language_uid'] = $this->arguments['language'];
         }
         $urlParameters['returnUrl'] = GeneralUtility::getIndpEnv('REQUEST_URI');
-        $uriBuilder = GeneralUtility::makeInstance('TYPO3\CMS\Backend\Routing\UriBuilder');
+        $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
         $uri = $uriBuilder->buildUriFromRoute('record_edit', $urlParameters);
       //  $uri = \TYPO3\CMS\Backend\Utility\BackendUtility::getModuleUrl('record_edit', $urlParameters);
       //  das hier funktioniert überhaupt nicht: 
