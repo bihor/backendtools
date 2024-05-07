@@ -641,7 +641,7 @@ class SessionController extends ActionController
                 }
             }
             $finalArray = $this->sessionRepository->getImagesWithout($img_without, $img_other);
-        } else if (($img_without == 2) && $this->request->hasArgument('replace_empty_meta')) {
+        } elseif (($img_without == 2) && $this->request->hasArgument('replace_empty_meta')) {
             // title-Tags setzen. In der sys_file_reference
             foreach ($finalArray as $key => $refArray) {
                 $uid = $refArray['ref_uid'];
@@ -750,7 +750,7 @@ class SessionController extends ActionController
                 }
             }
             $this->addFlashMessage('All not used (in tt_content) image-entries deleted.');
-        } else if ($this->request->hasArgument('delimg') &&
+        } elseif ($this->request->hasArgument('delimg') &&
             ($this->request->hasArgument('delthatimage1') || $this->request->hasArgument('delthatimage2'))) {
             // ein Bild-Eintrag löschen
             $uid = (int) $this->request->getArgument('delimg');

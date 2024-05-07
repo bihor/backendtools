@@ -177,7 +177,7 @@ class SessionRepository extends Repository
                     $queryBuilder->expr()->eq('tt_content.hidden', $queryBuilder->createNamedParameter(1))
                 )
             ]);
-        } else if ($my_c==2) {
+        } elseif ($my_c==2) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->eq('tt_content.deleted', $queryBuilder->createNamedParameter(0)),
                 $queryBuilder->expr()->eq('tt_content.hidden', $queryBuilder->createNamedParameter(0))
@@ -195,7 +195,7 @@ class SessionRepository extends Repository
                     )
                 )
             ]);
-        } else if ($my_p==2) {
+        } elseif ($my_p==2) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(0)),
                 $queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(0)),
@@ -213,7 +213,7 @@ class SessionRepository extends Repository
                 $res -> andWhere(
                     $queryBuilder->expr()->like('tt_content.CType', $queryBuilder->createNamedParameter($queryBuilder->escapeLikeWildcards($my_value) . "%"))
                 );
-            } else if ($my_type == 1) {
+            } elseif ($my_type == 1) {
                 $res -> andWhere(
                     $queryBuilder->expr()->like('tt_content.list_type', $queryBuilder->createNamedParameter($queryBuilder->escapeLikeWildcards($my_value) . "%"))
                 );
@@ -623,7 +623,7 @@ class SessionRepository extends Repository
      *
      * @return  array     Content-Elemente
      */
-    function getPageLinks($my_c, $my_p, $linkto_uid)
+    public function getPageLinks($my_c, $my_p, $linkto_uid)
     {
         $finalArray = [];
         $referenceArray = [];
@@ -686,7 +686,7 @@ class SessionRepository extends Repository
                     $queryBuilder->expr()->eq('tt_content.hidden', $queryBuilder->createNamedParameter(1))
                 )
             ]);
-        } else if ($my_c==2) {
+        } elseif ($my_c==2) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->eq('tt_content.deleted', $queryBuilder->createNamedParameter(0)),
                 $queryBuilder->expr()->eq('tt_content.hidden', $queryBuilder->createNamedParameter(0))
@@ -704,7 +704,7 @@ class SessionRepository extends Repository
                     )
                 )
             ]);
-        } else if ($my_p==2) {
+        } elseif ($my_p==2) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(0)),
                 $queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(0)),
@@ -763,7 +763,7 @@ class SessionRepository extends Repository
      *
      * @return  array     Content-Elemente
      */
-    function getNewsLinks($my_c, $my_p, $linkto_uid)
+    public function getNewsLinks($my_c, $my_p, $linkto_uid)
     {
         $finalArray = [];
 
@@ -790,7 +790,7 @@ class SessionRepository extends Repository
                     $queryBuilder->expr()->eq('hidden', $queryBuilder->createNamedParameter(1))
                 )
             ]);
-        } else if ($my_c==2) {
+        } elseif ($my_c==2) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->eq('deleted', 0),
                 $queryBuilder->expr()->eq('hidden', 0)
@@ -843,7 +843,7 @@ class SessionRepository extends Repository
                     $queryBuilder->expr()->eq('tx_news_domain_model_news.hidden', $queryBuilder->createNamedParameter(1))
                 )
             ]);
-        } else if ($my_c==2) {
+        } elseif ($my_c==2) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->eq('tx_news_domain_model_news.deleted', 0),
                 $queryBuilder->expr()->eq('tx_news_domain_model_news.hidden', 0)
@@ -894,7 +894,7 @@ class SessionRepository extends Repository
                     $queryBuilder->expr()->eq('tx_news_domain_model_news.hidden', $queryBuilder->createNamedParameter(1))
                 )
             ]);
-        } else if ($my_c==2) {
+        } elseif ($my_c==2) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->eq('tx_news_domain_model_news.deleted', 0),
                 $queryBuilder->expr()->eq('tx_news_domain_model_news.hidden', 0)
@@ -927,7 +927,7 @@ class SessionRepository extends Repository
      *
      * @return  array     Content-Elemente
      */
-    function getCamaligaLinks($my_c, $my_p, $linkto_uid)
+    public function getCamaligaLinks($my_c, $my_p, $linkto_uid)
     {
         $finalArray = [];
 
@@ -954,7 +954,7 @@ class SessionRepository extends Repository
                     $queryBuilder->expr()->eq('hidden', $queryBuilder->createNamedParameter(1))
                 )
             ]);
-        } else if ($my_c==2) {
+        } elseif ($my_c==2) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->eq('deleted', 0),
                 $queryBuilder->expr()->eq('hidden', 0)
@@ -1007,7 +1007,7 @@ class SessionRepository extends Repository
                     $queryBuilder->expr()->eq('tx_camaliga_domain_model_content.hidden', $queryBuilder->createNamedParameter(1))
                 )
             ]);
-        } else if ($my_c==2) {
+        } elseif ($my_c==2) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->eq('tx_camaliga_domain_model_content.deleted', 0),
                 $queryBuilder->expr()->eq('tx_camaliga_domain_model_content.hidden', 0)
@@ -1037,7 +1037,7 @@ class SessionRepository extends Repository
      *
      * @return  array     Bilder
      */
-    function getMissingImages($img_other)
+    public function getMissingImages($img_other)
     {
         $this->siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
         $fileArray = [];
@@ -1186,7 +1186,7 @@ class SessionRepository extends Repository
      * @param   integer   Bild-UID
      * @return    boolean
      */
-    function delMissingImage(int $uid)
+    public function delMissingImage(int $uid)
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_reference');
         $queryBuilder
@@ -1219,7 +1219,7 @@ class SessionRepository extends Repository
      *
      * @return  array     Bilder
      */
-    function getImagesWithout($img_without, $img_other)
+    public function getImagesWithout($img_without, $img_other)
     {
         //$pageRep = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
         $this->siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
@@ -1407,7 +1407,7 @@ class SessionRepository extends Repository
      * @param	int		$sys_language_uid	language-uid
      * @return array
      */
-    function getL10n($parent, $sys_language_uid)
+    protected function getL10n($parent, $sys_language_uid)
     {
         $queryBuilderPages = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('pages')->createQueryBuilder();
         $language_res = $queryBuilderPages ->select(...[
@@ -1462,7 +1462,7 @@ class SessionRepository extends Repository
                 if ((!str_starts_with((string) $base, 'http')) && (strlen((string) $base) > 4)) {
                     if (str_starts_with((string) $base, '//')) {
                         // muss nicht sein:   $domain = 'http:' . $domain;
-                    } else if (str_starts_with((string) $base, '/')) {
+                    } elseif (str_starts_with((string) $base, '/')) {
                         $domain = 'http:/' . $domain;
                     } else {
                         $domain = 'http://' . $domain;
