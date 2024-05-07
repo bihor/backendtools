@@ -16,3 +16,25 @@ input,select,table.table {
     box-shadow: var(--shadow);
 }
 .isok {color:#007700}
+.tooltipbase {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+.tooltipbase .tooltiptext {
+    visibility: hidden;
+    width: 420px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+}
+
+.tooltipbase:hover .tooltiptext {
+    visibility: visible;
+}
