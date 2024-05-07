@@ -1347,7 +1347,7 @@ class SessionRepository extends Repository
         // Bilder ohne alt oder title
         foreach ($referenceArray as $uid => $refArray) {
             $imgArray = $refArray['file'];
-            //echo $imgArray['meta_alt'] .'#'. $imgArray['ref_alt'];
+            //echo $imgArray['meta_alt'] .'#'. $imgArray['ref_alt'] .'||';
             if (((($img_without == 1) || ($img_without == 3)) &&
                     ((!isset($imgArray['meta_alt']) || $imgArray['meta_alt']=='') && (!isset($refArray['ref_alt']) || $refArray['ref_alt']==''))) ||
                 ((($img_without == 2) || ($img_without == 3)) &&

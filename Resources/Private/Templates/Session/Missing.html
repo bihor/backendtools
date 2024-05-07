@@ -99,7 +99,7 @@
 		<tr>
 			<th>-</th>
 			<th>uid</th>
-			<th>identifier</th>
+			<th>name</th>
 			<th>size</th>
 			<th>uid</th>
 			<th>width</th>
@@ -113,7 +113,7 @@
 			<tr{f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
 				<td><f:form.radio name="delimg" value="{image.uid}" /></td>
 				<td>{image.uid}</td>
-				<td>{image.identifier}</td>
+				<td><div class="tooltipbase">{image.name}<span class="tooltiptext">{image.identifier}</span></div></td>
 				<td>{image.size}</td>
 				<td>{image.meta_uid}</td>
 				<td>{image.meta_width}</td>

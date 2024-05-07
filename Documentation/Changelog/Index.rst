@@ -10,8 +10,9 @@
 
 Changelog
 =========
-Version 5.2.1:
+Version 5.3.0:
 Possibility added, to delete missing image-entries.
+Image-preview added to "Find used images without title- or alt-text".
 
 Version 5.2.0:
 Refactored with the rector-tool.
