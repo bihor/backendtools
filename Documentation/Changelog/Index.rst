@@ -10,6 +10,9 @@
 
 Changelog
 =========
+Version 5.2.1:
+Possibility added, to delete missing image-entries.
+
 Version 5.2.0:
 Refactored with the rector-tool.
 setup.txt and constants.txt renamed to .typoscript.

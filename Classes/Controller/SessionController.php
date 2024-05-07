@@ -734,6 +734,32 @@ class SessionController extends ActionController
             $default->setPagestart($my_recursive);
         } else $my_recursive = $default->getPagestart();
 
+        if ($this->request->hasArgument('delallimages')) {
+            // alle nicht benutzen Bilder-Einträge löschen
+            $doubleArray = $this->sessionRepository->getMissingImages($img_other);
+            $notUsedImages = [];
+            foreach ($doubleArray[0] as $image) {
+                if (!$image['used']) {
+                    $notUsedImages[] = $image;
+                }
+            }
+            foreach ($notUsedImages as $image) {
+                $uid = (int) $image['uid'];
+                if ($uid) {
+                    $this->sessionRepository->delMissingImage($uid);
+                }
+            }
+            $this->addFlashMessage('All not used (in tt_content) image-entries deleted.');
+        } else if ($this->request->hasArgument('delimg') &&
+            ($this->request->hasArgument('delthatimage1') || $this->request->hasArgument('delthatimage2'))) {
+            // ein Bild-Eintrag löschen
+            $uid = (int) $this->request->getArgument('delimg');
+            if ($uid) {
+                $this->sessionRepository->delMissingImage($uid);
+                $this->addFlashMessage('Image-entries with uid "'. $uid . '" deleted.');
+            }
+        }
+
         $doubleArray = $this->sessionRepository->getMissingImages($img_other);
         $finalArray = $doubleArray[1];
         $notUsedImages = [];

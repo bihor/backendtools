@@ -1181,6 +1181,37 @@ class SessionRepository extends Repository
     }
 
     /**
+     * Missing Bilder löschen
+     *
+     * @param   integer   Bild-UID
+     * @return    boolean
+     */
+    function delMissingImage(int $uid)
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_reference');
+        $queryBuilder
+            ->delete('sys_file_reference')
+            ->where(
+                $queryBuilder->expr()->eq('uid_local', $uid)
+            )
+            ->executeStatement();
+        $queryBuilder2 = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
+        $queryBuilder2
+            ->delete('sys_file_metadata')
+            ->where(
+                $queryBuilder2->expr()->eq('file', $uid)
+            )
+            ->executeStatement();
+        $queryBuilder3 = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
+        return $queryBuilder3
+            ->delete('sys_file')
+            ->where(
+                $queryBuilder3->expr()->eq('uid', $uid)
+            )
+            ->executeStatement();
+    }
+
+    /**
      * Bilder ohne Alt- oder Titel-Text
      *
      * @param   integer   Modus
