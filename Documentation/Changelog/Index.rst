@@ -64,3 +64,6 @@ Version 2.0:
 Refactoring: large modification of the queries.
 FE-links: domain + language entry point added, L removed.
 Link added to all page-titles + the csv-view.
+
+Version 5.3.1:
+Widget "No. of extensions" deleted. Widget "Statistic about image meta tags" added.

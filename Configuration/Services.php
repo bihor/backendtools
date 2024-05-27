@@ -14,28 +14,6 @@ return function (ContainerConfigurator $configurator, ContainerBuilder $containe
     if ($containerBuilder->hasDefinition(DoughnutChartWidget::class)) {
         $services = $configurator->services();
 
-        $services->set('dashboard.widget.fixpunktExtensions')
-            ->class(NumberWithIconWidget::class)
-            ->arg('$dataProvider', new Reference(\Fixpunkt\Backendtools\Widgets\Provider\NumberOfExtensionsDataProvider::class))
-            ->arg('$backendViewFactory', new Reference(BackendViewFactory::class))
-            ->arg('$options', [
-                'title' => 'LLL:EXT:backendtools/Resources/Private/Language/locallang.xlf:number_with_icon_widget.title',
-                'subtitle' => 'LLL:EXT:backendtools/Resources/Private/Language/locallang.xlf:number_with_icon_widget.subtitle',
-                'icon' => 'content-tab'
-            ])
-            ->tag(
-                'dashboard.widget',
-                [
-                    'identifier' => 'fixpunktExtensions',
-                    'groupNames' => 'fixpunkt',
-                    'title' => 'Statistic about extensions',
-                    'description' => 'No. of extensions in the typo3conf/ext folder.',
-                    'iconIdentifier' => 'content-widget-number',
-                    'height' => 'small',
-                    'width' => 'small'
-                ]
-            );
-
         $services->set('dashboard.widget.fixpunktFiles')
             ->class(NumberWithIconWidget::class)
             ->arg('$dataProvider', new Reference(\Fixpunkt\Backendtools\Widgets\Provider\NumberOfFilesDataProvider::class))
@@ -54,6 +32,23 @@ return function (ContainerConfigurator $configurator, ContainerBuilder $containe
                     'description' => 'No. of missing files registered in sys_file.',
                     'iconIdentifier' => 'content-widget-number',
                     'height' => 'small',
+                    'width' => 'small'
+                ]
+            );
+
+        $services->set('dashboard.widget.fixpunktImages')
+            ->class(DoughnutChartWidget::class)
+            ->arg('$dataProvider', new Reference(\Fixpunkt\Backendtools\Widgets\Provider\ImagesDataProvider::class))
+            ->arg('$backendViewFactory', new Reference(BackendViewFactory::class))
+            ->tag(
+                'dashboard.widget',
+                [
+                    'identifier' => 'fixpunktImages',
+                    'groupNames' => 'fixpunkt',
+                    'title' => 'Statistic about image meta tags',
+                    'description' => 'Images with and without alt- and title-tags.',
+                    'iconIdentifier' => 'content-widget-chart-pie',
+                    'height' => 'medium',
                     'width' => 'small'
                 ]
             );

@@ -1,6 +1,6 @@
 # backendtools
 
-version 5.3.0
+version 5.3.1
 
 9 admin tools for extensions, pages, (backend) layouts, slug, redirects, files, images and links:
 extension-list, recent pages and content elements, used (backend) layouts, import redirects, check redirects, 
@@ -23,3 +23,6 @@ setup.txt and constants.txt renamed to .typoscript.
 Version 5.3.0:
 Possibility added, to delete missing image-entries.
 Image-preview added to "Find used images without title- or alt-text".
+
+Version 5.3.1:
+Widget "No. of extensions" deleted. Widget "Statistic about image meta tags" added.
