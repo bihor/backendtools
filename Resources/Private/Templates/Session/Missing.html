@@ -22,6 +22,11 @@
     </style>
     <h1>Find missing files and show where they are used</h1>
     <f:flashMessages />
+    <f:if condition="{message}">
+        <f:then>
+            <p><strong><f:format.raw>{message}</f:format.raw></strong></p>
+        </f:then>
+    </f:if>
     <f:form action="missing" class="form-inline">
         <div class="row"><div class="col-md-8">
             <div style="margin: 10px 0;">Show images used only in tt_content:
@@ -53,7 +58,7 @@
                 <table class="table">
                     <thead>
                     <tr>
-                        <th colspan="3" style="text-align:center;background-color:#cfc;">sys_file</th>
+                        <th colspan="4" style="text-align:center;background-color:#cfc;">sys_file</th>
                         <th colspan="5" style="text-align:center;background-color:#ccf;">sys_file_metadata</th>
                         <th colspan="3" style="text-align:center;background-color:#fcc;">sys_file_reference</th>
                         <th colspan="4" style="text-align:center;background-color:#fcf;">tt_content or other</th>
@@ -79,6 +84,7 @@
                     <tbody>
                     <f:for each="{paginator.paginatedItems}" as="image" iteration="iterator">
                         <tr{f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
+                        <td><f:form.radio name="delimg" value="{image.file.uid}" /></td>
                         <f:render partial="Image" arguments="{image: image}" />
                         </tr>
                     </f:for>
@@ -111,10 +117,11 @@
             <table class="table">
                 <thead>
                 <tr>
-                    <th colspan="3" style="text-align:center;background-color:#cfc;">sys_file</th>
+                    <th colspan="4" style="text-align:center;background-color:#cfc;">sys_file</th>
                     <th colspan="5" style="text-align:center;background-color:#ccf;">sys_file_metadata</th>
                 </tr>
                 <tr>
+                    <td></td>
                     <th>uid</th>
                     <th>identifier</th>
                     <th>size</th>
@@ -128,6 +135,7 @@
                 <tbody>
                 <f:for each="{fileArray}" as="image" iteration="iterator">
                     <tr{f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
+                    <td><f:form.radio name="delimg" value="{image.uid}" /></td>
                     <td>{image.uid}</td>
                     <td>{image.identifier}</td>
                     <td>{image.size}</td>
@@ -142,6 +150,8 @@
             </table>
         </f:if>
 
+        <f:form.submit value="Delete selected entry in sys_file, sys_file_metadata and sys_file_reference" name="delthatimage2" class="btn btn-primary" />
+        <f:form.submit value="Delete all not used (in tt_content) image-entries in sys_file, sys_file_metadata and sys_file_reference" name="delallimages" class="btn btn-secondary" />
     </f:form>
 </f:section>
 </html>

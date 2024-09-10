@@ -1325,6 +1325,37 @@ class SessionRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
     }
 
     /**
+     * Missing Bilder löschen
+     *
+     * @param   integer   Bild-UID
+     * @return    boolean
+     */
+    public function delMissingImage(int $uid)
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_reference');
+        $queryBuilder
+            ->delete('sys_file_reference')
+            ->where(
+                $queryBuilder->expr()->eq('uid_local', $uid)
+            )
+            ->execute();
+        $queryBuilder2 = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
+        $queryBuilder2
+            ->delete('sys_file_metadata')
+            ->where(
+                $queryBuilder2->expr()->eq('file', $uid)
+            )
+            ->execute();
+        $queryBuilder3 = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
+        return $queryBuilder3
+            ->delete('sys_file')
+            ->where(
+                $queryBuilder3->expr()->eq('uid', $uid)
+            )
+            ->execute();
+    }
+
+    /**
      * setAltOrTitle
      *
      * @param	int		$uid			uid of sys_file_reference

@@ -564,6 +564,33 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             $default->setPagestart($my_recursive);
         } else $my_recursive = $default->getPagestart();
 
+        $content = '';
+        if ($this->request->hasArgument('delallimages')) {
+            // alle nicht benutzen Bilder-Einträge löschen
+            $doubleArray = $this->sessionRepository->getMissingImages($img_other);
+            $notUsedImages = [];
+            foreach ($doubleArray[0] as $image) {
+                if (!$image['used']) {
+                    $notUsedImages[] = $image;
+                }
+            }
+            foreach ($notUsedImages as $image) {
+                $uid = (int) $image['uid'];
+                if ($uid) {
+                    $this->sessionRepository->delMissingImage($uid);
+                }
+            }
+            $content = 'All not used (in tt_content) image-entries deleted.';
+        } elseif ($this->request->hasArgument('delimg') &&
+            ($this->request->hasArgument('delthatimage1') || $this->request->hasArgument('delthatimage2'))) {
+            // ein Bild-Eintrag löschen
+            $uid = (int) $this->request->getArgument('delimg');
+            if ($uid) {
+                $this->sessionRepository->delMissingImage($uid);
+                $content = 'Image-entries with uid "'. $uid . '" deleted.';
+            }
+        }
+
         $doubleArray = $this->sessionRepository->getMissingImages($img_other);
         $finalArray = $doubleArray[1];
         $notUsedImages = [];
@@ -606,6 +633,7 @@ class SessionController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         $this->view->assign('my_recursive', $my_recursive);
         $this->view->assign('settings', $this->settings);
         $this->view->assign('action', 'missing');
+        $this->view->assign('message', $content);
     }
 
     /**

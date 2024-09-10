@@ -11,6 +11,9 @@
 Changelog
 =========
 
+Version 4.4.1
+Possibility added, to delete missing files.
+
 Version 4.4.0:
 New tool: show where missing files are used.
 
