@@ -1,6 +1,6 @@
 # backendtools
 
-version 5.3.1
+version 5.3.2
 
 9 admin tools for extensions, pages, (backend) layouts, slug, redirects, files, images and links:
 extension-list, recent pages and content elements, used (backend) layouts, import redirects, check redirects, 
@@ -24,5 +24,5 @@ Version 5.3.0:
 Possibility added, to delete missing image-entries.
 Image-preview added to "Find used images without title- or alt-text".
 
-Version 5.3.1:
+Version 5.3.1/2:
 Widget "No. of extensions" deleted. Widget "Statistic about image meta tags" added.
