@@ -1,6 +1,6 @@
 # backendtools
 
-version 4.4.1
+version 4.4.2
 
 9 admin tools for extensions, pages, (backend) layouts, slug, redirects, files, images and links:
 extension-list, recent pages and content elements, used (backend) layouts, import redirects, check redirects,
@@ -30,5 +30,5 @@ Bugfix (for PHP 8).
 Version 4.4.0
 New tool: show where missing files are used.
 
-Version 4.4.1
+Version 4.4.2
 Possibility to delete missing files.

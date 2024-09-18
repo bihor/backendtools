@@ -11,7 +11,7 @@
 Changelog
 =========
 
-Version 4.4.1
+Version 4.4.2
 Possibility added, to delete missing files.
 
 Version 4.4.0:
