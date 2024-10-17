@@ -1452,7 +1452,7 @@ class SessionRepository extends Repository
                 $site = $this->siteFinder->getSiteByPageId($root['uid']);   // oder $uid;
                 $base = $site->getConfiguration()['base'];
                 $lang = $site->getConfiguration()['languages'];
-                $lang = $lang[$sys_language_uid]['base'];
+                $lang = $lang[$sys_language_uid]['base'] ?? '';
                 if ((str_starts_with((string) $base, 'http')) && (str_starts_with((string) $lang, 'http'))) {
                     // wenn die Domain beides mal benutzt wird, entfernen wir sie bei der Sprache
                     $parse_url = parse_url((string) $lang);
