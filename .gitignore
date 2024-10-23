@@ -1,1 +1,5 @@
 /.idea/
+/Build/rector/.Build/
+/Build/rector/composer.lock
+/.Build/
+/Build/rector/composer.json.testing
