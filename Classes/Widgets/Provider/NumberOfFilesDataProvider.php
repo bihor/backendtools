@@ -10,6 +10,7 @@ use TYPO3\CMS\Dashboard\Widgets\NumberWithIconDataProviderInterface;
 
 class NumberOfFilesDataProvider implements NumberWithIconDataProviderInterface
 {
+    private array $options = [];
     public function getNumber(int $secondsBack = 86400): int
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');

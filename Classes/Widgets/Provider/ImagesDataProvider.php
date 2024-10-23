@@ -11,6 +11,7 @@ use TYPO3\CMS\Dashboard\Widgets\ChartDataProviderInterface;
 
 class ImagesDataProvider implements ChartDataProviderInterface
 {
+    private array $options = [];
     public function __construct(protected SessionRepository $sessionRepository) {}
 
     /**

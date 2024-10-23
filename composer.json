@@ -8,7 +8,9 @@
 		}
 	],
 	"require" : {
-		"typo3/cms-core" : "~13.4.0"
+		"typo3/cms-core" : "~13.4.0",
+        "typo3/cms-dashboard" : "~13.4.0",
+        "typo3/cms-extbase" : "~13.4.0"
 	},
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",
@@ -26,14 +28,12 @@
 			"Fixpunkt\\Backendtools\\Tests\\" : "Tests"
 		}
 	},
-	"replace" : {
-		"typo3-ter/backendtools" : "self.version"
-	},
 	"homepage" : "https://www.fixpunkt.com/webentwicklung/typo3/typo3-extensions/",
 	"license" : "GPL-3.0-or-later",
 	"extra": {
 		"typo3/cms": {
-			"extension-key": "backendtools"
+			"extension-key": "backendtools",
+            "web-dir": ".Build/public"
 		}
 	},
     "config": {

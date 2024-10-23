@@ -11,6 +11,8 @@ use TYPO3\CMS\Dashboard\Widgets\ChartDataProviderInterface;
 
 class ContentDataProvider implements ChartDataProviderInterface
 {
+    private array $options = [];
+
     /**
      * @inheritDoc
      */
