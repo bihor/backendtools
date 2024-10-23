@@ -3,3 +3,5 @@
 /Build/rector/composer.lock
 /.Build/
 /Build/rector/composer.json.testing
+/composer.json.testing
+/composer.lock

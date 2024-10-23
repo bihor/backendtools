@@ -1,8 +1,9 @@
 <?php
+
 namespace Fixpunkt\Backendtools\Domain\Model;
 
-use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 use TYPO3\CMS\Extbase\Annotation as Extbase;
+use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
 /***************************************************************
  *
@@ -34,7 +35,6 @@ use TYPO3\CMS\Extbase\Annotation as Extbase;
  */
 class Session extends AbstractEntity
 {
-
     /**
      * Key (action)
      *
@@ -42,42 +42,42 @@ class Session extends AbstractEntity
      */
     #[Extbase\Validate(['validator' => 'NotEmpty'])]
     protected $action = '';
-    
+
     /**
      * Value 1
      *
      * @var int
      */
     protected $value1 = 0;
-    
+
     /**
      * Value 2
      *
      * @var int
      */
     protected $value2 = 0;
-    
+
     /**
      * Value 3
      *
      * @var int
      */
     protected $value3 = 0;
-    
+
     /**
      * Value 4
      *
      * @var string
      */
     protected $value4 = '';
-    
+
     /**
      * Value 5
      *
      * @var string
      */
     protected $value5 = '';
-    
+
     /**
      * Value 6
      *
@@ -104,9 +104,8 @@ class Session extends AbstractEntity
      *
      * @var BackendUser
      */
-    protected $beuser = null;
-    
-    
+    protected $beuser;
+
     /**
      * Returns the action
      *
@@ -116,18 +115,17 @@ class Session extends AbstractEntity
     {
         return $this->action;
     }
-    
+
     /**
      * Sets the action
      *
      * @param string $action
-     * @return void
      */
-    public function setAction($action)
+    public function setAction($action): void
     {
         $this->action = $action;
     }
-    
+
     /**
      * Returns the value1
      *
@@ -137,18 +135,17 @@ class Session extends AbstractEntity
     {
         return $this->value1;
     }
-    
+
     /**
      * Sets the value1
      *
      * @param int $value1
-     * @return void
      */
-    public function setValue1($value1)
+    public function setValue1($value1): void
     {
         $this->value1 = $value1;
     }
-    
+
     /**
      * Returns the value2
      *
@@ -158,18 +155,17 @@ class Session extends AbstractEntity
     {
         return $this->value2;
     }
-    
+
     /**
      * Sets the value2
      *
      * @param int $value2
-     * @return void
      */
-    public function setValue2($value2)
+    public function setValue2($value2): void
     {
         $this->value2 = $value2;
     }
-    
+
     /**
      * Returns the value3
      *
@@ -179,18 +175,17 @@ class Session extends AbstractEntity
     {
         return $this->value3;
     }
-    
+
     /**
      * Sets the value3
      *
      * @param int $value3
-     * @return void
      */
-    public function setValue3($value3)
+    public function setValue3($value3): void
     {
         $this->value3 = $value3;
     }
-    
+
     /**
      * Returns the value4
      *
@@ -200,18 +195,17 @@ class Session extends AbstractEntity
     {
         return $this->value4;
     }
-    
+
     /**
      * Sets the value4
      *
      * @param string $value4
-     * @return void
      */
-    public function setValue4($value4)
+    public function setValue4($value4): void
     {
         $this->value4 = $value4;
     }
-    
+
     /**
      * Returns the value5
      *
@@ -221,18 +215,17 @@ class Session extends AbstractEntity
     {
         return $this->value5;
     }
-    
+
     /**
      * Sets the value5
      *
      * @param string $value5
-     * @return void
      */
-    public function setValue5($value5)
+    public function setValue5($value5): void
     {
         $this->value5 = $value5;
     }
-    
+
     /**
      * Returns the value6
      *
@@ -242,14 +235,13 @@ class Session extends AbstractEntity
     {
         return $this->value6;
     }
-    
+
     /**
      * Sets the value6
      *
      * @param string $value6
-     * @return void
      */
-    public function setValue6($value6)
+    public function setValue6($value6): void
     {
         $this->value6 = $value6;
     }
@@ -261,18 +253,17 @@ class Session extends AbstractEntity
      */
     public function getPageel()
     {
-    	return $this->pageel;
+        return $this->pageel;
     }
-    
+
     /**
      * Sets the pageel
      *
      * @param int $pageel
-     * @return void
      */
-    public function setPageel($pageel)
+    public function setPageel($pageel): void
     {
-    	$this->pageel = $pageel;
+        $this->pageel = $pageel;
     }
 
     /**
@@ -289,9 +280,8 @@ class Session extends AbstractEntity
      * Sets the pagestart
      *
      * @param int $pagestart
-     * @return void
      */
-    public function setPagestart($pagestart)
+    public function setPagestart($pagestart): void
     {
         $this->pagestart = $pagestart;
     }
@@ -305,13 +295,11 @@ class Session extends AbstractEntity
     {
         return $this->beuser;
     }
-    
+
     /**
      * Sets the beuser
-     *
-     * @return void
      */
-    public function setBeuser(BackendUser $beuser)
+    public function setBeuser(BackendUser $beuser): void
     {
         $this->beuser = $beuser;
     }

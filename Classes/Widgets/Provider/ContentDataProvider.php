@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Fixpunkt\Backendtools\Widgets\Provider;
 
-use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Dashboard\WidgetApi;
@@ -12,7 +11,6 @@ use TYPO3\CMS\Dashboard\Widgets\ChartDataProviderInterface;
 
 class ContentDataProvider implements ChartDataProviderInterface
 {
-
     /**
      * @inheritDoc
      */
@@ -26,7 +24,7 @@ class ContentDataProvider implements ChartDataProviderInterface
             'labels' => [
                 'Enabled',
                 'Hidden',
-                'Deleted'
+                'Deleted',
             ],
             'datasets' => [
                 [
@@ -55,7 +53,7 @@ class ContentDataProvider implements ChartDataProviderInterface
             ->count('*')
             ->from('tt_content')
             ->where(
-                $expression
+                $expression,
             )
             ->executeQuery()
             ->fetchOne();

@@ -1,14 +1,16 @@
 <?php
+
 namespace Fixpunkt\Backendtools\Tests\Unit\Controller;
 
-use TYPO3\CMS\Core\Tests\UnitTestCase;
 use Fixpunkt\Backendtools\Controller\SessionController;
+use TYPO3\CMS\Core\Tests\UnitTestCase;
 use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
+
 /***************************************************************
  *  Copyright notice
  *
  *  (c) 2016 Kurt Gusbeth <k.gusbeth@fixpunkt.com>, fixpunkt werbeagentur gmbh
- *  			
+ *
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -34,38 +36,37 @@ use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
  */
 class SessionControllerTest extends UnitTestCase
 {
-
-	/**
+    /**
   * @var SessionController
   */
- protected $subject = NULL;
+    protected $subject;
 
-	public function setUp()
-	{
-		$this->subject = $this->getMock(SessionController::class, ['redirect', 'forward', 'addFlashMessage'], [], '', FALSE);
-	}
+    public function setUp()
+    {
+        $this->subject = $this->getMock(SessionController::class, ['redirect', 'forward', 'addFlashMessage'], [], '', false);
+    }
 
-	public function tearDown()
-	{
-		unset($this->subject);
-	}
+    public function tearDown()
+    {
+        unset($this->subject);
+    }
 
-	/**
-	 * @test
-	 */
-	public function listActionFetchesAllSessionsFromRepositoryAndAssignsThemToView()
-	{
+    /**
+     * @test
+     */
+    public function listActionFetchesAllSessionsFromRepositoryAndAssignsThemToView()
+    {
 
-		$allSessions = $this->getMock(ObjectStorage::class, [], [], '', FALSE);
+        $allSessions = $this->getMock(ObjectStorage::class, [], [], '', false);
 
-		$sessionRepository = $this->getMock('', ['findAll'], [], '', FALSE);
-		$sessionRepository->expects($this->once())->method('findAll')->will($this->returnValue($allSessions));
-		$this->inject($this->subject, 'sessionRepository', $sessionRepository);
+        $sessionRepository = $this->getMock('', ['findAll'], [], '', false);
+        $sessionRepository->expects(self::once())->method('findAll')->willReturn($allSessions);
+        $this->inject($this->subject, 'sessionRepository', $sessionRepository);
 
-		$view = $this->getMock('TYPO3\\CMS\\Extbase\\Mvc\\View\\ViewInterface');
-		$view->expects($this->once())->method('assign')->with('sessions', $allSessions);
-		$this->inject($this->subject, 'view', $view);
+        $view = $this->getMock('TYPO3\\CMS\\Extbase\\Mvc\\View\\ViewInterface');
+        $view->expects(self::once())->method('assign')->with('sessions', $allSessions);
+        $this->inject($this->subject, 'view', $view);
 
-		$this->subject->listAction();
-	}
+        $this->subject->listAction();
+    }
 }

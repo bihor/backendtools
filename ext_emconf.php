@@ -11,16 +11,16 @@
  ***************************************************************/
 
 $EM_CONF[$_EXTKEY] = [
-  'title' => 'Backend tools',
-  'description' => '9 admin tools: extension-list, recent pages & elements, backend layouts, redirects import & check, file-deletion, missing files, images with no alt or title and link-list.',
-  'category' => 'module',
-  'author' => 'Kurt Gusbeth',
-  'author_company' => 'fixpunkt für digitales GmbH',
-  'state' => 'stable',
-  'version' => '5.3.3',
-  'constraints' => [
-    'depends' => [
-        'typo3' => '12.4.0-12.4.99',
-    ]
-  ]
+    'title' => 'Backend tools',
+    'description' => '9 admin tools: extension-list, recent pages & elements, backend layouts, redirects import & check, file-deletion, missing files, images with no alt or title and link-list.',
+    'category' => 'module',
+    'author' => 'Kurt Gusbeth',
+    'author_company' => 'fixpunkt für digitales GmbH',
+    'state' => 'stable',
+    'version' => '5.3.3',
+    'constraints' => [
+        'depends' => [
+            'typo3' => '13.3.0-13.99.99',
+        ],
+    ],
 ];

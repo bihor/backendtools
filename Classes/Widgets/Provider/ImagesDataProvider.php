@@ -5,29 +5,20 @@ declare(strict_types=1);
 namespace Fixpunkt\Backendtools\Widgets\Provider;
 
 use Fixpunkt\Backendtools\Domain\Repository\SessionRepository;
-use TYPO3\CMS\Core\Database\Connection;
-use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Dashboard\WidgetApi;
 use TYPO3\CMS\Dashboard\Widgets\ChartDataProviderInterface;
 
 class ImagesDataProvider implements ChartDataProviderInterface
 {
-
-    /**
-     * Injects the session-Repository
-     */
-    public function injectSessionRepository(SessionRepository $sessionRepository)
-    {
-        $this->sessionRepository = $sessionRepository;
-    }
+    public function __construct(protected SessionRepository $sessionRepository) {}
 
     /**
      * @inheritDoc
      */
     public function getChartData(): array
     {
-        $sessionRepository = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(SessionRepository::class);
+        $sessionRepository = GeneralUtility::makeInstance(SessionRepository::class);
         $images1 = count($sessionRepository->getImagesWithout(1, 1));
         $images2 = count($sessionRepository->getImagesWithout(2, 1));
         $images4 = count($sessionRepository->getImagesWithout(4, 1));
@@ -38,7 +29,7 @@ class ImagesDataProvider implements ChartDataProviderInterface
                 'without alt-tag',
                 'without title-tag',
                 'with alt-tag',
-                'with title-tag'
+                'with title-tag',
             ],
             'datasets' => [
                 [

@@ -2,8 +2,9 @@
 
 namespace Fixpunkt\Backendtools\Tests\Unit\Domain\Model;
 
-use TYPO3\CMS\Core\Tests\UnitTestCase;
 use Fixpunkt\Backendtools\Domain\Model\Session;
+use TYPO3\CMS\Core\Tests\UnitTestCase;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -37,166 +38,158 @@ use Fixpunkt\Backendtools\Domain\Model\Session;
  */
 class SessionTest extends UnitTestCase
 {
-	/**
+    /**
   * @var Session
   */
- protected $subject = NULL;
+    protected $subject;
 
-	public function setUp()
-	{
-		$this->subject = new Session();
-	}
+    public function setUp()
+    {
+        $this->subject = new Session();
+    }
 
-	public function tearDown()
-	{
-		unset($this->subject);
-	}
+    public function tearDown()
+    {
+        unset($this->subject);
+    }
 
-	/**
-	 * @test
-	 */
-	public function getActionReturnsInitialValueForString()
-	{
-		$this->assertSame(
-			'',
-			$this->subject->getAction()
-		);
-	}
+    /**
+     * @test
+     */
+    public function getActionReturnsInitialValueForString()
+    {
+        self::assertSame(
+            '',
+            $this->subject->getAction(),
+        );
+    }
 
-	/**
-	 * @test
-	 */
-	public function setActionForStringSetsAction()
-	{
-		$this->subject->setAction('Conceived at T3CON10');
+    /**
+     * @test
+     */
+    public function setActionForStringSetsAction()
+    {
+        $this->subject->setAction('Conceived at T3CON10');
 
-		$this->assertAttributeEquals(
-			'Conceived at T3CON10',
-			'action',
-			$this->subject
-		);
-	}
+        self::assertAttributeEquals(
+            'Conceived at T3CON10',
+            'action',
+            $this->subject,
+        );
+    }
 
-	/**
-	 * @test
-	 */
-	public function getValue1ReturnsInitialValueForInt()
-	{	}
+    /**
+     * @test
+     */
+    public function getValue1ReturnsInitialValueForInt() {}
 
-	/**
-	 * @test
-	 */
-	public function setValue1ForIntSetsValue1()
-	{	}
+    /**
+     * @test
+     */
+    public function setValue1ForIntSetsValue1() {}
 
-	/**
-	 * @test
-	 */
-	public function getValue2ReturnsInitialValueForInt()
-	{	}
+    /**
+     * @test
+     */
+    public function getValue2ReturnsInitialValueForInt() {}
 
-	/**
-	 * @test
-	 */
-	public function setValue2ForIntSetsValue2()
-	{	}
+    /**
+     * @test
+     */
+    public function setValue2ForIntSetsValue2() {}
 
-	/**
-	 * @test
-	 */
-	public function getValue3ReturnsInitialValueForInt()
-	{	}
+    /**
+     * @test
+     */
+    public function getValue3ReturnsInitialValueForInt() {}
 
-	/**
-	 * @test
-	 */
-	public function setValue3ForIntSetsValue3()
-	{	}
+    /**
+     * @test
+     */
+    public function setValue3ForIntSetsValue3() {}
 
-	/**
-	 * @test
-	 */
-	public function getValue4ReturnsInitialValueForString()
-	{
-		$this->assertSame(
-			'',
-			$this->subject->getValue4()
-		);
-	}
+    /**
+     * @test
+     */
+    public function getValue4ReturnsInitialValueForString()
+    {
+        self::assertSame(
+            '',
+            $this->subject->getValue4(),
+        );
+    }
 
-	/**
-	 * @test
-	 */
-	public function setValue4ForStringSetsValue4()
-	{
-		$this->subject->setValue4('Conceived at T3CON10');
+    /**
+     * @test
+     */
+    public function setValue4ForStringSetsValue4()
+    {
+        $this->subject->setValue4('Conceived at T3CON10');
 
-		$this->assertAttributeEquals(
-			'Conceived at T3CON10',
-			'value4',
-			$this->subject
-		);
-	}
+        self::assertAttributeEquals(
+            'Conceived at T3CON10',
+            'value4',
+            $this->subject,
+        );
+    }
 
-	/**
-	 * @test
-	 */
-	public function getValue5ReturnsInitialValueForString()
-	{
-		$this->assertSame(
-			'',
-			$this->subject->getValue5()
-		);
-	}
+    /**
+     * @test
+     */
+    public function getValue5ReturnsInitialValueForString()
+    {
+        self::assertSame(
+            '',
+            $this->subject->getValue5(),
+        );
+    }
 
-	/**
-	 * @test
-	 */
-	public function setValue5ForStringSetsValue5()
-	{
-		$this->subject->setValue5('Conceived at T3CON10');
+    /**
+     * @test
+     */
+    public function setValue5ForStringSetsValue5()
+    {
+        $this->subject->setValue5('Conceived at T3CON10');
 
-		$this->assertAttributeEquals(
-			'Conceived at T3CON10',
-			'value5',
-			$this->subject
-		);
-	}
+        self::assertAttributeEquals(
+            'Conceived at T3CON10',
+            'value5',
+            $this->subject,
+        );
+    }
 
-	/**
-	 * @test
-	 */
-	public function getValue6ReturnsInitialValueForString()
-	{
-		$this->assertSame(
-			'',
-			$this->subject->getValue6()
-		);
-	}
+    /**
+     * @test
+     */
+    public function getValue6ReturnsInitialValueForString()
+    {
+        self::assertSame(
+            '',
+            $this->subject->getValue6(),
+        );
+    }
 
-	/**
-	 * @test
-	 */
-	public function setValue6ForStringSetsValue6()
-	{
-		$this->subject->setValue6('Conceived at T3CON10');
+    /**
+     * @test
+     */
+    public function setValue6ForStringSetsValue6()
+    {
+        $this->subject->setValue6('Conceived at T3CON10');
 
-		$this->assertAttributeEquals(
-			'Conceived at T3CON10',
-			'value6',
-			$this->subject
-		);
-	}
+        self::assertAttributeEquals(
+            'Conceived at T3CON10',
+            'value6',
+            $this->subject,
+        );
+    }
 
-	/**
-	 * @test
-	 */
-	public function getBeuserReturnsInitialValueForBackendUser()
-	{	}
+    /**
+     * @test
+     */
+    public function getBeuserReturnsInitialValueForBackendUser() {}
 
-	/**
-	 * @test
-	 */
-	public function setBeuserForBackendUserSetsBeuser()
-	{	}
+    /**
+     * @test
+     */
+    public function setBeuserForBackendUserSetsBeuser() {}
 }

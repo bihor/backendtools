@@ -14,8 +14,8 @@ fix: rector fix-code-style
 install:
 	Build/Scripts/runTests.sh -s composerUpdate
 
-.PHONY: install-rectory
-install:
+.PHONY: install-rector
+install-rector:
 	Build/Scripts/runTests.sh -s composerUpdateRector
 
 .PHONY: code-style
