@@ -1,21 +1,21 @@
 <?php
+
 namespace Fixpunkt\Backendtools\Controller;
 
-use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
-use Fixpunkt\Backendtools\Domain\Repository\SessionRepository;
 use Fixpunkt\Backendtools\Domain\Model\Session;
-use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
-use TYPO3\CMS\Core\Core\Environment;
+use Fixpunkt\Backendtools\Domain\Repository\BackendUserRepository;
+use Fixpunkt\Backendtools\Domain\Repository\SessionRepository;
+use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
+use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Localization\LanguageService;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Domain\Repository\BackendUserRepository;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Pagination\ArrayPaginator;
 use TYPO3\CMS\Core\Pagination\SimplePagination;
-use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
-use Psr\Http\Message\ResponseInterface;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 
 /***************************************************************
  *
@@ -47,7 +47,6 @@ use Psr\Http\Message\ResponseInterface;
  */
 class SessionController extends ActionController
 {
-
     protected int $id;
 
     protected ModuleTemplate $moduleTemplate;
@@ -62,35 +61,20 @@ class SessionController extends ActionController
     /**
      * backendUserRepository
      *
-     * @var \Fixpunkt\Backendtools\Domain\Repository\BackendUserRepository
+     * @var BackendUserRepository
      */
     protected $backendUserRepository;
 
-    public function __construct(
-        protected readonly ModuleTemplateFactory $moduleTemplateFactory,
-    ) {
+    public function __construct(protected readonly ModuleTemplateFactory $moduleTemplateFactory, SessionRepository $sessionRepository, BackendUserRepository $backendUserRepository)
+    {
+        $this->sessionRepository = $sessionRepository;
+        $this->backendUserRepository = $backendUserRepository;
     }
 
-    public function initializeAction()
+    public function initializeAction(): void
     {
         $this->id = (int)($this->request->getQueryParams()['id'] ?? 0);
         $this->moduleTemplate = $this->moduleTemplateFactory->create($this->request);
-    }
-
-    /**
-     * Injects the session-Repository
-     */
-    public function injectSessionRepository(SessionRepository $sessionRepository)
-    {
-        $this->sessionRepository = $sessionRepository;
-    }
-
-    /**
-     * Injects the BackendUserRepository-Repository
-     */
-    public function injectBackendUserRepository(\Fixpunkt\Backendtools\Domain\Repository\BackendUserRepository $backendUserRepository)
-    {
-        $this->backendUserRepository = $backendUserRepository;
     }
 
     /**
@@ -103,7 +87,7 @@ class SessionController extends ActionController
         $beuser_id = $GLOBALS['BE_USER']->user['uid'];
         $result = $this->sessionRepository->findByAction('list', $beuser_id);
         if ($result->count() == 0) {
-            $new = TRUE;
+            $new = true;
             $default = GeneralUtility::makeInstance(Session::class);
             $default->setAction('list');
             $default->setValue1(0);
@@ -113,41 +97,57 @@ class SessionController extends ActionController
             $default->setValue5('');
             $default->setValue6('');
         } else {
-            $new = FALSE;
+            $new = false;
             $default = $result[0];
         }
 
         if ($this->request->hasArgument('currentPage')) {
-            $currentPage = intval($this->request->getArgument('currentPage'));
-        } else $currentPage = 1;
+            $currentPage = (int)($this->request->getArgument('currentPage'));
+        } else {
+            $currentPage = 1;
+        }
         if ($this->request->hasArgument('my_c')) {
-            $my_c = intval($this->request->getArgument('my_c'));		// content visibility
+            $my_c = (int)($this->request->getArgument('my_c'));		// content visibility
             $default->setValue1($my_c);
-        } else $my_c = $default->getValue1();
+        } else {
+            $my_c = $default->getValue1();
+        }
         if ($this->request->hasArgument('my_p')) {
-            $my_p = intval($this->request->getArgument('my_p'));		// pages visibility
+            $my_p = (int)($this->request->getArgument('my_p'));		// pages visibility
             $default->setValue2($my_p);
-        } else $my_p = $default->getValue2();
+        } else {
+            $my_p = $default->getValue2();
+        }
         if ($this->request->hasArgument('my_type')) {
-            $my_type = intval($this->request->getArgument('my_type'));	// type
+            $my_type = (int)($this->request->getArgument('my_type'));	// type
             $default->setValue3($my_type);
-        } else $my_type = $default->getValue3();
+        } else {
+            $my_type = $default->getValue3();
+        }
         if ($this->request->hasArgument('my_value')) {
             $my_value = $this->request->getArgument('my_value');		// type value
             $default->setValue4($my_value);
-        } else $my_value = $default->getValue4();
+        } else {
+            $my_value = $default->getValue4();
+        }
         if ($this->request->hasArgument('my_flexform')) {
             $my_flexform = $this->request->getArgument('my_flexform');	// flexform value
             $default->setValue5($my_flexform);
-        } else $my_flexform = $default->getValue5();
+        } else {
+            $my_flexform = $default->getValue5();
+        }
         if ($this->request->hasArgument('my_exclude')) {
             $my_exclude = $this->request->getArgument('my_exclude');	// exclude type
             $default->setValue6($my_exclude);
-        } else $my_exclude = $default->getValue6();
+        } else {
+            $my_exclude = $default->getValue6();
+        }
         if ($this->request->hasArgument('my_page')) {
-            $my_page = intval($this->request->getArgument('my_page'));		// elements per page
+            $my_page = (int)($this->request->getArgument('my_page'));		// elements per page
             $default->setPageel($my_page);
-        } else $my_page = $default->getPageel();
+        } else {
+            $my_page = $default->getPageel();
+        }
         if (!$my_page) {
             if (isset($this->settings['pagebrowser']['itemsPerPage'])) {
                 $my_page = $this->settings['pagebrowser']['itemsPerPage'];
@@ -159,18 +159,26 @@ class SessionController extends ActionController
             $this->settings['pagebrowser']['itemsPerPage'] = $my_page;
         }
         if ($this->request->hasArgument('my_outp')) {
-            $my_outp = intval($this->request->getArgument('my_outp'));		// output
-        } else $my_outp = 0;
+            $my_outp = (int)($this->request->getArgument('my_outp'));		// output
+        } else {
+            $my_outp = 0;
+        }
         if ($this->request->hasArgument('my_orderby')) {
-            $my_orderby = intval($this->request->getArgument('my_orderby'));		// order by
-        } else $my_orderby = 0;
+            $my_orderby = (int)($this->request->getArgument('my_orderby'));		// order by
+        } else {
+            $my_orderby = 0;
+        }
         if ($this->request->hasArgument('my_direction')) {
-            $my_direction = intval($this->request->getArgument('my_direction'));		// order direction
-        } else $my_direction = 0;
+            $my_direction = (int)($this->request->getArgument('my_direction'));		// order direction
+        } else {
+            $my_direction = 0;
+        }
         if ($this->request->hasArgument('my_recursive')) {
-            $my_recursive = intval($this->request->getArgument('my_recursive'));		// recursive pid search
+            $my_recursive = (int)($this->request->getArgument('my_recursive'));		// recursive pid search
             $default->setPagestart($my_recursive);
-        } else $my_recursive = $default->getPagestart();
+        } else {
+            $my_recursive = $default->getPagestart();
+        }
 
         if ($new) {
             $user = $this->backendUserRepository->findByUid($beuser_id);
@@ -184,7 +192,15 @@ class SessionController extends ActionController
 
         $gridelements_loaded = ExtensionManagementUtility::isLoaded('gridelements');
         $pages = $this->sessionRepository->getPagesWithExtensions(
-            $my_c, $my_p, $my_type, $my_value, $my_flexform, $my_exclude, $my_orderby, $my_direction, $gridelements_loaded
+            $my_c,
+            $my_p,
+            $my_type,
+            $my_value,
+            $my_flexform,
+            $my_exclude,
+            $my_orderby,
+            $my_direction,
+            $gridelements_loaded,
         );
         $types = $this->sessionRepository->getAllTypes();
         if ($my_recursive > 0) {
@@ -228,7 +244,7 @@ class SessionController extends ActionController
         $beuser_id = $GLOBALS['BE_USER']->user['uid'];
         $result = $this->sessionRepository->findByAction('latest', $beuser_id);
         if ($result->count() == 0) {
-            $new = TRUE;
+            $new = true;
             $default = GeneralUtility::makeInstance(Session::class);
             $default->setAction('latest');
             $default->setValue1(0);
@@ -236,33 +252,45 @@ class SessionController extends ActionController
             $default->setValue4('01.01.' . date('Y') . ' 00:00:00');
             $default->setValue5('CET');
         } else {
-            $new = FALSE;
+            $new = false;
             $default = $result[0];
         }
 
         if ($this->request->hasArgument('currentPage')) {
-            $currentPage = intval($this->request->getArgument('currentPage'));
-        } else $currentPage = 1;
+            $currentPage = (int)($this->request->getArgument('currentPage'));
+        } else {
+            $currentPage = 1;
+        }
         if ($this->request->hasArgument('my_c')) {
-            $my_c = intval($this->request->getArgument('my_c'));		// content visibility
+            $my_c = (int)($this->request->getArgument('my_c'));		// content visibility
             $default->setValue1($my_c);
-        } else $my_c = $default->getValue1();
+        } else {
+            $my_c = $default->getValue1();
+        }
         if ($this->request->hasArgument('my_p')) {
-            $my_p = intval($this->request->getArgument('my_p'));		// pages visibility
+            $my_p = (int)($this->request->getArgument('my_p'));		// pages visibility
             $default->setValue2($my_p);
-        } else $my_p = $default->getValue2();
+        } else {
+            $my_p = $default->getValue2();
+        }
         if ($this->request->hasArgument('my_value')) {
             $my_value = $this->request->getArgument('my_value');		// date and time
             $default->setValue4($my_value);
-        } else $my_value = $default->getValue4();
+        } else {
+            $my_value = $default->getValue4();
+        }
         if ($this->request->hasArgument('my_zone')) {
             $my_zone = $this->request->getArgument('my_zone');		    // date zone
             $default->setValue5($my_zone);
-        } else $my_zone = $default->getValue5();
+        } else {
+            $my_zone = $default->getValue5();
+        }
         if ($this->request->hasArgument('my_page')) {
-            $my_page = intval($this->request->getArgument('my_page'));		// elements per page
+            $my_page = (int)($this->request->getArgument('my_page'));		// elements per page
             $default->setPageel($my_page);
-        } else $my_page = $default->getPageel();
+        } else {
+            $my_page = $default->getPageel();
+        }
         if (!$my_page) {
             if (isset($this->settings['pagebrowser']['itemsPerPage'])) {
                 $my_page = $this->settings['pagebrowser']['itemsPerPage'];
@@ -274,12 +302,16 @@ class SessionController extends ActionController
             $this->settings['pagebrowser']['itemsPerPage'] = $my_page;
         }
         if ($this->request->hasArgument('my_outp')) {
-            $my_outp = intval($this->request->getArgument('my_outp'));		// output
-        } else $my_outp = 0;
+            $my_outp = (int)($this->request->getArgument('my_outp'));		// output
+        } else {
+            $my_outp = 0;
+        }
         if ($this->request->hasArgument('my_recursive')) {
-            $my_recursive = intval($this->request->getArgument('my_recursive'));		// recursive pid search
+            $my_recursive = (int)($this->request->getArgument('my_recursive'));		// recursive pid search
             $default->setPagestart($my_recursive);
-        } else $my_recursive = $default->getPagestart();
+        } else {
+            $my_recursive = $default->getPagestart();
+        }
 
         if ($new) {
             $user = $this->backendUserRepository->findByUid($beuser_id);
@@ -297,7 +329,7 @@ class SessionController extends ActionController
         $d = \DateTime::createFromFormat(
             'd.m.Y H:i:s',
             $my_value,
-            new \DateTimeZone($my_zone)
+            new \DateTimeZone($my_zone),
         );
         if ($d === false) {
             $tstamp = time();
@@ -306,10 +338,13 @@ class SessionController extends ActionController
         }
 
         $pages = $this->sessionRepository->getLatestContentElements(
-            $my_c, $my_p, $tstamp
+            $my_c,
+            $my_p,
+            $tstamp,
         );
         $pages2 = $this->sessionRepository->getLatestPages(
-            $my_p, $tstamp
+            $my_p,
+            $tstamp,
         );
         foreach ($pages2 as $page) {
             $pid = $page['pid'];
@@ -373,31 +408,39 @@ class SessionController extends ActionController
         $beuser_id = $GLOBALS['BE_USER']->user['uid'];
         $result = $this->sessionRepository->findByAction('layouts', $beuser_id);
         if ($result->count() == 0) {
-            $new = TRUE;
+            $new = true;
             $default = GeneralUtility::makeInstance(Session::class);
             $default->setAction('layouts');
             $default->setValue1(0);
             $default->setValue2(0);
         } else {
-            $new = FALSE;
+            $new = false;
             $default = $result[0];
         }
 
         if ($this->request->hasArgument('currentPage')) {
-            $currentPage = intval($this->request->getArgument('currentPage'));
-        } else $currentPage = 1;
+            $currentPage = (int)($this->request->getArgument('currentPage'));
+        } else {
+            $currentPage = 1;
+        }
         if ($this->request->hasArgument('my_value')) {
             $my_value = $this->request->getArgument('my_value');		// date and time
             $default->setValue1($my_value);
-        } else $my_value = $default->getValue1();
+        } else {
+            $my_value = $default->getValue1();
+        }
         if ($this->request->hasArgument('my_p')) {
-            $my_p = intval($this->request->getArgument('my_p'));		// pages visibility
+            $my_p = (int)($this->request->getArgument('my_p'));		// pages visibility
             $default->setValue2($my_p);
-        } else $my_p = $default->getValue2();
+        } else {
+            $my_p = $default->getValue2();
+        }
         if ($this->request->hasArgument('my_page')) {
-            $my_page = intval($this->request->getArgument('my_page'));		// elements per page
+            $my_page = (int)($this->request->getArgument('my_page'));		// elements per page
             $default->setPageel($my_page);
-        } else $my_page = $default->getPageel();
+        } else {
+            $my_page = $default->getPageel();
+        }
         if (!$my_page) {
             if (isset($this->settings['pagebrowser']['itemsPerPage'])) {
                 $my_page = $this->settings['pagebrowser']['itemsPerPage'];
@@ -409,12 +452,16 @@ class SessionController extends ActionController
             $this->settings['pagebrowser']['itemsPerPage'] = $my_page;
         }
         if ($this->request->hasArgument('my_outp')) {
-            $my_outp = intval($this->request->getArgument('my_outp'));		// output
-        } else $my_outp = 0;
+            $my_outp = (int)($this->request->getArgument('my_outp'));		// output
+        } else {
+            $my_outp = 0;
+        }
         if ($this->request->hasArgument('my_recursive')) {
-            $my_recursive = intval($this->request->getArgument('my_recursive'));		// recursive pid search
+            $my_recursive = (int)($this->request->getArgument('my_recursive'));		// recursive pid search
             $default->setPagestart($my_recursive);
-        } else $my_recursive = $default->getPagestart();
+        } else {
+            $my_recursive = $default->getPagestart();
+        }
 
         if ($new) {
             $user = $this->backendUserRepository->findByUid($beuser_id);
@@ -426,7 +473,7 @@ class SessionController extends ActionController
             $this->sessionRepository->update($default);
         }
 
-        $pages = $this->sessionRepository->getLayouts( $my_value, $my_p );
+        $pages = $this->sessionRepository->getLayouts($my_value, $my_p);
         if ($my_recursive > 0) {
             $pages = $this->sessionRepository->filterPagesRecursive($pages, $my_recursive);
         }
@@ -461,7 +508,7 @@ class SessionController extends ActionController
         $beuser_id = $GLOBALS['BE_USER']->user['uid'];
         $result = $this->sessionRepository->findByAction('filedeletion', $beuser_id);
         if ($result->count() == 0) {
-            $new = TRUE;
+            $new = true;
             $default = GeneralUtility::makeInstance(Session::class);
             $default->setAction('filedeletion');
             $default->setValue1(0);
@@ -470,27 +517,34 @@ class SessionController extends ActionController
             $default->setValue4('');
             $default->setValue5('0');
         } else {
-            $new = FALSE;
+            $new = false;
             $default = $result[0];
         }
 
         if ($this->request->hasArgument('method')) {
-            $method = intval($this->request->getArgument('method'));
+            $method = (int)($this->request->getArgument('method'));
             $default->setValue1($method);
-        } else $method = $default->getValue1();
+        } else {
+            $method = $default->getValue1();
+        }
         if ($this->request->hasArgument('bytes')) {
-            $bytes = intval($this->request->getArgument('bytes'));
+            $bytes = (int)($this->request->getArgument('bytes'));
             $default->setValue2($bytes);
-        } else $bytes = $default->getValue2();
+        } else {
+            $bytes = $default->getValue2();
+        }
         if ($this->request->hasArgument('convert')) {
             $convert = $this->request->getArgument('convert');
             $default->setValue5($convert);
-        } else $convert = $default->getValue5();
+        } else {
+            $convert = $default->getValue5();
+        }
         if ($this->request->hasArgument('delfile')) {
             $delfile = $this->request->getArgument('delfile');
             //	$default->setValue4($delfile);
-        } else $delfile = ''; // $default->getValue4();
-
+        } else {
+            $delfile = '';
+        } // $default->getValue4();
 
         if ($new) {
             $user = $this->backendUserRepository->findByUid($beuser_id);
@@ -507,24 +561,33 @@ class SessionController extends ActionController
         $content = '';
 
         if ($delfile) {
-            $total=0;
-            $success=0;
+            $total = 0;
+            $success = 0;
             $filename = Environment::getPublicPath() . '/' . 'fileadmin/' . $delfile;
             if (is_file($filename) && file_exists($filename)) {
-                if (!$method) $content .= "This is the file content:<br />\n";
-                $filecontent = fopen($filename,"r");
+                if (!$method) {
+                    $content .= "This is the file content:<br />\n";
+                }
+                $filecontent = fopen($filename, 'r');
                 while (!feof($filecontent)) {
                     $row = trim(fgets($filecontent));
-                    if ($convert == 'iso') $row = utf8_decode ( $row );
-                    if ($convert == 'utf8') $row = utf8_encode ( $row );
+                    if ($convert == 'iso') {
+                        $row = utf8_decode($row);
+                    }
+                    if ($convert == 'utf8') {
+                        $row = utf8_encode($row);
+                    }
                     if (is_file($row) && file_exists($row)) {
                         if ($bytes) {
                             $groesse = filesize($row);
                             $groesse_total += $groesse;
                         }
-                        if ($method && strpos($row, '/uploads/')>0) {
-                            if (unlink($row)) $success++;
-                            else $content .= "$row could not be deleted!<br />\n";
+                        if ($method && strpos($row, '/uploads/') > 0) {
+                            if (unlink($row)) {
+                                $success++;
+                            } else {
+                                $content .= "$row could not be deleted!<br />\n";
+                            }
                         } else {
                             $content .= ($bytes) ? "$row ($groesse bytes)<br />\n" : "$row<br />\n";
                         }
@@ -533,8 +596,10 @@ class SessionController extends ActionController
                     }
                     $total++;
                 }
-                fclose ($filecontent);
-                if ($bytes) $content .= "<br />That are $groesse_total bytes (".$this->formatBytes($groesse_total).").";
+                fclose($filecontent);
+                if ($bytes) {
+                    $content .= "<br />That are $groesse_total bytes (" . $this->formatBytes($groesse_total) . ').';
+                }
                 $content .= "<br />$success/$total files deleted.";
             } else {
                 $content .= 'Note: file not found!!!';
@@ -560,31 +625,39 @@ class SessionController extends ActionController
         $beuser_id = $GLOBALS['BE_USER']->user['uid'];
         $result = $this->sessionRepository->findByAction('images', $beuser_id);
         if ($result->count() == 0) {
-            $new = TRUE;
+            $new = true;
             $default = GeneralUtility::makeInstance(Session::class);
             $default->setAction('images');
             $default->setValue1(0);
             $default->setValue2(0);
         } else {
-            $new = FALSE;
+            $new = false;
             $default = $result[0];
         }
 
         if ($this->request->hasArgument('currentPage')) {
-            $currentPage = intval($this->request->getArgument('currentPage'));
-        } else $currentPage = 1;
+            $currentPage = (int)($this->request->getArgument('currentPage'));
+        } else {
+            $currentPage = 1;
+        }
         if ($this->request->hasArgument('img_without')) {
-            $img_without = intval($this->request->getArgument('img_without'));
+            $img_without = (int)($this->request->getArgument('img_without'));
             $default->setValue1($img_without);
-        } else $img_without = $default->getValue1();
+        } else {
+            $img_without = $default->getValue1();
+        }
         if ($this->request->hasArgument('img_other')) {
-            $img_other = intval($this->request->getArgument('img_other'));
+            $img_other = (int)($this->request->getArgument('img_other'));
             $default->setValue2($img_other);
-        } else $img_other = $default->getValue2();
+        } else {
+            $img_other = $default->getValue2();
+        }
         if ($this->request->hasArgument('my_page')) {
-            $my_page = intval($this->request->getArgument('my_page'));		// elements per page
+            $my_page = (int)($this->request->getArgument('my_page'));		// elements per page
             $default->setPageel($my_page);
-        } else $my_page = $default->getPageel();
+        } else {
+            $my_page = $default->getPageel();
+        }
         if (!$my_page) {
             if (isset($this->settings['pagebrowser']['itemsPerPage'])) {
                 $my_page = $this->settings['pagebrowser']['itemsPerPage'];
@@ -596,9 +669,11 @@ class SessionController extends ActionController
             $this->settings['pagebrowser']['itemsPerPage'] = $my_page;
         }
         if ($this->request->hasArgument('my_recursive')) {
-            $my_recursive = intval($this->request->getArgument('my_recursive'));		// recursive pid search
+            $my_recursive = (int)($this->request->getArgument('my_recursive'));		// recursive pid search
             $default->setPagestart($my_recursive);
-        } else $my_recursive = $default->getPagestart();
+        } else {
+            $my_recursive = $default->getPagestart();
+        }
 
         if ($img_without) {
             $finalArray = $this->sessionRepository->getImagesWithout($img_without, $img_other);
@@ -617,22 +692,23 @@ class SessionController extends ActionController
             $this->sessionRepository->update($default);
         }
 
-        $count=0;
+        $count = 0;
 
         if (($img_without == 1) && $this->request->hasArgument('replace_empty_alt')) {
             // alt-Tags setzen. In der sys_file_reference
             foreach ($finalArray as $key => $refArray) {
                 $uid = $refArray['ref_uid'];
                 $imgArray = $refArray['file'];
-                if ($refArray['ref_title'])
+                if ($refArray['ref_title']) {
                     $finalArray[$key]['ref_alt'] = $refArray['ref_title'];
-                else if ($imgArray['meta_title'])
+                } elseif ($imgArray['meta_title']) {
                     $finalArray[$key]['ref_alt'] = $imgArray['meta_title'];
-                else {
-                    if (strrpos((string) $imgArray['name'], '.') > 0)
-                        $finalArray[$key]['ref_alt'] = trim(str_replace('_', ' ', substr((string) $imgArray['name'], 0, strrpos((string) $imgArray['name'], '.'))));
-                    else
-                        $finalArray[$key]['ref_alt'] = trim(str_replace('_', ' ', (string) $imgArray['name']));
+                } else {
+                    if (strrpos((string)$imgArray['name'], '.') > 0) {
+                        $finalArray[$key]['ref_alt'] = trim(str_replace('_', ' ', substr((string)$imgArray['name'], 0, strrpos((string)$imgArray['name'], '.'))));
+                    } else {
+                        $finalArray[$key]['ref_alt'] = trim(str_replace('_', ' ', (string)$imgArray['name']));
+                    }
                 }
                 $success = $this->sessionRepository->setAltOrTitle($uid, $finalArray[$key]['ref_alt'], '');
                 if ($success) {
@@ -646,15 +722,16 @@ class SessionController extends ActionController
             foreach ($finalArray as $key => $refArray) {
                 $uid = $refArray['ref_uid'];
                 $imgArray = $refArray['file'];
-                if ($refArray['ref_alt'])
+                if ($refArray['ref_alt']) {
                     $finalArray[$key]['ref_title'] = $refArray['ref_alt'];
-                else if ($imgArray['meta_alt'])
+                } elseif ($imgArray['meta_alt']) {
                     $finalArray[$key]['ref_title'] = $imgArray['meta_alt'];
-                else {
-                    if (strrpos((string) $imgArray['name'], '.') > 0)
-                        $finalArray[$key]['ref_title'] = trim(str_replace('_', ' ', substr((string) $imgArray['name'], 0, strrpos((string) $imgArray['name'], '.'))));
-                    else
-                        $finalArray[$key]['ref_title'] = trim(str_replace('_', ' ', (string) $imgArray['name']));
+                } else {
+                    if (strrpos((string)$imgArray['name'], '.') > 0) {
+                        $finalArray[$key]['ref_title'] = trim(str_replace('_', ' ', substr((string)$imgArray['name'], 0, strrpos((string)$imgArray['name'], '.'))));
+                    } else {
+                        $finalArray[$key]['ref_title'] = trim(str_replace('_', ' ', (string)$imgArray['name']));
+                    }
                 }
                 $success = $this->sessionRepository->setAltOrTitle($uid, '', $finalArray[$key]['ref_title']);
                 if ($success) {
@@ -664,11 +741,13 @@ class SessionController extends ActionController
             }
             $finalArray = $this->sessionRepository->getImagesWithout($img_without, $img_other);
         }
-        if (count($finalArray)>0 && $my_recursive>0) {
+        if (count($finalArray) > 0 && $my_recursive > 0) {
             $finalArray = $this->sessionRepository->filterPagesRecursive($finalArray, $my_recursive);
         }
 
-        if (!$finalArray) $finalArray = [];
+        if (!$finalArray) {
+            $finalArray = [];
+        }
         $arrayPaginator = new ArrayPaginator($finalArray, $currentPage, $this->settings['pagebrowser']['itemsPerPage']);
         $pagination = new SimplePagination($arrayPaginator);
 
@@ -698,27 +777,33 @@ class SessionController extends ActionController
         $beuser_id = $GLOBALS['BE_USER']->user['uid'];
         $result = $this->sessionRepository->findByAction('missing', $beuser_id);
         if ($result->count() == 0) {
-            $new = TRUE;
+            $new = true;
             $default = GeneralUtility::makeInstance(Session::class);
             $default->setAction('missing');
             $default->setValue1(0);
             $default->setValue2(0);
         } else {
-            $new = FALSE;
+            $new = false;
             $default = $result[0];
         }
 
         if ($this->request->hasArgument('currentPage')) {
-            $currentPage = intval($this->request->getArgument('currentPage'));
-        } else $currentPage = 1;
+            $currentPage = (int)($this->request->getArgument('currentPage'));
+        } else {
+            $currentPage = 1;
+        }
         if ($this->request->hasArgument('img_other')) {
-            $img_other = intval($this->request->getArgument('img_other'));
+            $img_other = (int)($this->request->getArgument('img_other'));
             $default->setValue2($img_other);
-        } else $img_other = $default->getValue2();
+        } else {
+            $img_other = $default->getValue2();
+        }
         if ($this->request->hasArgument('my_page')) {
-            $my_page = intval($this->request->getArgument('my_page'));		// elements per page
+            $my_page = (int)($this->request->getArgument('my_page'));		// elements per page
             $default->setPageel($my_page);
-        } else $my_page = $default->getPageel();
+        } else {
+            $my_page = $default->getPageel();
+        }
         if (!$my_page) {
             if (isset($this->settings['pagebrowser']['itemsPerPage'])) {
                 $my_page = $this->settings['pagebrowser']['itemsPerPage'];
@@ -730,9 +815,11 @@ class SessionController extends ActionController
             $this->settings['pagebrowser']['itemsPerPage'] = $my_page;
         }
         if ($this->request->hasArgument('my_recursive')) {
-            $my_recursive = intval($this->request->getArgument('my_recursive'));		// recursive pid search
+            $my_recursive = (int)($this->request->getArgument('my_recursive'));		// recursive pid search
             $default->setPagestart($my_recursive);
-        } else $my_recursive = $default->getPagestart();
+        } else {
+            $my_recursive = $default->getPagestart();
+        }
 
         if ($this->request->hasArgument('delallimages')) {
             // alle nicht benutzen Bilder-Einträge löschen
@@ -744,7 +831,7 @@ class SessionController extends ActionController
                 }
             }
             foreach ($notUsedImages as $image) {
-                $uid = (int) $image['uid'];
+                $uid = (int)$image['uid'];
                 if ($uid) {
                     $this->sessionRepository->delMissingImage($uid);
                 }
@@ -753,10 +840,10 @@ class SessionController extends ActionController
         } elseif ($this->request->hasArgument('delimg') &&
             ($this->request->hasArgument('delthatimage1') || $this->request->hasArgument('delthatimage2'))) {
             // ein Bild-Eintrag löschen
-            $uid = (int) $this->request->getArgument('delimg');
+            $uid = (int)$this->request->getArgument('delimg');
             if ($uid) {
                 $this->sessionRepository->delMissingImage($uid);
-                $this->addFlashMessage('Image-entries with uid "'. $uid . '" deleted.');
+                $this->addFlashMessage('Image-entries with uid "' . $uid . '" deleted.');
             }
         }
 
@@ -780,11 +867,13 @@ class SessionController extends ActionController
             $this->sessionRepository->update($default);
         }
 
-        if (count($finalArray)>0 && $my_recursive>0) {
+        if (count($finalArray) > 0 && $my_recursive > 0) {
             $finalArray = $this->sessionRepository->filterPagesRecursive($finalArray, $my_recursive);
         }
 
-        if (!$finalArray) $finalArray = [];
+        if (!$finalArray) {
+            $finalArray = [];
+        }
         $arrayPaginator = new ArrayPaginator($finalArray, $currentPage, $this->settings['pagebrowser']['itemsPerPage']);
         $pagination = new SimplePagination($arrayPaginator);
 
@@ -813,39 +902,51 @@ class SessionController extends ActionController
         $beuser_id = $GLOBALS['BE_USER']->user['uid'];
         $result = $this->sessionRepository->findByAction('pagesearch', $beuser_id);
         if ($result->count() == 0) {
-            $new = TRUE;
+            $new = true;
             $default = GeneralUtility::makeInstance(Session::class);
             $default->setAction('pagesearch');
             $default->setValue1(0);
         } else {
-            $new = FALSE;
+            $new = false;
             $default = $result[0];
         }
 
         if ($this->request->hasArgument('currentPage')) {
-            $currentPage = intval($this->request->getArgument('currentPage'));
-        } else $currentPage = 1;
+            $currentPage = (int)($this->request->getArgument('currentPage'));
+        } else {
+            $currentPage = 1;
+        }
         if ($this->request->hasArgument('my_c')) {
-            $my_c = intval($this->request->getArgument('my_c'));
+            $my_c = (int)($this->request->getArgument('my_c'));
             $default->setValue1($my_c);
-        } else $my_c = $default->getValue1();
+        } else {
+            $my_c = $default->getValue1();
+        }
         if ($this->request->hasArgument('my_p')) {
-            $my_p = intval($this->request->getArgument('my_p'));
+            $my_p = (int)($this->request->getArgument('my_p'));
             $default->setValue2($my_p);
-        } else $my_p = $default->getValue2();
+        } else {
+            $my_p = $default->getValue2();
+        }
         if ($this->request->hasArgument('exttoo')) {
-            $exttoo = intval($this->request->getArgument('exttoo'));
+            $exttoo = (int)($this->request->getArgument('exttoo'));
             $default->setValue3($exttoo);
-        } else $exttoo = $default->getValue3();
+        } else {
+            $exttoo = $default->getValue3();
+        }
         if ($this->request->hasArgument('linksto')) {
             $linksto = $this->request->getArgument('linksto');
             $default->setValue4($linksto);
-        } else $linksto = $default->getValue4();
-        $linkto_uid = intval($linksto);
+        } else {
+            $linksto = $default->getValue4();
+        }
+        $linkto_uid = (int)$linksto;
         if ($this->request->hasArgument('my_page')) {
-            $my_page = intval($this->request->getArgument('my_page'));		// elements per page
+            $my_page = (int)($this->request->getArgument('my_page'));		// elements per page
             $default->setPageel($my_page);
-        } else $my_page = $default->getPageel();
+        } else {
+            $my_page = $default->getPageel();
+        }
         if (!$my_page) {
             if (isset($this->settings['pagebrowser']['itemsPerPage'])) {
                 $my_page = $this->settings['pagebrowser']['itemsPerPage'];
@@ -857,9 +958,11 @@ class SessionController extends ActionController
             $this->settings['pagebrowser']['itemsPerPage'] = $my_page;
         }
         if ($this->request->hasArgument('my_recursive')) {
-            $my_recursive = intval($this->request->getArgument('my_recursive'));		// recursive pid search
+            $my_recursive = (int)($this->request->getArgument('my_recursive'));		// recursive pid search
             $default->setPagestart($my_recursive);
-        } else $my_recursive = $default->getPagestart();
+        } else {
+            $my_recursive = $default->getPagestart();
+        }
 
         if ($new) {
             $user = $this->backendUserRepository->findByUid($beuser_id);
@@ -889,7 +992,9 @@ class SessionController extends ActionController
             }
         }
 
-        if (!$pages) $pages = [];
+        if (!$pages) {
+            $pages = [];
+        }
         $arrayPaginator = new ArrayPaginator($pages, $currentPage, $this->settings['pagebrowser']['itemsPerPage']);
         $pagination = new SimplePagination($arrayPaginator);
 
@@ -922,7 +1027,7 @@ class SessionController extends ActionController
         $beuser_id = $GLOBALS['BE_USER']->user['uid'];
         $result = $this->sessionRepository->findByAction('redirects', $beuser_id);
         if ($result->count() == 0) {
-            $new = TRUE;
+            $new = true;
             $default = GeneralUtility::makeInstance(Session::class);
             $default->setAction('redirects');
             $default->setValue1(0);
@@ -932,30 +1037,39 @@ class SessionController extends ActionController
             $default->setValue5('0');
             $default->setValue6('301');
         } else {
-            $new = FALSE;
+            $new = false;
             $default = $result[0];
         }
 
         if ($this->request->hasArgument('method')) {
-            $method = intval($this->request->getArgument('method'));
+            $method = (int)($this->request->getArgument('method'));
             $default->setValue1($method);
-        } else $method = $default->getValue1();
+        } else {
+            $method = $default->getValue1();
+        }
         if ($this->request->hasArgument('regex')) {
-            $regex = intval($this->request->getArgument('regex'));
+            $regex = (int)($this->request->getArgument('regex'));
             $default->setValue2($regex);
-        } else $regex = $default->getValue2();
+        } else {
+            $regex = $default->getValue2();
+        }
         if ($this->request->hasArgument('convert')) {
             $convert = $this->request->getArgument('convert');
             $default->setValue5($convert);
-        } else $convert = $default->getValue5();
+        } else {
+            $convert = $default->getValue5();
+        }
         if ($this->request->hasArgument('defaultstatuscode')) {
             $defaultstatuscode = $this->request->getArgument('defaultstatuscode');
             $default->setValue6($defaultstatuscode);
-        } else $defaultstatuscode = $default->getValue6();
+        } else {
+            $defaultstatuscode = $default->getValue6();
+        }
         if ($this->request->hasArgument('impfile')) {
             $impfile = $this->request->getArgument('impfile');
-        } else $impfile = '';
-
+        } else {
+            $impfile = '';
+        }
 
         if ($new) {
             $user = $this->backendUserRepository->findByUid($beuser_id);
@@ -968,25 +1082,29 @@ class SessionController extends ActionController
         }
 
         if ($impfile) {
-            $total=0;
-            $success=0;
+            $total = 0;
+            $success = 0;
             $regexp = ($regex) ? 1 : 0;
             $treffer = [];
             $rewrites = [];
             $filename = Environment::getPublicPath() . '/' . 'fileadmin/' . $impfile;
             if (is_file($filename) && file_exists($filename)) {
                 $content .= "This is the result of the file content:<br /><table>\n";
-                $filecontent = fopen($filename,"r");
+                $filecontent = fopen($filename, 'r');
                 while (!feof($filecontent)) {
                     $row = trim(fgets($filecontent));
-                    if ($convert == 'iso') $row = utf8_decode ( $row );
-                    if ($convert == 'utf8') $row = utf8_encode ( $row );
+                    if ($convert == 'iso') {
+                        $row = utf8_decode($row);
+                    }
+                    if ($convert == 'utf8') {
+                        $row = utf8_encode($row);
+                    }
                     $row = preg_replace('/[ ]{2,}|[\t]/', ' ', trim($row));	// tab und/oder mehrere Spaces zu einem Space umwandeln
-                    $rewrites = explode(' ', (string) $row);
+                    $rewrites = explode(' ', (string)$row);
                     preg_match('/R=(\d+)/', $rewrites[3], $treffer);
                     $statuscode = $treffer[1];
                     if (!$statuscode) {
-                        $statuscode = intval($defaultstatuscode);
+                        $statuscode = (int)$defaultstatuscode;
                     }
                     if ($rewrites[1] && (!str_starts_with($rewrites[1], '^/')) && (str_starts_with($rewrites[1], '^'))) {
                         if ($regexp) {
@@ -998,7 +1116,7 @@ class SessionController extends ActionController
                     if ($regexp) {
                         $rewrites[1] = '#' . $rewrites[1] . '#';        // TYPO3 will das so
                     }
-                    if ($rewrites[1] && $rewrites[2] && (strlen($rewrites[1])>2)) {
+                    if ($rewrites[1] && $rewrites[2] && (strlen($rewrites[1]) > 2)) {
                         if ($method) {
                             if ($this->sessionRepository->addRedirect($rewrites[1], $rewrites[2], $regexp, $statuscode, $beuser_id)) {
                                 $content .= '<tr><td>' . $rewrites[1] . '</td><td style="color:#00ff00;"> to </td><td>' . $rewrites[2] . '</td><td>' . $statuscode . "</td></tr>\n";
@@ -1015,7 +1133,7 @@ class SessionController extends ActionController
                     }
                     $total++;
                 }
-                fclose ($filecontent);
+                fclose($filecontent);
                 $content .= "</table><br />$success/$total lines ";
                 $content .= ($method) ? 'added.' : 'accepted.';
             } else {
@@ -1044,31 +1162,39 @@ class SessionController extends ActionController
         $beuser_id = $GLOBALS['BE_USER']->user['uid'];
         $result = $this->sessionRepository->findByAction('redirectscheck', $beuser_id);
         if ($result->count() == 0) {
-            $new = TRUE;
+            $new = true;
             $default = GeneralUtility::makeInstance(Session::class);
             $default->setAction('redirectscheck');
             $default->setValue1(0);
             $default->setValue2(0);
         } else {
-            $new = FALSE;
+            $new = false;
             $default = $result[0];
         }
 
         if ($this->request->hasArgument('currentPage')) {
-            $currentPage = intval($this->request->getArgument('currentPage'));
-        } else $currentPage = 1;
+            $currentPage = (int)($this->request->getArgument('currentPage'));
+        } else {
+            $currentPage = 1;
+        }
         if ($this->request->hasArgument('my_http')) {
-            $my_http = intval($this->request->getArgument('my_http'));
+            $my_http = (int)($this->request->getArgument('my_http'));
             $default->setValue1($my_http);
-        } else $my_http = $default->getValue1();
+        } else {
+            $my_http = $default->getValue1();
+        }
         if ($this->request->hasArgument('my_error')) {
-            $my_error = intval($this->request->getArgument('my_error'));
+            $my_error = (int)($this->request->getArgument('my_error'));
             $default->setValue2($my_error);
-        } else $my_error = $default->getValue2();
+        } else {
+            $my_error = $default->getValue2();
+        }
         if ($this->request->hasArgument('my_page')) {
-            $my_page = intval($this->request->getArgument('my_page'));		// elements per page
+            $my_page = (int)($this->request->getArgument('my_page'));		// elements per page
             $default->setPageel($my_page);
-        } else $my_page = $default->getPageel();
+        } else {
+            $my_page = $default->getPageel();
+        }
         if (!$my_page) {
             if (isset($this->settings['pagebrowser']['itemsPerPage'])) {
                 $my_page = $this->settings['pagebrowser']['itemsPerPage'];
@@ -1079,7 +1205,7 @@ class SessionController extends ActionController
         } else {
             $this->settings['pagebrowser']['itemsPerPage'] = $my_page;
         }
-        $limit_from = ($currentPage-1) * $my_page;
+        $limit_from = ($currentPage - 1) * $my_page;
         $limit_to = $currentPage * $my_page;
 
         if ($new) {
@@ -1095,7 +1221,7 @@ class SessionController extends ActionController
         if ($this->request->hasArgument('delete')) {
             $deleteUids = $this->request->getArgument('delete');
             if ($deleteUids) {
-                $i=0;
+                $i = 0;
                 foreach ($deleteUids as $uid) {
                     $this->sessionRepository->deleteRedirect($uid);
                     $i++;
@@ -1124,7 +1250,7 @@ class SessionController extends ActionController
             $target = $redirect['target'];
             // Wir überprüfen den Status nur für die aktuelle Seite!
             if (($i >= $limit_from) && ($i < $limit_to)) {
-                if ((str_starts_with((string) $target, '/')) && ($my_error != 1)) {
+                if ((str_starts_with((string)$target, '/')) && ($my_error != 1)) {
                     if ($host == '*') {
                         $checkHosts = $hostsArray;
                     } else {
@@ -1134,17 +1260,17 @@ class SessionController extends ActionController
                     foreach ($checkHosts as $checkHost) {
                         $headers = @get_headers($checkHost . $target);
                         if (is_array($headers) && isset($headers[0])) {
-                            if (strpos((string) $headers[0], '200')) {
+                            if (strpos((string)$headers[0], '200')) {
                                 $status = 'OK';
                                 break;
                             } else {
-                                $code = intval(substr((string) $headers[0], 9, 3));
+                                $code = (int)(substr((string)$headers[0], 9, 3));
                                 if ($code) {
                                     $status = $code; //$headers[0];
                                 } else {
                                     $status = 'none';
                                 }
-                                if (($code >= $my_error) && ($code < ($my_error+100))) {
+                                if (($code >= $my_error) && ($code < ($my_error + 100))) {
                                     $errorFound = true;
                                 }
                             }
@@ -1154,8 +1280,8 @@ class SessionController extends ActionController
                         $errorCount++;
                         $match = true;
                     }
-                } else if ((str_starts_with((string) $target, 't3:')) && ($my_error < 2)) {
-                    $parts = explode('=', (string) $target);
+                } elseif ((str_starts_with((string)$target, 't3:')) && ($my_error < 2)) {
+                    $parts = explode('=', (string)$target);
                     [$pre, $rowid] = $parts;
                     $rowid = (int)$rowid;
                     $parts = explode('?', $pre);
@@ -1169,8 +1295,8 @@ class SessionController extends ActionController
                             $status = 'target disabled or deleted!';
                             $errorCount++;
                             $match = true;
-                        } else if (is_int($row['uid'])) {
-                            if (isset($row['doktype']) && ($row['doktype']==254 || $row['doktype']==255 || $row['doktype']==198 || $row['doktype']==199)) {
+                        } elseif (is_int($row['uid'])) {
+                            if (isset($row['doktype']) && ($row['doktype'] == 254 || $row['doktype'] == 255 || $row['doktype'] == 198 || $row['doktype'] == 199)) {
                                 $status = 'doktype=' . $row['doktype'] . ' !';
                             } else {
                                 $status = 'OK';
@@ -1179,19 +1305,19 @@ class SessionController extends ActionController
                     } else {
                         $status = 'unknown table ' . $table;
                     }
-                } else if ((str_starts_with((string) $target, 'http')) && ($my_error != 1)) {
+                } elseif ((str_starts_with((string)$target, 'http')) && ($my_error != 1)) {
                     $headers = @get_headers($target);
                     if (is_array($headers) && isset($headers[0])) {
-                        if (strpos((string) $headers[0], '200')) {
+                        if (strpos((string)$headers[0], '200')) {
                             $status = 'OK';
                         } else {
-                            $code = intval(substr((string) $headers[0], 9, 3));
+                            $code = (int)(substr((string)$headers[0], 9, 3));
                             if ($code) {
                                 $status = $code; //$headers[0];
                             } else {
                                 $status = 'none';
                             }
-                            if (($code >= $my_error) && ($code < ($my_error+100))) {
+                            if (($code >= $my_error) && ($code < ($my_error + 100))) {
                                 $errorCount++;
                                 $match = true;
                             }
@@ -1213,7 +1339,9 @@ class SessionController extends ActionController
             }
         }
 
-        if (!$redirectsArray) $redirectsArray = [];
+        if (!$redirectsArray) {
+            $redirectsArray = [];
+        }
         $arrayPaginator = new ArrayPaginator($redirectsArray, $currentPage, $this->settings['pagebrowser']['itemsPerPage']);
         $pagination = new SimplePagination($arrayPaginator);
 
@@ -1232,22 +1360,19 @@ class SessionController extends ActionController
         return $this->defaultRendering();
     }
 
-
-
-
     /**
      * Formats bytes.
      *
-     * @param integer $size
-     * @param integer $precision
+     * @param int $size
+     * @param int $precision
      * @return string
      */
-    function formatBytes($size, $precision = 2)
+    public function formatBytes($size, $precision = 2)
     {
         $base = log($size) / log(1024);
         $suffixes = ['', 'k', 'M', 'G', 'T'];
 
-        return round(1024 ** ($base - floor($base)), $precision) .' '. $suffixes[floor($base)] .'B';
+        return round(1024 ** ($base - floor($base)), $precision) . ' ' . $suffixes[floor($base)] . 'B';
     }
 
     /**
@@ -1257,14 +1382,14 @@ class SessionController extends ActionController
      * @param int $http
      * @return string
      */
-    function formatHost($host, $http)
+    public function formatHost($host, $http)
     {
         if ((strlen($host) > 2) && (!str_starts_with($host, 'http'))) {
             $pre = ($http) ? 'http://' : 'https://';
             $host = $pre . $host;
         }
         if (str_ends_with($host, '/')) {
-            $host = substr($host,0,-1);
+            $host = substr($host, 0, -1);
         }
         return $host;
     }
@@ -1290,10 +1415,10 @@ class SessionController extends ActionController
             $actionMenu->addMenuItem(
                 $actionMenu->makeMenuItem()
                     ->setTitle($languageService->sL(
-                        'LLL:EXT:backendtools/Resources/Private/Language/locallang_mod1.xlf:module.' . $action
+                        'LLL:EXT:backendtools/Resources/Private/Language/locallang_mod1.xlf:module.' . $action,
                     ))
                     ->setHref($this->getModuleUri($action))
-                    ->setActive($currentAction === $action)
+                    ->setActive($currentAction === $action),
             );
         }
         $this->moduleTemplate->getDocHeaderComponent()->getMenuRegistry()->addMenu($actionMenu);
@@ -1307,6 +1432,6 @@ class SessionController extends ActionController
         if ($action !== null) {
             $parameters['action'] = $action;
         }
-        return $this->uriBuilder->uriFor($action,null, 'Session', 'mod1');
+        return $this->uriBuilder->uriFor($action, null, 'Session', 'mod1');
     }
 }

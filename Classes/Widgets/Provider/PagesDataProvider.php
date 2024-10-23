@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Fixpunkt\Backendtools\Widgets\Provider;
 
-use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Dashboard\WidgetApi;
@@ -12,7 +11,7 @@ use TYPO3\CMS\Dashboard\Widgets\ChartDataProviderInterface;
 
 class PagesDataProvider implements ChartDataProviderInterface
 {
-
+    private array $options = [];
     /**
      * @inheritDoc
      */
@@ -28,7 +27,7 @@ class PagesDataProvider implements ChartDataProviderInterface
                 'Enabled',
                 'Hidden',
                 'Deleted',
-                'Hidden in menu'
+                'Hidden in menu',
             ],
             'datasets' => [
                 [
@@ -59,7 +58,7 @@ class PagesDataProvider implements ChartDataProviderInterface
             ->count('*')
             ->from('pages')
             ->where(
-                $expression
+                $expression,
             )
             ->executeQuery()
             ->fetchOne();

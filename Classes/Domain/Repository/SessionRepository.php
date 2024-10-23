@@ -1,13 +1,14 @@
 <?php
+
 namespace Fixpunkt\Backendtools\Domain\Repository;
 
-use TYPO3\CMS\Extbase\Persistence\Repository;
-use TYPO3\CMS\Core\Utility\RootlineUtility;
+use TYPO3\CMS\Core\Database\Connection;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Database\Connection;
+use TYPO3\CMS\Core\Utility\RootlineUtility;
+use TYPO3\CMS\Extbase\Persistence\Repository;
 
 /***************************************************************
  *  Copyright notice
@@ -36,9 +37,7 @@ use TYPO3\CMS\Core\Database\Connection;
 /**
  * Session Repository
  *
- * @package backendtools
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
- *
  */
 class SessionRepository extends Repository
 {
@@ -47,7 +46,7 @@ class SessionRepository extends Repository
      *
      * @var SiteFinder
      */
-    protected $siteFinder = null;
+    protected $siteFinder;
 
     /**
      * findByAction ersetzen, wegen user-id-Abfrage
@@ -60,11 +59,10 @@ class SessionRepository extends Repository
         $query = $this->createQuery();
         $query->matching($query->logicalAnd(
             $query->equals('action', $action),
-            $query->equals('beuser', $beuser)
+            $query->equals('beuser', $beuser),
         ));
         return $query->execute();
     }
-
 
     /**
      * Get list of all used CTypes and list_types
@@ -74,12 +72,12 @@ class SessionRepository extends Repository
     public function getAllTypes()
     {
         $types = [];
-        $types['0#0'] = "Select CType/list_type ...";
+        $types['0#0'] = 'Select CType/list_type ...';
         $exclude_ctypes = [
-            "html", "text", "image", "textpic", "textmedia", "bullets", "menu",
-            "search", "mailform", "indexed_search", "login", "header", "rte",
-            "table", "splash", "uploads", "multimedia", "media", "script",
-            "shortcut", "div"
+            'html', 'text', 'image', 'textpic', 'textmedia', 'bullets', 'menu',
+            'search', 'mailform', 'indexed_search', 'login', 'header', 'rte',
+            'table', 'splash', 'uploads', 'multimedia', 'media', 'script',
+            'shortcut', 'div',
         ];
         // Query aufbauen
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('tt_content')->createQueryBuilder();
@@ -88,21 +86,20 @@ class SessionRepository extends Repository
             ->removeAll();
         $res = $queryBuilder ->select(...[
             'CType',
-            'list_type'
-        ]) -> from ('tt_content');
+            'list_type',
+        ]) -> from('tt_content');
         $res -> andWhere(...[
-            $queryBuilder->expr()->notIn('CType', $queryBuilder->createNamedParameter($exclude_ctypes, Connection::PARAM_STR_ARRAY))
+            $queryBuilder->expr()->notIn('CType', $queryBuilder->createNamedParameter($exclude_ctypes, Connection::PARAM_STR_ARRAY)),
         ]);
         $res -> orderBy('list_type', 'ASC') -> addOrderBy('CType');
         //$res -> groupBy('CType');
         //print_r($res->getSQL());
         $result = $res-> executeQuery()->fetchAllAssociative();
 
-        foreach($result as $row) {
+        foreach ($result as $row) {
             if ($row['list_type']) {
                 $types['1#' . $row['list_type']] = $row['list_type'];
-            }
-            elseif ($row['CType'] && $row['CType']!='list') {
+            } elseif ($row['CType'] && $row['CType'] != 'list') {
                 $types['2#' . $row['CType']] = $row['CType'];
             }
         }
@@ -129,13 +126,13 @@ class SessionRepository extends Repository
         //$PageRepository = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
         $this->siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
         $exclude_ctypes = [
-            "html", "list", "text", "image", "textpic", "textmedia", "bullets", "menu",
-            "search", "mailform", "indexed_search", "login", "header", "rte",
-            "table", "splash", "uploads", "multimedia", "media", "script",
-            "shortcut", "div"
+            'html', 'list', 'text', 'image', 'textpic', 'textmedia', 'bullets', 'menu',
+            'search', 'mailform', 'indexed_search', 'login', 'header', 'rte',
+            'table', 'splash', 'uploads', 'multimedia', 'media', 'script',
+            'shortcut', 'div',
         ];
         if ($my_exclude) {
-            $exclude_ctypes = array_merge ($exclude_ctypes, explode(' ', $my_exclude));
+            $exclude_ctypes = array_merge($exclude_ctypes, explode(' ', $my_exclude));
         }
         $more = ($gridelements_loaded) ? 'tt_content.tx_gridelements_backend_layout' : 'tt_content.t3_origuid';
 
@@ -156,13 +153,13 @@ class SessionRepository extends Repository
             'pages.title',
             'pages.slug',
             'pages.deleted AS pdeleted',
-            'pages.hidden AS phidden'
-        ]) -> from ('tt_content')
+            'pages.hidden AS phidden',
+        ]) -> from('tt_content')
             -> join(
                 'tt_content',
                 'pages',
                 'pages',
-                $queryBuilder->expr()->eq('tt_content.pid', $queryBuilder->quoteIdentifier('pages.uid'))
+                $queryBuilder->expr()->eq('tt_content.pid', $queryBuilder->quoteIdentifier('pages.uid')),
             );
 
         // Restricions
@@ -170,20 +167,20 @@ class SessionRepository extends Repository
             ->getRestrictions()
             ->removeAll();
 
-        if ($my_c==1) {
+        if ($my_c == 1) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('tt_content.deleted', $queryBuilder->createNamedParameter(1)),
-                    $queryBuilder->expr()->eq('tt_content.hidden', $queryBuilder->createNamedParameter(1))
-                )
+                    $queryBuilder->expr()->eq('tt_content.hidden', $queryBuilder->createNamedParameter(1)),
+                ),
             ]);
-        } elseif ($my_c==2) {
+        } elseif ($my_c == 2) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->eq('tt_content.deleted', $queryBuilder->createNamedParameter(0)),
-                $queryBuilder->expr()->eq('tt_content.hidden', $queryBuilder->createNamedParameter(0))
+                $queryBuilder->expr()->eq('tt_content.hidden', $queryBuilder->createNamedParameter(0)),
             ]);
         }
-        if ($my_p==1) {
+        if ($my_p == 1) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(1)),
@@ -191,19 +188,19 @@ class SessionRepository extends Repository
                     $queryBuilder->expr()->gt('pages.starttime', $queryBuilder->createNamedParameter(time())),
                     $queryBuilder->expr()->and(
                         $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(0)),
-                        $queryBuilder->expr()->lte('pages.endtime', $queryBuilder->createNamedParameter(time()))
-                    )
-                )
+                        $queryBuilder->expr()->lte('pages.endtime', $queryBuilder->createNamedParameter(time())),
+                    ),
+                ),
             ]);
-        } elseif ($my_p==2) {
+        } elseif ($my_p == 2) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(0)),
                 $queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(0)),
                 $queryBuilder->expr()->lte('pages.starttime', $queryBuilder->createNamedParameter(time())),
                 $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('pages.endtime', $queryBuilder->createNamedParameter(0)),
-                    $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(time()))
-                )
+                    $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(time())),
+                ),
             ]);
         }
 
@@ -211,20 +208,22 @@ class SessionRepository extends Repository
         if ($my_value) {
             if ($my_type == 2) {
                 $res -> andWhere(
-                    $queryBuilder->expr()->like('tt_content.CType', $queryBuilder->createNamedParameter($queryBuilder->escapeLikeWildcards($my_value) . "%"))
+                    $queryBuilder->expr()->like('tt_content.CType', $queryBuilder->createNamedParameter($queryBuilder->escapeLikeWildcards($my_value) . '%')),
                 );
             } elseif ($my_type == 1) {
                 $res -> andWhere(
-                    $queryBuilder->expr()->like('tt_content.list_type', $queryBuilder->createNamedParameter($queryBuilder->escapeLikeWildcards($my_value) . "%"))
+                    $queryBuilder->expr()->like('tt_content.list_type', $queryBuilder->createNamedParameter($queryBuilder->escapeLikeWildcards($my_value) . '%')),
                 );
             }
         } else {
             $res -> andWhere(...[
-                $queryBuilder->expr()->or($queryBuilder->expr()->and(
-                    $queryBuilder->expr()->neq('tt_content.list_type', $queryBuilder->createNamedParameter('')),
-                    $queryBuilder->expr()->neq('tt_content.list_type', $queryBuilder->createNamedParameter('0'))
+                $queryBuilder->expr()->or(
+                    $queryBuilder->expr()->and(
+                        $queryBuilder->expr()->neq('tt_content.list_type', $queryBuilder->createNamedParameter('')),
+                        $queryBuilder->expr()->neq('tt_content.list_type', $queryBuilder->createNamedParameter('0')),
+                    ),
+                    $queryBuilder->expr()->notIn('tt_content.CType', $queryBuilder->createNamedParameter($exclude_ctypes, Connection::PARAM_STR_ARRAY)),
                 ),
-                $queryBuilder->expr()->notIn('tt_content.CType', $queryBuilder->createNamedParameter($exclude_ctypes, Connection::PARAM_STR_ARRAY)))
             ]);
         }
 
@@ -233,13 +232,13 @@ class SessionRepository extends Repository
                 // wir suchen auch in tx_gridelements_backend_layout
                 $res -> andWhere(...[
                     $queryBuilder->expr()->or(
-                        $queryBuilder->expr()->like('tt_content.pi_flexform', $queryBuilder->createNamedParameter("%" . $queryBuilder->escapeLikeWildcards($my_flexform) . "%")),
-                        $queryBuilder->expr()->like('tt_content.tx_gridelements_backend_layout', $queryBuilder->createNamedParameter($queryBuilder->escapeLikeWildcards($my_flexform)))
-                    )
+                        $queryBuilder->expr()->like('tt_content.pi_flexform', $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($my_flexform) . '%')),
+                        $queryBuilder->expr()->like('tt_content.tx_gridelements_backend_layout', $queryBuilder->createNamedParameter($queryBuilder->escapeLikeWildcards($my_flexform))),
+                    ),
                 ]);
             } else {
                 $res->andWhere(
-                    $queryBuilder->expr()->like('tt_content.pi_flexform', $queryBuilder->createNamedParameter("%" . $queryBuilder->escapeLikeWildcards($my_flexform) . "%"))
+                    $queryBuilder->expr()->like('tt_content.pi_flexform', $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($my_flexform) . '%')),
                 );
             }
         }
@@ -264,22 +263,22 @@ class SessionRepository extends Repository
         $result = $res-> executeQuery()->fetchAllAssociative();
 
         //print_r($queryBuilder->getParameters());
-        foreach($result as $row) {
+        foreach ($result as $row) {
             $subject = $row['pi_flexform'];
             if ($subject) {
                 $pattern = '/<field index="switchableControllerActions">([\n|\r|\t| ]*)<value index="vDEF">(.*)</';
                 $matches = [];
-                preg_match($pattern, (string) $subject, $matches);
+                preg_match($pattern, (string)$subject, $matches);
                 if (isset($matches[2])) {
                     $row['actions'] = str_replace('###', '&gt;', str_replace(';', ', ', str_replace('&gt;', '###', $matches[2])));
                 } else {
                     $pattern = '/<field index="what_to_display">([\n|\r|\t| ]*)<value index="vDEF">(.*)</';
                     $matches = [];
-                    preg_match($pattern, (string) $subject, $matches);
+                    preg_match($pattern, (string)$subject, $matches);
                     if (isset($matches[2])) {
                         $row['actions'] = $matches[2];
                     } elseif ($row['CType'] == 'wst3bootstrap_fluidrow') {
-                        $sections = substr_count((string) $subject,"<section index");
+                        $sections = substr_count((string)$subject, '<section index');
                         if ($sections > 0) {
                             $row['actions'] = $sections . ' cols';
                         }
@@ -299,25 +298,25 @@ class SessionRepository extends Repository
             } else {
                 $row['pl10n'] = $row['pid'];
             }
-            if ( $row["pdeleted"] ) {
+            if ($row['pdeleted']) {
                 $row['domain'] = '';
             } else {
                 $row['domain'] = $this->getDomain($row['pid'], $row['sys_language_uid']);
             }
-            $row['csvheader'] = str_replace('"', '\'', (string) $row['header']);
-            $row['csvtitle'] = str_replace('"', '\'', (string) $row['title']);
+            $row['csvheader'] = str_replace('"', '\'', (string)$row['header']);
+            $row['csvtitle'] = str_replace('"', '\'', (string)$row['title']);
             if (isset($row['tx_gridelements_backend_layout'])) {
                 $row['misc'] = $row['tx_gridelements_backend_layout'];
-                if ($row['misc']=='2cols' || $row['misc']=='3cols' || $row['misc']=='4cols' || $row['misc']=='6cols') {
+                if ($row['misc'] == '2cols' || $row['misc'] == '3cols' || $row['misc'] == '4cols' || $row['misc'] == '6cols') {
                     $pattern = '/<field index="xsCol1">([\n|\r|\t| ]*)<value index="vDEF">(.*)</';
                     $matches = [];
-                    preg_match($pattern, (string) $subject, $matches);
+                    preg_match($pattern, (string)$subject, $matches);
                     if (isset($matches[2])) {
                         $row['misc'] .= ' # xs=' . $matches[2];
                     } else {
                         $pattern = '/<field index="smCol1">([\n|\r|\t| ]*)<value index="vDEF">(.*)</';
                         $matches = [];
-                        preg_match($pattern, (string) $subject, $matches);
+                        preg_match($pattern, (string)$subject, $matches);
                         if (isset($matches[2])) {
                             $row['misc'] .= ' # SM=' . $matches[2];
                         }
@@ -337,7 +336,8 @@ class SessionRepository extends Repository
      * @param	int		$tstamp		    date as timestamp
      * @return array
      */
-    public function getLatestContentElements($my_c, $my_p, $tstamp) {
+    public function getLatestContentElements($my_c, $my_p, $tstamp)
+    {
         $pages = [];
         $this->siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
         // Query aufbauen
@@ -357,33 +357,33 @@ class SessionRepository extends Repository
             'pages.slug',
             'pages.deleted AS pdeleted',
             'pages.hidden AS phidden',
-            'pages.tstamp AS ptstamp'
-        ]) -> from ('tt_content')
+            'pages.tstamp AS ptstamp',
+        ]) -> from('tt_content')
             -> join(
                 'tt_content',
                 'pages',
                 'pages',
-                $queryBuilder->expr()->eq('tt_content.pid', $queryBuilder->quoteIdentifier('pages.uid'))
+                $queryBuilder->expr()->eq('tt_content.pid', $queryBuilder->quoteIdentifier('pages.uid')),
             )
             ->where($queryBuilder->expr()->gt('tt_content.tstamp', $queryBuilder->createNamedParameter($tstamp)));
         // Restricions
         $queryBuilder
             ->getRestrictions()
             ->removeAll();
-        if ($my_c==1) {
+        if ($my_c == 1) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('tt_content.deleted', $queryBuilder->createNamedParameter(1)),
-                    $queryBuilder->expr()->eq('tt_content.hidden', $queryBuilder->createNamedParameter(1))
-                )
+                    $queryBuilder->expr()->eq('tt_content.hidden', $queryBuilder->createNamedParameter(1)),
+                ),
             ]);
-        } else if ($my_c==2) {
+        } elseif ($my_c == 2) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->eq('tt_content.deleted', $queryBuilder->createNamedParameter(0)),
-                $queryBuilder->expr()->eq('tt_content.hidden', $queryBuilder->createNamedParameter(0))
+                $queryBuilder->expr()->eq('tt_content.hidden', $queryBuilder->createNamedParameter(0)),
             ]);
         }
-        if ($my_p==1) {
+        if ($my_p == 1) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(1)),
@@ -391,19 +391,19 @@ class SessionRepository extends Repository
                     $queryBuilder->expr()->gt('pages.starttime', $queryBuilder->createNamedParameter(time())),
                     $queryBuilder->expr()->and(
                         $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(0)),
-                        $queryBuilder->expr()->lte('pages.endtime', $queryBuilder->createNamedParameter(time()))
-                    )
-                )
+                        $queryBuilder->expr()->lte('pages.endtime', $queryBuilder->createNamedParameter(time())),
+                    ),
+                ),
             ]);
-        } else if ($my_p==2) {
+        } elseif ($my_p == 2) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(0)),
                 $queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(0)),
                 $queryBuilder->expr()->lte('pages.starttime', $queryBuilder->createNamedParameter(time())),
                 $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('pages.endtime', $queryBuilder->createNamedParameter(0)),
-                    $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(time()))
-                )
+                    $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(time())),
+                ),
             ]);
         }
         $res -> orderBy('tt_content.tstamp', 'DESC');
@@ -411,7 +411,7 @@ class SessionRepository extends Repository
         //print_r($res->getSQL());
         $result = $res-> executeQuery()->fetchAllAssociative();
 
-        foreach($result as $row) {
+        foreach ($result as $row) {
             if ($row['sys_language_uid'] > 0) {
                 // wir brauchen noch die Übersetzungen aus pages!
                 $language_result = $this->getL10n($row['pid'], $row['sys_language_uid']);
@@ -425,13 +425,13 @@ class SessionRepository extends Repository
             } else {
                 $row['pl10n'] = $row['pid'];
             }
-            if ( $row["pdeleted"] ) {
+            if ($row['pdeleted']) {
                 $row['domain'] = '';
             } else {
                 $row['domain'] = $this->getDomain($row['pid'], $row['sys_language_uid']);
             }
-            $row['csvheader'] = str_replace('"', '\'', (string) $row['header']);
-            $row['csvtitle'] = str_replace('"', '\'', (string) $row['title']);
+            $row['csvheader'] = str_replace('"', '\'', (string)$row['header']);
+            $row['csvtitle'] = str_replace('"', '\'', (string)$row['title']);
             $pages[] = $row;
         }
         return $pages;
@@ -444,7 +444,8 @@ class SessionRepository extends Repository
      * @param	int		$my_p			pages visibility
      * @return array
      */
-    public function getLayouts($my_value, $my_p) {
+    public function getLayouts($my_value, $my_p)
+    {
         $pages = [];
         $this->siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
         // Query aufbauen
@@ -460,38 +461,38 @@ class SessionRepository extends Repository
             'slug',
             'layout',
             'backend_layout',
-            'backend_layout_next_level'
-        ]) -> from ('pages');
+            'backend_layout_next_level',
+        ]) -> from('pages');
         if ($my_value == 0) {
             $res->where(
-                $queryBuilder->expr()->gt('layout', $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT))
+                $queryBuilder->expr()->gt('layout', $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)),
             );
         } else {
             $res->where(
                 $queryBuilder->expr()->neq(
                     'backend_layout',
-                    $queryBuilder->createNamedParameter('')
+                    $queryBuilder->createNamedParameter(''),
                 ),
                 $queryBuilder->expr()->neq(
                     'backend_layout',
-                    $queryBuilder->createNamedParameter('0')
-                )
+                    $queryBuilder->createNamedParameter('0'),
+                ),
             )
             ->orWhere(
                 $queryBuilder->expr()->and($queryBuilder->expr()->neq(
                     'backend_layout_next_level',
-                    $queryBuilder->createNamedParameter('')
+                    $queryBuilder->createNamedParameter(''),
                 ), $queryBuilder->expr()->neq(
                     'backend_layout_next_level',
-                    $queryBuilder->createNamedParameter('0')
-                ))
+                    $queryBuilder->createNamedParameter('0'),
+                )),
             );
         }
         // Restricions
         $queryBuilder
             ->getRestrictions()
             ->removeAll();
-        if ($my_p==1) {
+        if ($my_p == 1) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(1)),
@@ -499,25 +500,25 @@ class SessionRepository extends Repository
                     $queryBuilder->expr()->gt('pages.starttime', $queryBuilder->createNamedParameter(time())),
                     $queryBuilder->expr()->and(
                         $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(0)),
-                        $queryBuilder->expr()->lte('pages.endtime', $queryBuilder->createNamedParameter(time()))
-                    )
-                )
+                        $queryBuilder->expr()->lte('pages.endtime', $queryBuilder->createNamedParameter(time())),
+                    ),
+                ),
             ]);
-        } else if ($my_p==2) {
+        } elseif ($my_p == 2) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(0)),
                 $queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(0)),
                 $queryBuilder->expr()->lte('pages.starttime', $queryBuilder->createNamedParameter(time())),
                 $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('pages.endtime', $queryBuilder->createNamedParameter(0)),
-                    $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(time()))
-                )
+                    $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(time())),
+                ),
             ]);
         }
         $res -> orderBy('uid', 'ASC');
         $result = $res-> executeQuery()->fetchAllAssociative();
 
-        foreach($result as $row) {
+        foreach ($result as $row) {
             if ($row['sys_language_uid'] > 0) {
                 $row['pl10n'] = $row['uid'];
                 $row['uid'] = $row['l10n_parent'];
@@ -526,13 +527,13 @@ class SessionRepository extends Repository
             }
             $row['pid'] = $row['uid'];
             $row['uid'] = 0;
-            if ( $row["pdeleted"] ) {
+            if ($row['pdeleted']) {
                 $row['domain'] = '';
             } else {
                 $row['domain'] = $this->getDomain($row['pid'], $row['sys_language_uid']);
             }
             $row['csvheader'] = '';
-            $row['csvtitle'] = str_replace('"', '\'', (string) $row['title']);
+            $row['csvtitle'] = str_replace('"', '\'', (string)$row['title']);
             $pages[] = $row;
         }
         return $pages;
@@ -545,7 +546,8 @@ class SessionRepository extends Repository
      * @param	int		$tstamp		    date as timestamp
      * @return array
      */
-    public function getLatestPages($my_p, $tstamp) {
+    public function getLatestPages($my_p, $tstamp)
+    {
         $pages = [];
         $this->siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
         // Query aufbauen
@@ -558,14 +560,14 @@ class SessionRepository extends Repository
             'sys_language_uid',
             'deleted AS pdeleted',
             'hidden AS phidden',
-            'tstamp AS ptstamp'
-        ]) -> from ('pages')
+            'tstamp AS ptstamp',
+        ]) -> from('pages')
             ->where($queryBuilder->expr()->gt('tstamp', $queryBuilder->createNamedParameter($tstamp)));
         // Restricions
         $queryBuilder
             ->getRestrictions()
             ->removeAll();
-        if ($my_p==1) {
+        if ($my_p == 1) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(1)),
@@ -573,19 +575,19 @@ class SessionRepository extends Repository
                     $queryBuilder->expr()->gt('pages.starttime', $queryBuilder->createNamedParameter(time())),
                     $queryBuilder->expr()->and(
                         $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(0)),
-                        $queryBuilder->expr()->lte('pages.endtime', $queryBuilder->createNamedParameter(time()))
-                    )
-                )
+                        $queryBuilder->expr()->lte('pages.endtime', $queryBuilder->createNamedParameter(time())),
+                    ),
+                ),
             ]);
-        } else if ($my_p==2) {
+        } elseif ($my_p == 2) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(0)),
                 $queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(0)),
                 $queryBuilder->expr()->lte('pages.starttime', $queryBuilder->createNamedParameter(time())),
                 $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('pages.endtime', $queryBuilder->createNamedParameter(0)),
-                    $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(time()))
-                )
+                    $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(time())),
+                ),
             ]);
         }
         $res -> orderBy('tstamp', 'DESC');
@@ -593,7 +595,7 @@ class SessionRepository extends Repository
         //print_r($res->getSQL());
         $result = $res-> executeQuery()->fetchAllAssociative();
 
-        foreach($result as $row) {
+        foreach ($result as $row) {
             if ($row['sys_language_uid'] > 0) {
                 $row['pl10n'] = $row['uid'];
                 $row['uid'] = $row['l10n_parent'];
@@ -602,13 +604,13 @@ class SessionRepository extends Repository
             }
             $row['pid'] = $row['uid'];
             $row['uid'] = 0;
-            if ( $row["pdeleted"] ) {
+            if ($row['pdeleted']) {
                 $row['domain'] = '';
             } else {
                 $row['domain'] = $this->getDomain($row['pid'], $row['sys_language_uid']);
             }
             $row['csvheader'] = '';
-            $row['csvtitle'] = str_replace('"', '\'', (string) $row['title']);
+            $row['csvtitle'] = str_replace('"', '\'', (string)$row['title']);
             $pages[] = $row;
         }
         return $pages;
@@ -617,9 +619,9 @@ class SessionRepository extends Repository
     /**
      * Finde Elemente mit Links zu einer gesuchten Seite
      *
-     * @param   integer	$my_c: content hidden?
-     * @param	integer	$my_p: page hidden?
-     * @param	integer	$linkto_uid: gesuchte uid
+     * @param   int	$my_c: content hidden?
+     * @param	int	$my_p: page hidden?
+     * @param	int	$linkto_uid: gesuchte uid
      *
      * @return  array     Content-Elemente
      */
@@ -630,24 +632,24 @@ class SessionRepository extends Repository
         $this->siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
 
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('sys_file_reference')->createQueryBuilder();
-        $res = $queryBuilder ->select('uid_foreign') -> from ('sys_file_reference');
+        $res = $queryBuilder ->select('uid_foreign') -> from('sys_file_reference');
         $queryBuilder
             ->getRestrictions()
             ->removeAll();
         $res->where(
-            $queryBuilder->expr()->eq('tablenames', $queryBuilder->createNamedParameter('tt_content'))
+            $queryBuilder->expr()->eq('tablenames', $queryBuilder->createNamedParameter('tt_content')),
         );
         $res -> andWhere(...[
             $queryBuilder->expr()->or(
-                $queryBuilder->expr()->eq('link', $queryBuilder->createNamedParameter("t3://page?uid=" . $linkto_uid)),
-                $queryBuilder->expr()->like('link', $queryBuilder->createNamedParameter("t3://page?uid=" . $linkto_uid . " %"))
-            )
+                $queryBuilder->expr()->eq('link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid)),
+                $queryBuilder->expr()->like('link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid . ' %')),
+            ),
         ]);
         //print_r($res->getSQL());
         $result = $res -> executeQuery()->fetchAllAssociative();
         //print_r($queryBuilder->getParameters());
 
-        foreach($result as $row) {
+        foreach ($result as $row) {
             $referenceArray[] = $row['uid_foreign'];
         }
         //var_dump($referenceArray);
@@ -665,13 +667,13 @@ class SessionRepository extends Repository
             'pages.title',
             'pages.slug',
             'pages.deleted AS pdeleted',
-            'pages.hidden AS phidden'
-        ]) -> from ('tt_content')
+            'pages.hidden AS phidden',
+        ]) -> from('tt_content')
             -> join(
                 'tt_content',
                 'pages',
                 'pages',
-                $queryBuilder->expr()->eq('tt_content.pid', $queryBuilder->quoteIdentifier('pages.uid'))
+                $queryBuilder->expr()->eq('tt_content.pid', $queryBuilder->quoteIdentifier('pages.uid')),
             );
 
         // Restricions
@@ -679,20 +681,20 @@ class SessionRepository extends Repository
             ->getRestrictions()
             ->removeAll();
 
-        if ($my_c==1) {
+        if ($my_c == 1) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('tt_content.deleted', $queryBuilder->createNamedParameter(1)),
-                    $queryBuilder->expr()->eq('tt_content.hidden', $queryBuilder->createNamedParameter(1))
-                )
+                    $queryBuilder->expr()->eq('tt_content.hidden', $queryBuilder->createNamedParameter(1)),
+                ),
             ]);
-        } elseif ($my_c==2) {
+        } elseif ($my_c == 2) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->eq('tt_content.deleted', $queryBuilder->createNamedParameter(0)),
-                $queryBuilder->expr()->eq('tt_content.hidden', $queryBuilder->createNamedParameter(0))
+                $queryBuilder->expr()->eq('tt_content.hidden', $queryBuilder->createNamedParameter(0)),
             ]);
         }
-        if ($my_p==1) {
+        if ($my_p == 1) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(1)),
@@ -700,19 +702,19 @@ class SessionRepository extends Repository
                     $queryBuilder->expr()->gt('pages.starttime', $queryBuilder->createNamedParameter(time())),
                     $queryBuilder->expr()->and(
                         $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(0)),
-                        $queryBuilder->expr()->lte('pages.endtime', $queryBuilder->createNamedParameter(time()))
-                    )
-                )
+                        $queryBuilder->expr()->lte('pages.endtime', $queryBuilder->createNamedParameter(time())),
+                    ),
+                ),
             ]);
-        } elseif ($my_p==2) {
+        } elseif ($my_p == 2) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->eq('pages.deleted', $queryBuilder->createNamedParameter(0)),
                 $queryBuilder->expr()->eq('pages.hidden', $queryBuilder->createNamedParameter(0)),
                 $queryBuilder->expr()->lte('pages.starttime', $queryBuilder->createNamedParameter(time())),
                 $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('pages.endtime', $queryBuilder->createNamedParameter(0)),
-                    $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(time()))
-                )
+                    $queryBuilder->expr()->gt('pages.endtime', $queryBuilder->createNamedParameter(time())),
+                ),
             ]);
         }
 
@@ -722,16 +724,16 @@ class SessionRepository extends Repository
                 $queryBuilder->expr()->like('tt_content.bodytext', $queryBuilder->createNamedParameter('%"t3://page?uid=' . $linkto_uid . '"%')),
                 $queryBuilder->expr()->eq('tt_content.header_link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid)),
                 $queryBuilder->expr()->like('tt_content.header_link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid . ' %')),
-                $queryBuilder->expr()->in('tt_content.uid', $queryBuilder->createNamedParameter($referenceArray, Connection::PARAM_INT_ARRAY))
-            )
+                $queryBuilder->expr()->in('tt_content.uid', $queryBuilder->createNamedParameter($referenceArray, Connection::PARAM_INT_ARRAY)),
+            ),
         ]);
         //print_r($res->getSQL());
         $result = $res -> orderBy('tt_content.pid')
             -> addOrderBy('tt_content.sorting')
             -> executeQuery()->fetchAllAssociative();
 
-        foreach($result as $row) {
-            if ( $row["pdeleted"] ) {
+        foreach ($result as $row) {
+            if ($row['pdeleted']) {
                 $row['domain'] = '';
             } else {
                 $row['domain'] = $this->getDomain($row['pid'], $row['sys_language_uid']);
@@ -757,9 +759,9 @@ class SessionRepository extends Repository
     /**
      * Finde news mit Links zu einer gesuchten Seite
      *
-     * @param   integer	$my_c: content hidden?
-     * @param	integer	$my_p: page hidden?
-     * @param	integer	$linkto_uid: gesuchte uid
+     * @param   int	$my_c: content hidden?
+     * @param	int	$my_p: page hidden?
+     * @param	int	$linkto_uid: gesuchte uid
      *
      * @return  array     Content-Elemente
      */
@@ -775,39 +777,39 @@ class SessionRepository extends Repository
             'deleted',
             'hidden',
             'title',
-            'sys_language_uid'
-        ]) -> from ('tx_news_domain_model_news');
+            'sys_language_uid',
+        ]) -> from('tx_news_domain_model_news');
 
         // Restricions
         $queryBuilder
             ->getRestrictions()
             ->removeAll();
 
-        if ($my_c==1) {
+        if ($my_c == 1) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(1)),
-                    $queryBuilder->expr()->eq('hidden', $queryBuilder->createNamedParameter(1))
-                )
+                    $queryBuilder->expr()->eq('hidden', $queryBuilder->createNamedParameter(1)),
+                ),
             ]);
-        } elseif ($my_c==2) {
+        } elseif ($my_c == 2) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->eq('deleted', 0),
-                $queryBuilder->expr()->eq('hidden', 0)
+                $queryBuilder->expr()->eq('hidden', 0),
             ]);
         }
         $res -> andWhere(...[
             $queryBuilder->expr()->or(
                 $queryBuilder->expr()->like('bodytext', $queryBuilder->createNamedParameter('%"t3://page?uid=' . $linkto_uid . '"%')),
                 $queryBuilder->expr()->eq('internalurl', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid)),
-                $queryBuilder->expr()->like('internalurl', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid . ' %'))
-            )
+                $queryBuilder->expr()->like('internalurl', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid . ' %')),
+            ),
         ]);
         $result = $res -> orderBy('pid', 'ASC')
             -> addOrderBy('tstamp', 'DESC')
             -> executeQuery()->fetchAllAssociative();
 
-        foreach($result as $row) {
+        foreach ($result as $row) {
             $uid = $row['uid'];
             $finalArray[$uid] = $row;
         }
@@ -820,47 +822,47 @@ class SessionRepository extends Repository
             'tx_news_domain_model_news.deleted',
             'tx_news_domain_model_news.hidden',
             'tx_news_domain_model_news.title',
-            'tx_news_domain_model_news.sys_language_uid'
-        ]) -> from ('tx_news_domain_model_news')
+            'tx_news_domain_model_news.sys_language_uid',
+        ]) -> from('tx_news_domain_model_news')
             -> join(
                 'tx_news_domain_model_news',
                 'sys_file_reference',
                 'ref',
-                $queryBuilder->expr()->eq('tx_news_domain_model_news.uid', $queryBuilder->quoteIdentifier('ref.uid_foreign'))
+                $queryBuilder->expr()->eq('tx_news_domain_model_news.uid', $queryBuilder->quoteIdentifier('ref.uid_foreign')),
             )
             ->where(
-                $queryBuilder->expr()->eq('tablenames', $queryBuilder->createNamedParameter('tx_news_domain_model_news'))
+                $queryBuilder->expr()->eq('tablenames', $queryBuilder->createNamedParameter('tx_news_domain_model_news')),
             );
         // Restricions
         $queryBuilder
             ->getRestrictions()
             ->removeAll();
 
-        if ($my_c==1) {
+        if ($my_c == 1) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('tx_news_domain_model_news.deleted', $queryBuilder->createNamedParameter(1)),
-                    $queryBuilder->expr()->eq('tx_news_domain_model_news.hidden', $queryBuilder->createNamedParameter(1))
-                )
+                    $queryBuilder->expr()->eq('tx_news_domain_model_news.hidden', $queryBuilder->createNamedParameter(1)),
+                ),
             ]);
-        } elseif ($my_c==2) {
+        } elseif ($my_c == 2) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->eq('tx_news_domain_model_news.deleted', 0),
-                $queryBuilder->expr()->eq('tx_news_domain_model_news.hidden', 0)
+                $queryBuilder->expr()->eq('tx_news_domain_model_news.hidden', 0),
             ]);
         }
         $res -> andWhere(...[
             $queryBuilder->expr()->or(
                 $queryBuilder->expr()->eq('ref.link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid)),
-                $queryBuilder->expr()->like('ref.link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid . ' %'))
-            )
+                $queryBuilder->expr()->like('ref.link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid . ' %')),
+            ),
         ]);
 
         $result = $res -> orderBy('tx_news_domain_model_news.pid', 'ASC')
             -> addOrderBy('tx_news_domain_model_news.tstamp', 'DESC')
             -> executeQuery()->fetchAllAssociative();
 
-        foreach($result as $row) {
+        foreach ($result as $row) {
             $uid = $row['uid'];
             $finalArray[$uid] = $row;
         }
@@ -873,13 +875,13 @@ class SessionRepository extends Repository
             'tx_news_domain_model_news.deleted',
             'tx_news_domain_model_news.hidden',
             'tx_news_domain_model_news.title',
-            'tx_news_domain_model_news.sys_language_uid'
-        ]) -> from ('tx_news_domain_model_news')
+            'tx_news_domain_model_news.sys_language_uid',
+        ]) -> from('tx_news_domain_model_news')
             -> join(
                 'tx_news_domain_model_news',
                 'tx_news_domain_model_link',
                 'tx_news_domain_model_link',
-                $queryBuilder->expr()->eq('tx_news_domain_model_news.uid', $queryBuilder->quoteIdentifier('tx_news_domain_model_link.parent'))
+                $queryBuilder->expr()->eq('tx_news_domain_model_news.uid', $queryBuilder->quoteIdentifier('tx_news_domain_model_link.parent')),
             );
 
         // Restricions
@@ -887,31 +889,31 @@ class SessionRepository extends Repository
             ->getRestrictions()
             ->removeAll();
 
-        if ($my_c==1) {
+        if ($my_c == 1) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('tx_news_domain_model_news.deleted', $queryBuilder->createNamedParameter(1)),
-                    $queryBuilder->expr()->eq('tx_news_domain_model_news.hidden', $queryBuilder->createNamedParameter(1))
-                )
+                    $queryBuilder->expr()->eq('tx_news_domain_model_news.hidden', $queryBuilder->createNamedParameter(1)),
+                ),
             ]);
-        } elseif ($my_c==2) {
+        } elseif ($my_c == 2) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->eq('tx_news_domain_model_news.deleted', 0),
-                $queryBuilder->expr()->eq('tx_news_domain_model_news.hidden', 0)
+                $queryBuilder->expr()->eq('tx_news_domain_model_news.hidden', 0),
             ]);
         }
         //$res -> andWhere("tx_news_domain_model_link.uri='t3://page?uid=".$linkto_uid."' OR tx_news_domain_model_link.uri LIKE 't3://page?uid=".$linkto_uid." %'");
         $res -> andWhere(...[
             $queryBuilder->expr()->or(
                 $queryBuilder->expr()->eq('tx_news_domain_model_link.uri', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid)),
-                $queryBuilder->expr()->like('tx_news_domain_model_link.uri', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid . ' %'))
-            )
+                $queryBuilder->expr()->like('tx_news_domain_model_link.uri', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid . ' %')),
+            ),
         ]);
         $result = $res -> orderBy('tx_news_domain_model_news.pid', 'ASC')
             -> addOrderBy('tx_news_domain_model_news.tstamp', 'DESC')
             -> executeQuery()->fetchAllAssociative();
 
-        foreach($result as $row) {
+        foreach ($result as $row) {
             $uid = $row['uid'];
             $finalArray[$uid] = $row;
         }
@@ -921,9 +923,9 @@ class SessionRepository extends Repository
     /**
      * Finde Camaliga-Elemente mit Links zu einer gesuchten Seite
      *
-     * @param   integer	$my_c: content hidden?
-     * @param	integer	$my_p: page hidden?
-     * @param	integer	$linkto_uid: gesuchte uid
+     * @param   int	$my_c: content hidden?
+     * @param	int	$my_p: page hidden?
+     * @param	int	$linkto_uid: gesuchte uid
      *
      * @return  array     Content-Elemente
      */
@@ -939,39 +941,39 @@ class SessionRepository extends Repository
             'deleted',
             'hidden',
             'title',
-            'sys_language_uid'
-        ]) -> from ('tx_camaliga_domain_model_content');
+            'sys_language_uid',
+        ]) -> from('tx_camaliga_domain_model_content');
 
         // Restricions
         $queryBuilder
             ->getRestrictions()
             ->removeAll();
 
-        if ($my_c==1) {
+        if ($my_c == 1) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(1)),
-                    $queryBuilder->expr()->eq('hidden', $queryBuilder->createNamedParameter(1))
-                )
+                    $queryBuilder->expr()->eq('hidden', $queryBuilder->createNamedParameter(1)),
+                ),
             ]);
-        } elseif ($my_c==2) {
+        } elseif ($my_c == 2) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->eq('deleted', 0),
-                $queryBuilder->expr()->eq('hidden', 0)
+                $queryBuilder->expr()->eq('hidden', 0),
             ]);
         }
         $res -> andWhere(...[
             $queryBuilder->expr()->or(
                 $queryBuilder->expr()->like('longdesc', $queryBuilder->createNamedParameter('%"t3://page?uid=' . $linkto_uid . '"%')),
                 $queryBuilder->expr()->eq('link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid)),
-                $queryBuilder->expr()->like('link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid . ' %'))
-            )
+                $queryBuilder->expr()->like('link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid . ' %')),
+            ),
         ]);
         $result = $res -> orderBy('pid', 'ASC')
             -> addOrderBy('tstamp', 'DESC')
             -> executeQuery()->fetchAllAssociative();
 
-        foreach($result as $row) {
+        foreach ($result as $row) {
             $uid = $row['uid'];
             $finalArray[$uid] = $row;
         }
@@ -984,46 +986,46 @@ class SessionRepository extends Repository
             'tx_camaliga_domain_model_content.deleted',
             'tx_camaliga_domain_model_content.hidden',
             'tx_camaliga_domain_model_content.title',
-            'tx_camaliga_domain_model_content.sys_language_uid'
-        ]) -> from ('tx_camaliga_domain_model_content')
+            'tx_camaliga_domain_model_content.sys_language_uid',
+        ]) -> from('tx_camaliga_domain_model_content')
             -> join(
                 'tx_camaliga_domain_model_content',
                 'sys_file_reference',
                 'ref',
-                $queryBuilder->expr()->eq('tx_camaliga_domain_model_content.uid', $queryBuilder->quoteIdentifier('ref.uid_foreign'))
+                $queryBuilder->expr()->eq('tx_camaliga_domain_model_content.uid', $queryBuilder->quoteIdentifier('ref.uid_foreign')),
             )
             ->where(
-                $queryBuilder->expr()->eq('tablenames', $queryBuilder->createNamedParameter('tx_camaliga_domain_model_content'))
+                $queryBuilder->expr()->eq('tablenames', $queryBuilder->createNamedParameter('tx_camaliga_domain_model_content')),
             );
         // Restricions
         $queryBuilder
             ->getRestrictions()
             ->removeAll();
 
-        if ($my_c==1) {
+        if ($my_c == 1) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('tx_camaliga_domain_model_content.deleted', $queryBuilder->createNamedParameter(1)),
-                    $queryBuilder->expr()->eq('tx_camaliga_domain_model_content.hidden', $queryBuilder->createNamedParameter(1))
-                )
+                    $queryBuilder->expr()->eq('tx_camaliga_domain_model_content.hidden', $queryBuilder->createNamedParameter(1)),
+                ),
             ]);
-        } elseif ($my_c==2) {
+        } elseif ($my_c == 2) {
             $res -> andWhere(...[
                 $queryBuilder->expr()->eq('tx_camaliga_domain_model_content.deleted', 0),
-                $queryBuilder->expr()->eq('tx_camaliga_domain_model_content.hidden', 0)
+                $queryBuilder->expr()->eq('tx_camaliga_domain_model_content.hidden', 0),
             ]);
         }
         $res -> andWhere(...[
             $queryBuilder->expr()->or(
                 $queryBuilder->expr()->eq('ref.link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid)),
-                $queryBuilder->expr()->like('ref.link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid . ' %'))
-            )
+                $queryBuilder->expr()->like('ref.link', $queryBuilder->createNamedParameter('t3://page?uid=' . $linkto_uid . ' %')),
+            ),
         ]);
         $result = $res -> orderBy('tx_camaliga_domain_model_content.pid', 'ASC')
             -> addOrderBy('tx_camaliga_domain_model_content.tstamp', 'DESC')
             -> executeQuery()->fetchAllAssociative();
 
-        foreach($result as $row) {
+        foreach ($result as $row) {
             $uid = $row['uid'];
             $finalArray[$uid] = $row;
         }
@@ -1033,7 +1035,7 @@ class SessionRepository extends Repository
     /**
      * Bilder die fehlen
      *
-     * @param   integer   not only in tt_content?
+     * @param   int   not only in tt_content?
      *
      * @return  array     Bilder
      */
@@ -1053,9 +1055,9 @@ class SessionRepository extends Repository
             ->where($queryBuilder->expr()->eq('missing', 1))
             ->orderBy('name', 'ASC')
             ->executeQuery()->fetchAllAssociative();
-      //  ->where($queryBuilder->expr()->like('mime_type', $queryBuilder->createNamedParameter('image%')))
+        //  ->where($queryBuilder->expr()->like('mime_type', $queryBuilder->createNamedParameter('image%')))
 
-        foreach($result as $row) {
+        foreach ($result as $row) {
             $uid = $row['uid'];
             $fileArray[$uid] = $row;
             $fileArray[$uid]['used'] = false;
@@ -1069,7 +1071,7 @@ class SessionRepository extends Repository
             ->from($table)
             ->executeQuery()->fetchAllAssociative();
 
-        foreach($result as $row) {
+        foreach ($result as $row) {
             if (isset($row['file'])) {
                 $uid = $row['file'];
                 if (isset($fileArray[$uid]) && isset($fileArray[$uid]['uid']) && ($fileArray[$uid]['uid'] == $uid)) {
@@ -1092,22 +1094,22 @@ class SessionRepository extends Repository
             'sys_file_reference.uid_foreign',
             'tt_content.pid AS tt_pid',
             'tt_content.colPos AS tt_pos',
-            'tt_content.sys_language_uid AS tt_lang'
-        ]) -> from ('sys_file_reference')
+            'tt_content.sys_language_uid AS tt_lang',
+        ]) -> from('sys_file_reference')
             -> join(
                 'sys_file_reference',
                 'tt_content',
                 'tt_content',
-                $queryBuilder->expr()->eq('sys_file_reference.uid_foreign', $queryBuilder->quoteIdentifier('tt_content.uid'))
+                $queryBuilder->expr()->eq('sys_file_reference.uid_foreign', $queryBuilder->quoteIdentifier('tt_content.uid')),
             )
             ->where(
-                $queryBuilder->expr()->eq('sys_file_reference.tablenames', $queryBuilder->createNamedParameter('tt_content'))
+                $queryBuilder->expr()->eq('sys_file_reference.tablenames', $queryBuilder->createNamedParameter('tt_content')),
             )
             ->orderBy('tt_pid', 'ASC');
         //print_r($queryBuilder->getSQL());
         $result = $res -> executeQuery()->fetchAllAssociative();
 
-        foreach($result as $row) {
+        foreach ($result as $row) {
             $uid = $row['uid'];
             $uid_file = $row['uid_local'];
             if (isset($fileArray[$uid_file]) && isset($fileArray[$uid_file]['uid']) && ($fileArray[$uid_file]['uid'] == $uid_file)) {
@@ -1135,16 +1137,16 @@ class SessionRepository extends Repository
                 'alternative',
                 'uid_local',
                 'uid_foreign',
-                'tablenames'
-            ]) -> from ('sys_file_reference')
+                'tablenames',
+            ]) -> from('sys_file_reference')
                 ->where(
-                    $queryBuilder->expr()->neq('tablenames', $queryBuilder->createNamedParameter('tt_content'))
+                    $queryBuilder->expr()->neq('tablenames', $queryBuilder->createNamedParameter('tt_content')),
                 )
                 ->orderBy('uid', 'ASC');
             //print_r($queryBuilder->getSQL());
             $result = $res -> executeQuery()->fetchAllAssociative();
 
-            foreach($result as $row) {
+            foreach ($result as $row) {
                 $uid = $row['uid'];
                 $uid_file = $row['uid_local'];
                 if (isset($fileArray[$uid_file]) && isset($fileArray[$uid_file]['uid']) && !isset($referenceArray[$uid]) && ($fileArray[$uid_file]['uid'] == $uid_file)) {
@@ -1183,8 +1185,8 @@ class SessionRepository extends Repository
     /**
      * Missing Bilder löschen
      *
-     * @param   integer   Bild-UID
-     * @return    boolean
+     * @param   int   Bild-UID
+     * @return    bool
      */
     public function delMissingImage(int $uid)
     {
@@ -1192,21 +1194,21 @@ class SessionRepository extends Repository
         $queryBuilder
             ->delete('sys_file_reference')
             ->where(
-                $queryBuilder->expr()->eq('uid_local', $uid)
+                $queryBuilder->expr()->eq('uid_local', $uid),
             )
             ->executeStatement();
         $queryBuilder2 = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
         $queryBuilder2
             ->delete('sys_file_metadata')
             ->where(
-                $queryBuilder2->expr()->eq('file', $uid)
+                $queryBuilder2->expr()->eq('file', $uid),
             )
             ->executeStatement();
         $queryBuilder3 = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
         return $queryBuilder3
             ->delete('sys_file')
             ->where(
-                $queryBuilder3->expr()->eq('uid', $uid)
+                $queryBuilder3->expr()->eq('uid', $uid),
             )
             ->executeStatement();
     }
@@ -1214,8 +1216,8 @@ class SessionRepository extends Repository
     /**
      * Bilder ohne Alt- oder Titel-Text
      *
-     * @param   integer   Modus
-     * @param   integer   not only in tt_content?
+     * @param   int   Modus
+     * @param   int   not only in tt_content?
      *
      * @return  array     Bilder
      */
@@ -1238,7 +1240,7 @@ class SessionRepository extends Repository
             ->orderBy('name', 'ASC')
             ->executeQuery()->fetchAllAssociative();
 
-        foreach($result as $row) {
+        foreach ($result as $row) {
             $uid = $row['uid'];
             //$fileOrder[] = $uid;
             $fileArray[$uid] = $row;
@@ -1252,7 +1254,7 @@ class SessionRepository extends Repository
             ->from($table)
             ->executeQuery()->fetchAllAssociative();
 
-        foreach($result as $row) {
+        foreach ($result as $row) {
             if (isset($row['file'])) {
                 $uid = $row['file'];
                 if (isset($fileArray[$uid]) && isset($fileArray[$uid]['uid']) && ($fileArray[$uid]['uid'] == $uid)) {
@@ -1275,22 +1277,22 @@ class SessionRepository extends Repository
             'sys_file_reference.uid_foreign',
             'tt_content.pid AS tt_pid',
             'tt_content.colPos AS tt_pos',
-            'tt_content.sys_language_uid AS tt_lang'
-        ]) -> from ('sys_file_reference')
+            'tt_content.sys_language_uid AS tt_lang',
+        ]) -> from('sys_file_reference')
             -> join(
                 'sys_file_reference',
                 'tt_content',
                 'tt_content',
-                $queryBuilder->expr()->eq('sys_file_reference.uid_foreign', $queryBuilder->quoteIdentifier('tt_content.uid'))
+                $queryBuilder->expr()->eq('sys_file_reference.uid_foreign', $queryBuilder->quoteIdentifier('tt_content.uid')),
             )
             ->where(
-                $queryBuilder->expr()->eq('sys_file_reference.tablenames', $queryBuilder->createNamedParameter('tt_content'))
+                $queryBuilder->expr()->eq('sys_file_reference.tablenames', $queryBuilder->createNamedParameter('tt_content')),
             )
             ->orderBy('tt_pid', 'ASC');
         //print_r($queryBuilder->getSQL());
         $result = $res -> executeQuery()->fetchAllAssociative();
 
-        foreach($result as $row) {
+        foreach ($result as $row) {
             $uid = $row['uid'];
             $uid_file = $row['uid_local'];
             if (isset($fileArray[$uid_file]) && isset($fileArray[$uid_file]['uid']) && ($fileArray[$uid_file]['uid'] == $uid_file)) {
@@ -1317,16 +1319,16 @@ class SessionRepository extends Repository
                 'alternative',
                 'uid_local',
                 'uid_foreign',
-                'tablenames'
-            ]) -> from ('sys_file_reference')
+                'tablenames',
+            ]) -> from('sys_file_reference')
                 ->where(
-                    $queryBuilder->expr()->neq('tablenames', $queryBuilder->createNamedParameter('tt_content'))
+                    $queryBuilder->expr()->neq('tablenames', $queryBuilder->createNamedParameter('tt_content')),
                 )
                 ->orderBy('uid', 'ASC');
             //print_r($queryBuilder->getSQL());
             $result = $res -> executeQuery()->fetchAllAssociative();
 
-            foreach($result as $row) {
+            foreach ($result as $row) {
                 $uid = $row['uid'];
                 $uid_file = $row['uid_local'];
                 if (isset($fileArray[$uid_file]) && isset($fileArray[$uid_file]['uid']) && !isset($referenceArray[$uid]) && ($fileArray[$uid_file]['uid'] == $uid_file)) {
@@ -1349,13 +1351,13 @@ class SessionRepository extends Repository
             $imgArray = $refArray['file'];
             //echo $imgArray['meta_alt'] .'#'. $imgArray['ref_alt'] .'||';
             if (((($img_without == 1) || ($img_without == 3)) &&
-                    ((!isset($imgArray['meta_alt']) || $imgArray['meta_alt']=='') && (!isset($refArray['ref_alt']) || $refArray['ref_alt']==''))) ||
+                    ((!isset($imgArray['meta_alt']) || $imgArray['meta_alt'] == '') && (!isset($refArray['ref_alt']) || $refArray['ref_alt'] == ''))) ||
                 ((($img_without == 2) || ($img_without == 3)) &&
-                    ((!isset($imgArray['meta_title']) || $imgArray['meta_title']=='') && (!isset($refArray['ref_title']) || $refArray['ref_title']==''))) ||
+                    ((!isset($imgArray['meta_title']) || $imgArray['meta_title'] == '') && (!isset($refArray['ref_title']) || $refArray['ref_title'] == ''))) ||
                 ((($img_without == 4) || ($img_without == 6)) &&
-                    ((isset($imgArray['meta_alt']) && $imgArray['meta_alt']!='') || (isset($refArray['ref_alt']) && $refArray['ref_alt']!=''))) ||
+                    ((isset($imgArray['meta_alt']) && $imgArray['meta_alt'] != '') || (isset($refArray['ref_alt']) && $refArray['ref_alt'] != ''))) ||
                 ((($img_without == 5) || ($img_without == 6)) &&
-                    ((isset($imgArray['meta_title']) && $imgArray['meta_title']!='') || (isset($refArray['ref_title']) && $refArray['ref_title']!='')))) {
+                    ((isset($imgArray['meta_title']) && $imgArray['meta_title'] != '') || (isset($refArray['ref_title']) && $refArray['ref_title'] != '')))) {
                 // neu ab version 1.4.3: final-array enthält reference-Daten statt file-Daten
                 if (isset($refArray['tt_pid'])) {
                     $refArray['domain'] = $this->getDomain($refArray['tt_pid'], $refArray['tt_lang']);
@@ -1374,7 +1376,7 @@ class SessionRepository extends Repository
      * @param	int		$uid			uid of sys_file_reference
      * @param	string	$alternative	alt-tag
      * @param	string	$title			title-tag
-     * @return	boolean
+     * @return	bool
      */
     public function setAltOrTitle($uid, $alternative, $title)
     {
@@ -1390,7 +1392,7 @@ class SessionRepository extends Repository
             $queryBuilder
                 ->update('sys_file_reference')
                 ->where(
-                    $queryBuilder->expr()->eq('uid', $uid)
+                    $queryBuilder->expr()->eq('uid', $uid),
                 )
                 ->set($field, $value)
                 ->executeStatement();
@@ -1415,14 +1417,14 @@ class SessionRepository extends Repository
             'pages.title',
             'pages.slug',
             'pages.deleted AS pdeleted',
-            'pages.hidden AS phidden'
-        ]) -> from ('pages');
+            'pages.hidden AS phidden',
+        ]) -> from('pages');
         $queryBuilderPages
             ->getRestrictions()
             ->removeAll();
         $language_res -> andWhere(...[
             $queryBuilderPages->expr()->eq('l10n_parent', $queryBuilderPages->createNamedParameter($parent, \PDO::PARAM_INT)),
-            $queryBuilderPages->expr()->eq('sys_language_uid', $queryBuilderPages->createNamedParameter($sys_language_uid, \PDO::PARAM_INT))
+            $queryBuilderPages->expr()->eq('sys_language_uid', $queryBuilderPages->createNamedParameter($sys_language_uid, \PDO::PARAM_INT)),
         ]);
         return $language_res-> executeQuery()->fetchAllAssociative();
     }
@@ -1453,16 +1455,16 @@ class SessionRepository extends Repository
                 $base = $site->getConfiguration()['base'];
                 $lang = $site->getConfiguration()['languages'];
                 $lang = $lang[$sys_language_uid]['base'] ?? '';
-                if ((str_starts_with((string) $base, 'http')) && (str_starts_with((string) $lang, 'http'))) {
+                if ((str_starts_with((string)$base, 'http')) && (str_starts_with((string)$lang, 'http'))) {
                     // wenn die Domain beides mal benutzt wird, entfernen wir sie bei der Sprache
-                    $parse_url = parse_url((string) $lang);
+                    $parse_url = parse_url((string)$lang);
                     $lang = $parse_url['path'];
                 }
-                $domain = rtrim((string) $base, '/') . rtrim((string) $lang, '/');
-                if ((!str_starts_with((string) $base, 'http')) && (strlen((string) $base) > 4)) {
-                    if (str_starts_with((string) $base, '//')) {
+                $domain = rtrim((string)$base, '/') . rtrim((string)$lang, '/');
+                if ((!str_starts_with((string)$base, 'http')) && (strlen((string)$base) > 4)) {
+                    if (str_starts_with((string)$base, '//')) {
                         // muss nicht sein:   $domain = 'http:' . $domain;
-                    } elseif (str_starts_with((string) $base, '/')) {
+                    } elseif (str_starts_with((string)$base, '/')) {
                         $domain = 'http:/' . $domain;
                     } else {
                         $domain = 'http://' . $domain;
@@ -1474,7 +1476,6 @@ class SessionRepository extends Repository
         }
         return $domain;
     }
-
 
     /**
      * Take only pages under a pid
@@ -1506,7 +1507,7 @@ class SessionRepository extends Repository
      *
      * @param	int		$uid	page-uid
      * @param	int		$searchUid	page-uid which should be in the rootline
-     * @return boolean
+     * @return bool
      */
     public function isInRootLine($uid, $searchUid)
     {
@@ -1519,7 +1520,6 @@ class SessionRepository extends Repository
         }
         return false;
     }
-
 
     /**
      * Get all domains
@@ -1553,10 +1553,10 @@ class SessionRepository extends Repository
                 'is_regexp' => $regexp,
                 'target_statuscode' => $statuscode,
                 'updatedon' => time(),
-                'createdon' => time()
+                'createdon' => time(),
             ])
             ->executeStatement();
-       // 'createdby' => intval($createdby), klappt nicht mehr in TYPO3 12!
+        // 'createdby' => intval($createdby), klappt nicht mehr in TYPO3 12!
     }
 
     /**
@@ -1570,7 +1570,7 @@ class SessionRepository extends Repository
         return $queryBuilder
             ->delete('sys_redirect')
             ->where(
-                $queryBuilder->expr()->eq('uid', (int) $uid)
+                $queryBuilder->expr()->eq('uid', (int)$uid),
             )
             ->executeStatement();
     }
@@ -1587,8 +1587,8 @@ class SessionRepository extends Repository
             'uid',
             'source_host',
             'source_path',
-            'target'
-        ]) -> from ('sys_redirect')
+            'target',
+        ]) -> from('sys_redirect')
             ->executeQuery()->fetchAllAssociative();
     }
 
@@ -1629,8 +1629,8 @@ class SessionRepository extends Repository
             ->where(
                 $queryBuilder->expr()->eq(
                     'uid',
-                    $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT)
-                )
+                    $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT),
+                ),
             )
             ->executeQuery()->fetchAssociative();
     }
