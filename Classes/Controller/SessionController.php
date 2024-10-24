@@ -211,27 +211,27 @@ class SessionController extends ActionController
         $pagination = new SimplePagination($arrayPaginator);
 
         // Assign
-        $this->view->assign('my_p', $my_p);
-        $this->view->assign('my_c', $my_c);
-        $this->view->assign('my_type', $my_type);
-        $this->view->assign('my_value', $my_value);
-        $this->view->assign('my_exclude', $my_exclude);
-        $this->view->assign('my_flexform', $my_flexform);
-        $this->view->assign('my_page', $my_page);
-        $this->view->assign('my_outp', $my_outp);
-        $this->view->assign('my_recursive', $my_recursive);
-        $this->view->assign('my_orderby', $my_orderby);
-        $this->view->assign('my_direction', $my_direction);
-        $this->view->assign('rows', count($pages));
-        $this->view->assign('pages', $pages);
-        $this->view->assign('paginator', $arrayPaginator);
-        $this->view->assign('pagination', $pagination);
-        $this->view->assign('no_pages', range(1, $pagination->getLastPageNumber()));
-        $this->view->assign('types', $types);
-        $this->view->assign('settings', $this->settings);
-        $this->view->assign('action', 'list');
+        $this->moduleTemplate->assign('my_p', $my_p);
+        $this->moduleTemplate->assign('my_c', $my_c);
+        $this->moduleTemplate->assign('my_type', $my_type);
+        $this->moduleTemplate->assign('my_value', $my_value);
+        $this->moduleTemplate->assign('my_exclude', $my_exclude);
+        $this->moduleTemplate->assign('my_flexform', $my_flexform);
+        $this->moduleTemplate->assign('my_page', $my_page);
+        $this->moduleTemplate->assign('my_outp', $my_outp);
+        $this->moduleTemplate->assign('my_recursive', $my_recursive);
+        $this->moduleTemplate->assign('my_orderby', $my_orderby);
+        $this->moduleTemplate->assign('my_direction', $my_direction);
+        $this->moduleTemplate->assign('rows', count($pages));
+        $this->moduleTemplate->assign('pages', $pages);
+        $this->moduleTemplate->assign('paginator', $arrayPaginator);
+        $this->moduleTemplate->assign('pagination', $pagination);
+        $this->moduleTemplate->assign('no_pages', range(1, $pagination->getLastPageNumber()));
+        $this->moduleTemplate->assign('types', $types);
+        $this->moduleTemplate->assign('settings', $this->settings);
+        $this->moduleTemplate->assign('action', 'list');
         $this->addDocHeaderDropDown('list');
-        return $this->defaultRendering();
+        return $this->moduleTemplate->renderResponse('Session/List');
     }
 
     /**
@@ -380,20 +380,20 @@ class SessionController extends ActionController
         $pagination = new SimplePagination($arrayPaginator);
 
         // Assign
-        $this->view->assign('my_p', $my_p);
-        $this->view->assign('my_c', $my_c);
-        $this->view->assign('my_value', $my_value);
-        $this->view->assign('my_zone', $my_zone);
-        $this->view->assign('my_page', $my_page);
-        $this->view->assign('my_outp', $my_outp);
-        $this->view->assign('my_recursive', $my_recursive);
-        $this->view->assign('rows', count($pages));
-        $this->view->assign('pages', $pages);
-        $this->view->assign('paginator', $arrayPaginator);
-        $this->view->assign('pagination', $pagination);
-        $this->view->assign('no_pages', range(1, $pagination->getLastPageNumber()));
-        $this->view->assign('settings', $this->settings);
-        $this->view->assign('action', 'latest');
+        $this->moduleTemplate->assign('my_p', $my_p);
+        $this->moduleTemplate->assign('my_c', $my_c);
+        $this->moduleTemplate->assign('my_value', $my_value);
+        $this->moduleTemplate->assign('my_zone', $my_zone);
+        $this->moduleTemplate->assign('my_page', $my_page);
+        $this->moduleTemplate->assign('my_outp', $my_outp);
+        $this->moduleTemplate->assign('my_recursive', $my_recursive);
+        $this->moduleTemplate->assign('rows', count($pages));
+        $this->moduleTemplate->assign('pages', $pages);
+        $this->moduleTemplate->assign('paginator', $arrayPaginator);
+        $this->moduleTemplate->assign('pagination', $pagination);
+        $this->moduleTemplate->assign('no_pages', range(1, $pagination->getLastPageNumber()));
+        $this->moduleTemplate->assign('settings', $this->settings);
+        $this->moduleTemplate->assign('action', 'latest');
         $this->addDocHeaderDropDown('latest');
         return $this->defaultRendering();
     }
@@ -482,18 +482,18 @@ class SessionController extends ActionController
         $pagination = new SimplePagination($arrayPaginator);
 
         // Assign
-        $this->view->assign('my_p', $my_p);
-        $this->view->assign('my_value', $my_value);
-        $this->view->assign('my_page', $my_page);
-        $this->view->assign('my_outp', $my_outp);
-        $this->view->assign('my_recursive', $my_recursive);
-        $this->view->assign('rows', count($pages));
-        $this->view->assign('pages', $pages);
-        $this->view->assign('paginator', $arrayPaginator);
-        $this->view->assign('pagination', $pagination);
-        $this->view->assign('no_pages', range(1, $pagination->getLastPageNumber()));
-        $this->view->assign('settings', $this->settings);
-        $this->view->assign('action', 'layouts');
+        $this->moduleTemplate->assign('my_p', $my_p);
+        $this->moduleTemplate->assign('my_value', $my_value);
+        $this->moduleTemplate->assign('my_page', $my_page);
+        $this->moduleTemplate->assign('my_outp', $my_outp);
+        $this->moduleTemplate->assign('my_recursive', $my_recursive);
+        $this->moduleTemplate->assign('rows', count($pages));
+        $this->moduleTemplate->assign('pages', $pages);
+        $this->moduleTemplate->assign('paginator', $arrayPaginator);
+        $this->moduleTemplate->assign('pagination', $pagination);
+        $this->moduleTemplate->assign('no_pages', range(1, $pagination->getLastPageNumber()));
+        $this->moduleTemplate->assign('settings', $this->settings);
+        $this->moduleTemplate->assign('action', 'layouts');
         $this->addDocHeaderDropDown('layouts');
         return $this->defaultRendering();
     }
@@ -605,12 +605,12 @@ class SessionController extends ActionController
                 $content .= 'Note: file not found!!!';
             }
         }
-        $this->view->assign('method', $method);
-        $this->view->assign('bytes', $bytes);
-        $this->view->assign('convert', $convert);
-        $this->view->assign('delfile', $delfile);
-        $this->view->assign('message', $content);
-        $this->view->assign('action', 'filedeletion');
+        $this->moduleTemplate->assign('method', $method);
+        $this->moduleTemplate->assign('bytes', $bytes);
+        $this->moduleTemplate->assign('convert', $convert);
+        $this->moduleTemplate->assign('delfile', $delfile);
+        $this->moduleTemplate->assign('message', $content);
+        $this->moduleTemplate->assign('action', 'filedeletion');
         $this->addDocHeaderDropDown('filedeletion');
         return $this->defaultRendering();
     }
@@ -751,18 +751,18 @@ class SessionController extends ActionController
         $arrayPaginator = new ArrayPaginator($finalArray, $currentPage, $this->settings['pagebrowser']['itemsPerPage']);
         $pagination = new SimplePagination($arrayPaginator);
 
-        $this->view->assign('img_without', $img_without);
-        $this->view->assign('img_other', $img_other);
-        $this->view->assign('count', $count);
-        $this->view->assign('images', $finalArray);
-        $this->view->assign('imagesReplaced', $replacedArray);
-        $this->view->assign('paginator', $arrayPaginator);
-        $this->view->assign('pagination', $pagination);
-        $this->view->assign('no_pages', range(1, $pagination->getLastPageNumber()));
-        $this->view->assign('my_page', $my_page);
-        $this->view->assign('my_recursive', $my_recursive);
-        $this->view->assign('settings', $this->settings);
-        $this->view->assign('action', 'images');
+        $this->moduleTemplate->assign('img_without', $img_without);
+        $this->moduleTemplate->assign('img_other', $img_other);
+        $this->moduleTemplate->assign('count', $count);
+        $this->moduleTemplate->assign('images', $finalArray);
+        $this->moduleTemplate->assign('imagesReplaced', $replacedArray);
+        $this->moduleTemplate->assign('paginator', $arrayPaginator);
+        $this->moduleTemplate->assign('pagination', $pagination);
+        $this->moduleTemplate->assign('no_pages', range(1, $pagination->getLastPageNumber()));
+        $this->moduleTemplate->assign('my_page', $my_page);
+        $this->moduleTemplate->assign('my_recursive', $my_recursive);
+        $this->moduleTemplate->assign('settings', $this->settings);
+        $this->moduleTemplate->assign('action', 'images');
         $this->addDocHeaderDropDown('images');
         return $this->defaultRendering();
     }
@@ -877,17 +877,17 @@ class SessionController extends ActionController
         $arrayPaginator = new ArrayPaginator($finalArray, $currentPage, $this->settings['pagebrowser']['itemsPerPage']);
         $pagination = new SimplePagination($arrayPaginator);
 
-        $this->view->assign('count', $count);
-        $this->view->assign('img_other', $img_other);
-        $this->view->assign('images', $finalArray);
-        $this->view->assign('fileArray', $notUsedImages);
-        $this->view->assign('paginator', $arrayPaginator);
-        $this->view->assign('pagination', $pagination);
-        $this->view->assign('no_pages', range(1, $pagination->getLastPageNumber()));
-        $this->view->assign('my_page', $my_page);
-        $this->view->assign('my_recursive', $my_recursive);
-        $this->view->assign('settings', $this->settings);
-        $this->view->assign('action', 'missing');
+        $this->moduleTemplate->assign('count', $count);
+        $this->moduleTemplate->assign('img_other', $img_other);
+        $this->moduleTemplate->assign('images', $finalArray);
+        $this->moduleTemplate->assign('fileArray', $notUsedImages);
+        $this->moduleTemplate->assign('paginator', $arrayPaginator);
+        $this->moduleTemplate->assign('pagination', $pagination);
+        $this->moduleTemplate->assign('no_pages', range(1, $pagination->getLastPageNumber()));
+        $this->moduleTemplate->assign('my_page', $my_page);
+        $this->moduleTemplate->assign('my_recursive', $my_recursive);
+        $this->moduleTemplate->assign('settings', $this->settings);
+        $this->moduleTemplate->assign('action', 'missing');
         $this->addDocHeaderDropDown('missing');
         return $this->defaultRendering();
     }
@@ -998,20 +998,20 @@ class SessionController extends ActionController
         $arrayPaginator = new ArrayPaginator($pages, $currentPage, $this->settings['pagebrowser']['itemsPerPage']);
         $pagination = new SimplePagination($arrayPaginator);
 
-        $this->view->assign('my_c', $my_c);
-        $this->view->assign('my_p', $my_p);
-        $this->view->assign('linksto', $linksto);
-        $this->view->assign('exttoo', $exttoo);
-        $this->view->assign('pages', $pages);
-        $this->view->assign('news', $news);
-        $this->view->assign('camaliga', $camaliga);
-        $this->view->assign('paginator', $arrayPaginator);
-        $this->view->assign('pagination', $pagination);
-        $this->view->assign('no_pages', range(1, $pagination->getLastPageNumber()));
-        $this->view->assign('my_page', $my_page);
-        $this->view->assign('my_recursive', $my_recursive);
-        $this->view->assign('settings', $this->settings);
-        $this->view->assign('action', 'pagesearch');
+        $this->moduleTemplate->assign('my_c', $my_c);
+        $this->moduleTemplate->assign('my_p', $my_p);
+        $this->moduleTemplate->assign('linksto', $linksto);
+        $this->moduleTemplate->assign('exttoo', $exttoo);
+        $this->moduleTemplate->assign('pages', $pages);
+        $this->moduleTemplate->assign('news', $news);
+        $this->moduleTemplate->assign('camaliga', $camaliga);
+        $this->moduleTemplate->assign('paginator', $arrayPaginator);
+        $this->moduleTemplate->assign('pagination', $pagination);
+        $this->moduleTemplate->assign('no_pages', range(1, $pagination->getLastPageNumber()));
+        $this->moduleTemplate->assign('my_page', $my_page);
+        $this->moduleTemplate->assign('my_recursive', $my_recursive);
+        $this->moduleTemplate->assign('settings', $this->settings);
+        $this->moduleTemplate->assign('action', 'pagesearch');
         $this->addDocHeaderDropDown('pagesearch');
         return $this->defaultRendering();
     }
@@ -1140,13 +1140,13 @@ class SessionController extends ActionController
                 $content .= 'Note: file not found!!!';
             }
         }
-        $this->view->assign('method', $method);
-        $this->view->assign('regex', $regex);
-        $this->view->assign('defaultstatuscode', $defaultstatuscode);
-        $this->view->assign('convert', $convert);
-        $this->view->assign('impfile', $impfile);
-        $this->view->assign('message', $content);
-        $this->view->assign('action', 'redirects');
+        $this->moduleTemplate->assign('method', $method);
+        $this->moduleTemplate->assign('regex', $regex);
+        $this->moduleTemplate->assign('defaultstatuscode', $defaultstatuscode);
+        $this->moduleTemplate->assign('convert', $convert);
+        $this->moduleTemplate->assign('impfile', $impfile);
+        $this->moduleTemplate->assign('message', $content);
+        $this->moduleTemplate->assign('action', 'redirects');
         $this->addDocHeaderDropDown('redirects');
         return $this->defaultRendering();
     }
@@ -1345,17 +1345,17 @@ class SessionController extends ActionController
         $arrayPaginator = new ArrayPaginator($redirectsArray, $currentPage, $this->settings['pagebrowser']['itemsPerPage']);
         $pagination = new SimplePagination($arrayPaginator);
 
-        $this->view->assign('message', $content);
-        $this->view->assign('redirects', $redirectsArray);
-        $this->view->assign('paginator', $arrayPaginator);
-        $this->view->assign('pagination', $pagination);
-        $this->view->assign('no_pages', range(1, $pagination->getLastPageNumber()));
-        $this->view->assign('my_http', $my_http);
-        $this->view->assign('my_error', $my_error);
-        $this->view->assign('my_page', $my_page);
-        $this->view->assign('page', $currentPage);
-        $this->view->assign('settings', $this->settings);
-        $this->view->assign('action', 'redirectscheck');
+        $this->moduleTemplate->assign('message', $content);
+        $this->moduleTemplate->assign('redirects', $redirectsArray);
+        $this->moduleTemplate->assign('paginator', $arrayPaginator);
+        $this->moduleTemplate->assign('pagination', $pagination);
+        $this->moduleTemplate->assign('no_pages', range(1, $pagination->getLastPageNumber()));
+        $this->moduleTemplate->assign('my_http', $my_http);
+        $this->moduleTemplate->assign('my_error', $my_error);
+        $this->moduleTemplate->assign('my_page', $my_page);
+        $this->moduleTemplate->assign('page', $currentPage);
+        $this->moduleTemplate->assign('settings', $this->settings);
+        $this->moduleTemplate->assign('action', 'redirectscheck');
         $this->addDocHeaderDropDown('redirectscheck');
         return $this->defaultRendering();
     }
@@ -1401,7 +1401,8 @@ class SessionController extends ActionController
 
     protected function defaultRendering(): ResponseInterface
     {
-        $this->moduleTemplate->setContent($this->view->render());
+        // TODO: https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/12.0/Feature-96730-SimplifiedExtbackendModuleTemplateAPI.html
+        $this->moduleTemplate->setContent($this->moduleTemplate->render());
         return $this->htmlResponse($this->moduleTemplate->renderContent());
     }
 

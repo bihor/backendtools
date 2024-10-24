@@ -134,7 +134,7 @@ class SessionRepository extends Repository
         if ($my_exclude) {
             $exclude_ctypes = array_merge($exclude_ctypes, explode(' ', $my_exclude));
         }
-        $more = ($gridelements_loaded) ? 'tt_content.tx_gridelements_backend_layout' : 'tt_content.t3_origuid';
+        $more = ($gridelements_loaded) ? 'tt_content.tx_gridelements_backend_layout' : 'tt_content.l18n_parent';
 
         // Query aufbauen
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('tt_content')->createQueryBuilder();
