@@ -4,7 +4,7 @@
 		xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
 		xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers"
 		data-namespace-typo3-fluid="true">
-<f:layout name="Default" />
+<f:layout name="Module" />
 <f:section name="Content">
 	<h1>Check sys_redirect entries for error targets</h1>
 	<f:flashMessages />
@@ -40,7 +40,7 @@
 		</div></div>
 		<f:form.submit value="Set defaults" name="setting" class="btn btn-default" />
 	</f:form>
-	<br>
+	<div>&nbsp;</div>
 	<f:form action="redirectscheck">
 		<f:form.hidden name="currentPage" value="{page}" />
 		<f:if condition="{redirects -> f:count()} > 0">
@@ -96,7 +96,7 @@
 	</f:form>
 	<f:if condition="{message}">
 	<f:then>
-		<br/>
+		<div>&nbsp;</div>
 		<p><f:format.raw>{message}</f:format.raw></p>
 	</f:then>
 	</f:if>

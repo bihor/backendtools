@@ -395,7 +395,7 @@ class SessionController extends ActionController
         $this->moduleTemplate->assign('settings', $this->settings);
         $this->moduleTemplate->assign('action', 'latest');
         $this->addDocHeaderDropDown('latest');
-        return $this->defaultRendering();
+        return $this->moduleTemplate->renderResponse('Session/Latest');
     }
 
     /**
@@ -495,7 +495,7 @@ class SessionController extends ActionController
         $this->moduleTemplate->assign('settings', $this->settings);
         $this->moduleTemplate->assign('action', 'layouts');
         $this->addDocHeaderDropDown('layouts');
-        return $this->defaultRendering();
+        return $this->moduleTemplate->renderResponse('Session/Layouts');
     }
 
     /**
@@ -612,7 +612,7 @@ class SessionController extends ActionController
         $this->moduleTemplate->assign('message', $content);
         $this->moduleTemplate->assign('action', 'filedeletion');
         $this->addDocHeaderDropDown('filedeletion');
-        return $this->defaultRendering();
+        return $this->moduleTemplate->renderResponse('Session/Filedeletion');
     }
 
     /**
@@ -764,7 +764,7 @@ class SessionController extends ActionController
         $this->moduleTemplate->assign('settings', $this->settings);
         $this->moduleTemplate->assign('action', 'images');
         $this->addDocHeaderDropDown('images');
-        return $this->defaultRendering();
+        return $this->moduleTemplate->renderResponse('Session/Images');
     }
 
     /**
@@ -889,7 +889,7 @@ class SessionController extends ActionController
         $this->moduleTemplate->assign('settings', $this->settings);
         $this->moduleTemplate->assign('action', 'missing');
         $this->addDocHeaderDropDown('missing');
-        return $this->defaultRendering();
+        return $this->moduleTemplate->renderResponse('Session/Missing');
     }
 
     /**
@@ -1013,7 +1013,7 @@ class SessionController extends ActionController
         $this->moduleTemplate->assign('settings', $this->settings);
         $this->moduleTemplate->assign('action', 'pagesearch');
         $this->addDocHeaderDropDown('pagesearch');
-        return $this->defaultRendering();
+        return $this->moduleTemplate->renderResponse('Session/Pagesearch');
     }
 
     /**
@@ -1148,7 +1148,7 @@ class SessionController extends ActionController
         $this->moduleTemplate->assign('message', $content);
         $this->moduleTemplate->assign('action', 'redirects');
         $this->addDocHeaderDropDown('redirects');
-        return $this->defaultRendering();
+        return $this->moduleTemplate->renderResponse('Session/Redirects');
     }
 
     /**
@@ -1357,7 +1357,7 @@ class SessionController extends ActionController
         $this->moduleTemplate->assign('settings', $this->settings);
         $this->moduleTemplate->assign('action', 'redirectscheck');
         $this->addDocHeaderDropDown('redirectscheck');
-        return $this->defaultRendering();
+        return $this->moduleTemplate->renderResponse('Session/Redirectscheck');
     }
 
     /**
@@ -1397,13 +1397,6 @@ class SessionController extends ActionController
     protected function getLanguageService(): LanguageService
     {
         return $GLOBALS['LANG'];
-    }
-
-    protected function defaultRendering(): ResponseInterface
-    {
-        // TODO: https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/12.0/Feature-96730-SimplifiedExtbackendModuleTemplateAPI.html
-        $this->moduleTemplate->setContent($this->moduleTemplate->render());
-        return $this->htmlResponse($this->moduleTemplate->renderContent());
     }
 
     protected function addDocHeaderDropDown(string $currentAction): void

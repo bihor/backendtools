@@ -465,7 +465,7 @@ class SessionRepository extends Repository
         ]) -> from('pages');
         if ($my_value == 0) {
             $res->where(
-                $queryBuilder->expr()->gt('layout', $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)),
+                $queryBuilder->expr()->gt('layout', $queryBuilder->createNamedParameter(0)),
             );
         } else {
             $res->where(
@@ -1423,8 +1423,8 @@ class SessionRepository extends Repository
             ->getRestrictions()
             ->removeAll();
         $language_res -> andWhere(...[
-            $queryBuilderPages->expr()->eq('l10n_parent', $queryBuilderPages->createNamedParameter($parent, \PDO::PARAM_INT)),
-            $queryBuilderPages->expr()->eq('sys_language_uid', $queryBuilderPages->createNamedParameter($sys_language_uid, \PDO::PARAM_INT)),
+            $queryBuilderPages->expr()->eq('l10n_parent', $queryBuilderPages->createNamedParameter(intval($parent))),
+            $queryBuilderPages->expr()->eq('sys_language_uid', $queryBuilderPages->createNamedParameter(intval($sys_language_uid))),
         ]);
         return $language_res-> executeQuery()->fetchAllAssociative();
     }
@@ -1629,7 +1629,7 @@ class SessionRepository extends Repository
             ->where(
                 $queryBuilder->expr()->eq(
                     'uid',
-                    $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT),
+                    $queryBuilder->createNamedParameter(intval($uid)),
                 ),
             )
             ->executeQuery()->fetchAssociative();

@@ -4,7 +4,7 @@
         xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
         xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers"
         data-namespace-typo3-fluid="true">
-<f:layout name="Default"/>
+<f:layout name="Module"/>
 <f:section name="Content">
     <h1>Find missing files/images and show where they are used</h1>
     <f:flashMessages/>
@@ -37,7 +37,7 @@
             </div>
         </div>
         <f:form.submit value="search" name="search" class="btn btn-default"/>
-        <br><br>
+        <div>&nbsp;</div>
 
         <f:if condition="{images -> f:count()} > 0">
             <f:then>
@@ -47,10 +47,10 @@
                 <table class="table">
                     <thead>
                     <tr>
-                        <th colspan="4" style="text-align:center;background-color:#cfc;">sys_file</th>
-                        <th colspan="5" style="text-align:center;background-color:#ccf;">sys_file_metadata</th>
-                        <th colspan="3" style="text-align:center;background-color:#fcc;">sys_file_reference</th>
-                        <th colspan="4" style="text-align:center;background-color:#fcf;">tt_content or other</th>
+                        <th colspan="4" style="color:#000;text-align:center;background-color:#cfc;">sys_file</th>
+                        <th colspan="5" style="color:#000;text-align:center;background-color:#ccf;">sys_file_metadata</th>
+                        <th colspan="3" style="color:#000;text-align:center;background-color:#fcc;">sys_file_reference</th>
+                        <th colspan="4" style="color:#000;text-align:center;background-color:#fcf;">tt_content or other</th>
                     </tr>
                     <tr>
                         <th>-</th>

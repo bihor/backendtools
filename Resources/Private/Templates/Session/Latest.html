@@ -2,10 +2,9 @@
 <html
 		xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
 		xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
-		xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers"
 		data-namespace-typo3-fluid="true">
 
-<f:layout name="Default" />
+<f:layout name="Module" />
 <f:section name="Content">
 <h1>Latest (changed) pages and content elements</h1>
 <f:flashMessages />
@@ -61,7 +60,7 @@
 
 	<f:form.submit value="search" class="btn btn-default" />
 </f:form>
-<br>
+<div>&nbsp;</div>
 
 <f:if condition="{rows} > 0">
 <f:then>
@@ -80,8 +79,8 @@ uid;tstamp;lang.;colPos;deleted;hidden;header;CType;list_type;uid;tstamp;deleted
 		<table class="table">
 		<thead>
 			<tr>
-				<th colspan="8" style="text-align:center;background-color:#cfc;">Content element</th>
-				<th colspan="5" style="text-align:center;background-color:#ccf;">Page</th>
+				<th colspan="8" style="text-align:center;background-color:#cfc;color:#000;">Content element</th>
+				<th colspan="5" style="text-align:center;background-color:#ccf;color:#000;">Page</th>
 			</tr>
 			<tr>
 				<th>uid</th>

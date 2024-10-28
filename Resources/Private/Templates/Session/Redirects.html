@@ -3,7 +3,7 @@
 		xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
 		xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers"
 		data-namespace-typo3-fluid="true">
-<f:layout name="Default" />
+<f:layout name="Module" />
 <f:section name="Content">
 <h1>Add simple .htaccess-redirects to the table sys_redirect</h1>
 <f:flashMessages />
@@ -22,7 +22,7 @@
 	</div>
 	<f:form.submit name="import" value="Show / import redirects" class="btn btn-primary" />
 </f:form>
-<br>
+<div>&nbsp;</div>
 <f:if condition="{message}">
 <f:then>
 	<p><f:format.raw>{message}</f:format.raw></p>

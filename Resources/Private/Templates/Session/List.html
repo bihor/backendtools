@@ -4,8 +4,7 @@
 		xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
 		xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers"
 		data-namespace-typo3-fluid="true">
-
-<f:layout name="Default" />
+<f:layout name="Module" />
 <f:section name="Content">
 	<f:asset.script identifier="backendtools" src="EXT:backendtools/Resources/Public/Js/List.js"/>
 <h1>Pages that use (specific) extensions</h1>
@@ -13,7 +12,8 @@
 <f:form action="list" class="form-inline">
 <div class="row"><div class="col-md-6">
 	<div style="margin: 10px 0;">Show only elements with this
-		<f:form.select name="my_value3001" options="{types}" id="mytype3001" /><br />
+		<f:form.select name="my_value3001" options="{types}" id="mytype3001" />
+		<div style="margin: 5px 0;">
 		(
 		<label class="checkbox-inline">
 			<f:form.radio name="my_type" value="1" checked="{my_type} == 1" id="mytype1" /> list_type  &nbsp; or
@@ -22,7 +22,8 @@
 			<f:form.radio name="my_type" value="2" checked="{my_type} == 2" id="mytype2" /> CType*:
 		</label>
 		<f:form.textfield name="my_value" value="{my_value}" size="19" id="mytypeval" />
-		&nbsp; )
+		)
+		</div>
 	</div>
 	<div style="margin: 10px 0;">Show only elements with this FlexForm value**:
 		<f:form.textfield name="my_flexform" value="{my_flexform}" />
@@ -76,7 +77,7 @@
 
 	<f:form.submit value="search" class="btn btn-default" />
 </f:form>
-<br>
+<div>&nbsp;</div>
 
 <f:if condition="{rows} > 0">
 <f:then>
@@ -95,8 +96,8 @@ uid;lang.;colPos;deleted;hidden;header;CType;list_type;FlexForm actions;uid;dele
 		<table class="table">
 		<thead>
 			<tr>
-				<th colspan="8" style="text-align:center;background-color:#cfc;">Content element</th>
-				<th colspan="4" style="text-align:center;background-color:#ccf;">Page</th>
+				<th colspan="8" style="text-align:center;background-color:#cfc;color:#000;">Content element</th>
+				<th colspan="4" style="text-align:center;background-color:#ccf;color:#000;">Page</th>
 			</tr>
 			<tr>
 				<th>uid</th>
