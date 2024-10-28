@@ -27,9 +27,6 @@
 			<trans-unit id="module.images" xml:space="preserve">
 				<source>Show images without title- or alt-text</source>
 			</trans-unit>
-			<trans-unit id="module.filedeletion" xml:space="preserve">
-				<source>Delete unused files in the uploads-folder</source>
-			</trans-unit>
 			<trans-unit id="module.redirects" xml:space="preserve">
 				<source>Import redirect-rules to sys_redirect</source>
 			</trans-unit>

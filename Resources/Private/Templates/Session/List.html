@@ -107,7 +107,7 @@ uid;lang.;colPos;deleted;hidden;header;CType;list_type;FlexForm actions;uid;dele
 				<th>header</th>
 				<th>CType</th>
 				<th>list_type</th>
-				<th>FlexForm actions / misc</th>
+				<th>Misc</th>
 				<th>uid</th>
 				<th>deleted / hidden</th>
 				<th>title</th>
@@ -129,7 +129,7 @@ uid;lang.;colPos;deleted;hidden;header;CType;list_type;FlexForm actions;uid;dele
 					<td>{page.header}</td>
 					<td>{page.CType}</td>
 					<td>{page.list_type}</td>
-					<td><f:format.raw>{page.actions}</f:format.raw> {page.misc}</td>
+					<td><f:format.raw>{page.actions}</f:format.raw></td>
 					<td>
 						<ex:editLink action="edit" table="pages" uid="{page.pl10n}" language="{page.sys_language_uid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=list">
 		      				<core:icon identifier="actions-open" size="small" />
@@ -159,7 +159,7 @@ uid;lang.;colPos;deleted;hidden;header;CType;list_type;FlexForm actions;uid;dele
 </f:else>
 </f:if>
 <p><i>*: this is a LIKE 'sword%' search.<br>
-	**: this is a LIKE '%sword%' search or if CTYPE=gridelements_pi1 a search in the field tx_gridelements_backend_layout will be performed too.<br>
+	**: this is a LIKE '%sword%' search.<br>
 	***: you can use more values, separated by a space.<br>
 	****: this fields are not working with the pagination, because they are not stored in the database.</i></p>
 </f:section>

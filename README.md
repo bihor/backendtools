@@ -1,10 +1,10 @@
 # backendtools
 
-version 5.4.0
+version 6.0.0
 
-9 admin tools for extensions, pages, (backend) layouts, slug, redirects, files, images and links:
+8 admin tools for extensions, pages, (backend) layouts, slug, redirects, files, images and links:
 extension-list, recent pages and content elements, used (backend) layouts, import redirects, check redirects, 
-delete unused files, show where missing files are used, images with no title/alt-text and linklist.
+show where missing files are used, images with no title/alt-text and linklist.
 
 You find the documentation for this extension at typo3.org:
 https://docs.typo3.org/p/fixpunkt/backendtools/master/en-us/
@@ -26,3 +26,10 @@ Image-preview added to "Find used images without title- or alt-text".
 
 Version 5.3.1/2/3:
 Widget "No. of extensions" deleted. Widget "Statistic about image meta tags" added.
+
+Version 6.0.0:
+Version for TYPO3 12 and 13 LTS.
+Refactored with the rector-extension.
+Support for the gridelements-extension dropped.
+Tool file-deletion (in uploads folder) deleted.
+"Flush TYPO3 and PHP Cache" must be clicked before first use.

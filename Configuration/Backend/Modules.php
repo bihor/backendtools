@@ -16,7 +16,7 @@ return [
         'labels' => 'LLL:EXT:backendtools/Resources/Private/Language/locallang_mod1.xlf',
         'extensionName' => 'Backendtools',
         'controllerActions' => [
-            SessionController::class => 'list, latest, layouts, filedeletion, missing, images, pagesearch, redirects, redirectscheck',
+            SessionController::class => 'list, latest, layouts, missing, images, pagesearch, redirects, redirectscheck',
         ],
     ],
 ];

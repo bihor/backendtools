@@ -1,195 +1,246 @@
 {namespace ex=Fixpunkt\Backendtools\ViewHelpers}
 <html
-		xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
-		xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
-		xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers"
-		data-namespace-typo3-fluid="true">
-<f:layout name="Module" />
+        xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+        xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+        data-namespace-typo3-fluid="true">
+<f:layout name="Module"/>
 <f:section name="Content">
-<h1>Links to a (specific) page</h1>
-<f:flashMessages />
-<f:form action="pagesearch" class="form-inline">
-<p>Search any content element that contains a link to this page:</p>
-<div class="row"><div class="col-md-6">
+    <h1>Links to a (specific) page</h1>
+    <f:flashMessages/>
+    <f:form action="pagesearch" class="form-inline">
+        <p>Search any content element that contains a link to this page:</p>
+        <div class="row">
+            <div class="col-md-6">
 
-<div style="margin: 10px 0;">Show only 
-  <label class="checkbox-inline">
-	<f:form.radio name="my_c" value="1" checked="{my_c} == 1" /> not visible &nbsp; or
-  </label>
-  <label class="checkbox-inline">
-	<f:form.radio name="my_c" value="2" checked="{my_c} == 2" /> visible &nbsp; or
-  </label>
-  <label class="checkbox-inline">
-	<f:form.radio name="my_c" value="0" checked="{my_c} == 0" /> all ... content elements.
-  </label>
-</div>
-<div style="margin: 10px 0;">Show only 
-  <label class="checkbox-inline">
-	<f:form.radio name="my_p" value="1" checked="{my_p} == 1" /> not visible &nbsp; or
-  </label>
-  <label class="checkbox-inline">
-	<f:form.radio name="my_p" value="2" checked="{my_p} == 2" /> visible &nbsp; or
-  </label>
-  <label class="checkbox-inline">
-	<f:form.radio name="my_p" value="0" checked="{my_p} == 0" /> all ... pages.
-  </label>
-</div>
-	<div style="margin: 10px 0;"><f:translate key="LLL:EXT:backendtools/Resources/Private/Language/locallang.xlf:tx_backendtools_domain_model_session.pagestart" />:
-		<f:form.textfield name="my_recursive" value="{my_recursive}" size="5" /> &nbsp;
-	</div>
-</div><div class="col-md-6">
+                <div style="margin: 10px 0;">Show only
+                    <label class="checkbox-inline">
+                        <f:form.radio name="my_c" value="1" checked="{my_c} == 1"/>
+                        not visible &nbsp; or
+                    </label>
+                    <label class="checkbox-inline">
+                        <f:form.radio name="my_c" value="2" checked="{my_c} == 2"/>
+                        visible &nbsp; or
+                    </label>
+                    <label class="checkbox-inline">
+                        <f:form.radio name="my_c" value="0" checked="{my_c} == 0"/>
+                        all ... content elements.
+                    </label>
+                </div>
+                <div style="margin: 10px 0;">Show only
+                    <label class="checkbox-inline">
+                        <f:form.radio name="my_p" value="1" checked="{my_p} == 1"/>
+                        not visible &nbsp; or
+                    </label>
+                    <label class="checkbox-inline">
+                        <f:form.radio name="my_p" value="2" checked="{my_p} == 2"/>
+                        visible &nbsp; or
+                    </label>
+                    <label class="checkbox-inline">
+                        <f:form.radio name="my_p" value="0" checked="{my_p} == 0"/>
+                        all ... pages.
+                    </label>
+                </div>
+                <div style="margin: 10px 0;">
+                    <f:translate
+                            key="LLL:EXT:backendtools/Resources/Private/Language/locallang.xlf:tx_backendtools_domain_model_session.pagestart"/>
+                    :
+                    <f:form.textfield name="my_recursive" value="{my_recursive}" size="5"/> &nbsp;
+                </div>
+            </div>
+            <div class="col-md-6">
 
-<div style="margin: 10px 0;">Find links with this target ID (UID of a page): 
- <f:form.textfield name="linksto" value="{linksto}" size="5" /> (e.g. 1)<br />
- <label class="checkbox-inline">
-  <f:form.checkbox name="exttoo" value="1" checked="{exttoo} == 1" /> search in some extensions too (news, camaliga)
- </label>
-</div>
-<div style="margin: 10px 0;">Elements per page:
-	<f:form.textfield name="my_page" value="{my_page}" size="5" /> &nbsp;
-</div>
+                <div style="margin: 10px 0;">Find links with this target ID (UID of a page):
+                    <f:form.textfield name="linksto" value="{linksto}" size="5"/>
+                    (e.g. 1)<br/>
+                    <label class="checkbox-inline">
+                        <f:form.checkbox name="exttoo" value="1" checked="{exttoo} == 1"/>
+                        search in some extensions too (news, camaliga)
+                    </label>
+                </div>
+                <div style="margin: 10px 0;">Elements per page:
+                    <f:form.textfield name="my_page" value="{my_page}" size="5"/> &nbsp;
+                </div>
 
-</div></div>
+            </div>
+        </div>
 
-<f:form.submit value="search" name="search" class="btn btn-default" />
-</f:form>
-<div>&nbsp;</div>
+        <f:form.submit value="search" name="search" class="btn btn-default"/>
+    </f:form>
+    <div>&nbsp;</div>
 
-<f:if condition="{pages -> f:count()} > 0">
-<f:then>
-	<f:if condition="{settings.pagebrowser.insertAbove} && ({paginator.numberOfPages} > 1)">
-		<f:render partial="Paginator" arguments="{_all}" />
-	</f:if>
-<table class="table">
-<thead>
-	<tr>
-		<th colspan="5" style="text-align:center;background-color:#cfc;color:#000;">Content element</th>
-		<th colspan="4" style="text-align:center;background-color:#ccf;color:#000;">Page</th>
-	</tr>
-	<tr>
-		<th>uid</th>
-		<th>lang.</th>
-		<th>colPos</th>
-		<th>deleted / hidden</th>
-		<th>header</th>
-		<th>uid</th>
-		<th>deleted / hidden</th>
-		<th>title</th>
-	</tr>
-</thead>
-<tbody>
-	<f:for each="{paginator.paginatedItems}" as="page" iteration="iterator">
-		<tr{f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
-			<td>
-				<ex:editLink action="edit" table="tt_content" uid="{page.uid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=pagesearch">
-					<core:icon identifier="actions-open" size="small" />
-      			</ex:editLink>
-      			{page.uid}
-      		</td>
-			<td>{page.sys_language_uid}</td>
-			<td>{page.colPos}</td>
-			<td><f:if condition="{page.ttdeleted} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if> / 
-				<f:if condition="{page.tthidden} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
-			<td>{page.header}</td>
-			<td>
-				<ex:editLink action="edit" table="pages" uid="{page.pl10n}" language="{page.sys_language_uid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=pagesearch">
-      				<core:icon identifier="actions-open" size="small" />
-      			</ex:editLink>
-      			<a href="{page.domain}/index.php?id={page.pid}&no_cache=1" target="extern">
-      				<core:icon identifier="actions-document-view" size="small" />
-      			</a>
-				{page.pid}
-			</td>
-			<td><f:if condition="{page.pdeleted} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if> / 
-				<f:if condition="{page.phidden} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
-			<td><a href="{page.domain}{page.slug}" target="extern">{page.title}</a></td>
-		</tr>
-	</f:for>
-</tbody>
-</table>
-	<f:if condition="{settings.pagebrowser.insertBelow} && ({paginator.numberOfPages} > 1)">
-		<f:render partial="Paginator" arguments="{_all}" />
-		<p>Element {pagination.startRecordNumber} - {pagination.endRecordNumber}.</p>
-	</f:if>
-	<p>{pages -> f:count()} content element(s) with links to the pages UID {linksto} found.</p>
-</f:then>
-<f:else>
-	<p>0 content elements found!</p>
-</f:else>
-</f:if>
+    <f:if condition="{pages -> f:count()} > 0">
+        <f:then>
+            <f:if condition="{settings.pagebrowser.insertAbove} && ({paginator.numberOfPages} > 1)">
+                <f:render partial="Paginator" arguments="{_all}"/>
+            </f:if>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th colspan="5" style="text-align:center;background-color:#cfc;color:#000;">Content element</th>
+                    <th colspan="4" style="text-align:center;background-color:#ccf;color:#000;">Page</th>
+                </tr>
+                <tr>
+                    <th>uid</th>
+                    <th>lang.</th>
+                    <th>colPos</th>
+                    <th>deleted / hidden</th>
+                    <th>header</th>
+                    <th>uid</th>
+                    <th>deleted / hidden</th>
+                    <th>title</th>
+                </tr>
+                </thead>
+                <tbody>
+                <f:for each="{paginator.paginatedItems}" as="page" iteration="iterator">
+                    <tr {f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
+                    <td>
+                        <ex:editLink action="edit" table="tt_content" uid="{page.uid}"
+                                     returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=pagesearch">
+                            <core:icon identifier="actions-open" size="small"/>
+                        </ex:editLink>
+                        {page.uid}
+                    </td>
+                    <td>{page.sys_language_uid}</td>
+                    <td>{page.colPos}</td>
+                    <td>
+                        <f:if condition="{page.ttdeleted} == 1">
+                            <f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then>
+                            <f:else>no</f:else>
+                        </f:if>
+                        /
+                        <f:if condition="{page.tthidden} == 1">
+                            <f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then>
+                            <f:else>no</f:else>
+                        </f:if>
+                    </td>
+                    <td>{page.header}</td>
+                    <td>
+                        <ex:editLink action="edit" table="pages" uid="{page.pl10n}" language="{page.sys_language_uid}"
+                                     returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=pagesearch">
+                            <core:icon identifier="actions-open" size="small"/>
+                        </ex:editLink>
+                        <a href="{page.domain}/index.php?id={page.pid}&no_cache=1" target="extern">
+                            <core:icon identifier="actions-document-view" size="small"/>
+                        </a>
+                        {page.pid}
+                    </td>
+                    <td>
+                        <f:if condition="{page.pdeleted} == 1">
+                            <f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then>
+                            <f:else>no</f:else>
+                        </f:if>
+                        /
+                        <f:if condition="{page.phidden} == 1">
+                            <f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then>
+                            <f:else>no</f:else>
+                        </f:if>
+                    </td>
+                    <td><a href="{page.domain}{page.slug}" target="extern">{page.title}</a></td>
+                    </tr>
+                </f:for>
+                </tbody>
+            </table>
+            <f:if condition="{settings.pagebrowser.insertBelow} && ({paginator.numberOfPages} > 1)">
+                <f:render partial="Paginator" arguments="{_all}"/>
+                <p>Element {pagination.startRecordNumber} - {pagination.endRecordNumber}.</p>
+            </f:if>
+            <p>{pages -> f:count()} content element(s) with links to the pages UID {linksto} found.</p>
+        </f:then>
+        <f:else>
+            <p>0 content elements found!</p>
+        </f:else>
+    </f:if>
 
-<f:if condition="{exttoo} == 1">
-	<f:if condition="{news -> f:count()} > 0">
-	<f:then>
-	<br>
-	<table class="table">
-	<thead>
-		<tr>
-			<th colspan="5" style="text-align:center;background-color:#fcc;">news</th>
-		</tr>
-		<tr>
-			<th>pid</th>
-			<th>uid</th>
-			<th>lang.</th>
-			<th>deleted / hidden</th>
-			<th>title</th>
-		</tr>
-	</thead>
-	<tbody>
-		<f:for each="{news}" as="page" iteration="iterator">
-			<tr{f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
-				<td>{page.pid}</td>
-				<td>{page.uid}</td>
-				<td>{page.sys_language_uid}</td>
-				<td><f:if condition="{page.deleted} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if> / 
-					<f:if condition="{page.hidden} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
-				<td>{page.title}</td>
-			</tr>
-		</f:for>
-	</tbody>
-	</table>
-		<p>{news -> f:count()} news entrie(s) with links to the pages UID {linksto} found.</p>
-	</f:then>
-	<f:else>
-		<p>0 news entries found.</p>
-	</f:else>
-	</f:if>
-	
-	<f:if condition="{camaliga -> f:count()} > 0">
-	<f:then>
-	<br>
-	<table class="table">
-	<thead>
-		<tr>
-			<th colspan="5" style="text-align:center;background-color:#fcc;">camaliga</th>
-		</tr>
-		<tr>
-			<th>pid</th>
-			<th>uid</th>
-			<th>lang.</th>
-			<th>deleted / hidden</th>
-			<th>title</th>
-		</tr>
-	</thead>
-	<tbody>
-		<f:for each="{camaliga}" as="page" iteration="iterator">
-			<tr{f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
-				<td>{page.pid}</td>
-				<td>{page.uid}</td>
-				<td>{page.sys_language_uid}</td>
-				<td><f:if condition="{page.deleted} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if> / 
-					<f:if condition="{page.hidden} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
-				<td>{page.title}</td>
-			</tr>
-		</f:for>
-	</tbody>
-	</table>
-		<p>{camaliga -> f:count()} camaliga entrie(s) with links to the pages UID {linksto} found.</p>
-	</f:then>
-	<f:else>
-		<p>0 camaliga entries found.</p>
-	</f:else>
-	</f:if>
-</f:if>
+    <f:if condition="{exttoo} == 1">
+        <f:if condition="{news -> f:count()} > 0">
+            <f:then>
+                <br>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th colspan="5" style="text-align:center;background-color:#fcc;">news</th>
+                    </tr>
+                    <tr>
+                        <th>pid</th>
+                        <th>uid</th>
+                        <th>lang.</th>
+                        <th>deleted / hidden</th>
+                        <th>title</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <f:for each="{news}" as="page" iteration="iterator">
+                        <tr {f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
+                        <td>{page.pid}</td>
+                        <td>{page.uid}</td>
+                        <td>{page.sys_language_uid}</td>
+                        <td>
+                            <f:if condition="{page.deleted} == 1">
+                                <f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then>
+                                <f:else>no</f:else>
+                            </f:if>
+                            /
+                            <f:if condition="{page.hidden} == 1">
+                                <f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then>
+                                <f:else>no</f:else>
+                            </f:if>
+                        </td>
+                        <td>{page.title}</td>
+                        </tr>
+                    </f:for>
+                    </tbody>
+                </table>
+                <p>{news -> f:count()} news entrie(s) with links to the pages UID {linksto} found.</p>
+            </f:then>
+            <f:else>
+                <p>0 news entries found.</p>
+            </f:else>
+        </f:if>
+
+        <f:if condition="{camaliga -> f:count()} > 0">
+            <f:then>
+                <br>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th colspan="5" style="text-align:center;background-color:#fcc;">camaliga</th>
+                    </tr>
+                    <tr>
+                        <th>pid</th>
+                        <th>uid</th>
+                        <th>lang.</th>
+                        <th>deleted / hidden</th>
+                        <th>title</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <f:for each="{camaliga}" as="page" iteration="iterator">
+                        <tr {f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
+                        <td>{page.pid}</td>
+                        <td>{page.uid}</td>
+                        <td>{page.sys_language_uid}</td>
+                        <td>
+                            <f:if condition="{page.deleted} == 1">
+                                <f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then>
+                                <f:else>no</f:else>
+                            </f:if>
+                            /
+                            <f:if condition="{page.hidden} == 1">
+                                <f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then>
+                                <f:else>no</f:else>
+                            </f:if>
+                        </td>
+                        <td>{page.title}</td>
+                        </tr>
+                    </f:for>
+                    </tbody>
+                </table>
+                <p>{camaliga -> f:count()} camaliga entrie(s) with links to the pages UID {linksto} found.</p>
+            </f:then>
+            <f:else>
+                <p>0 camaliga entries found.</p>
+            </f:else>
+        </f:if>
+    </f:if>
 </f:section>
 </html>

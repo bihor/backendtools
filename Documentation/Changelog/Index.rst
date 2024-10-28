@@ -10,6 +10,16 @@
 
 Changelog
 =========
+Version 6.0.0:
+Version for TYPO3 12 and 13 LTS.
+Refactored with the rector-extension.
+Support for the gridelements-extension dropped.
+Tool file-deletion (in uploads folder) deleted.
+"Flush TYPO3 and PHP Cache" must be clicked before first use.
+
+Version 5.3.3:
+Widget "No. of extensions" deleted. Widget "Statistic about image meta tags" added.
+
 Version 5.3.0:
 Possibility added, to delete missing image-entries.
 Image-preview added to "Find used images without title- or alt-text".
@@ -64,6 +74,3 @@ Version 2.0:
 Refactoring: large modification of the queries.
 FE-links: domain + language entry point added, L removed.
 Link added to all page-titles + the csv-view.
-
-Version 5.3.1:
-Widget "No. of extensions" deleted. Widget "Statistic about image meta tags" added.

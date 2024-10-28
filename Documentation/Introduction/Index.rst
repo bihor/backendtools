@@ -25,26 +25,27 @@ You can search for non-extensions too, e.g. if you set Ctype='mailform'.
 
 Tool 2: shows recently modified pages and content elements.
 
-Tool 3: helps you to delete unused files. Go to “Admin tools” → DB check” → “Database Relations” to find files which you can delete.
-This tool helps you to delete these files.
+Tool 3: helps you to find pages where layouts or backend layouts are in use.
 
-Tool 4: helps you to find pages where layouts or backend layouts are in use.
+Tool 4: helps you to find pages that link to another page. You can find any content element with a link to a specific page.
 
-Tool 5: helps you to find pages that link to another page. You can find any content element with a link to a specific page.
+Tool 5: helps you to find images with no title- oder alternative-text. This tool can set that values for you too.
 
-Tool 6: helps you to find images with no title- oder alternative-text. This tool can set that values for you too.
+Tool 6: helps you to find missing files/images. This tool shows you where they are used.
 
-Tool 7: helps you to find missing files/images. This tool shows you where they are used.
+Tool 7: you can import simple redirect rules form your .htaccess to the table sys_redirect.
 
-Tool 8: you can import simple redirect rules form your .htaccess to the table sys_redirect.
+Tool 8: you can check all your entries of sys_redirect, if the target links are reachable.
 
-Tool 9: you can check all your entries of sys_redirect, if the target links are reachable.
+Tool 9: helps you to delete unused files. Go to “Admin tools” → DB check” → “Database Relations” to find files which you can delete.
+This tool helps you to delete these files in the uploads-folder.
+Note: this tool was removed in version 6.0.0, because the uploads-folder is no longer in use.
 
 Tool 10: shows differences between RealURL-pagepath (in tx_realurl_pathdata) and Slug (in pages).
 Note: the old RealURL-tables must be present!
 Note: this tool was removed in version 4.0.0.
 
-Tool 11: unzip a zig file in the fileadmin-folder.
+Tool 11: unzip a zip-file in the fileadmin-folder.
 Note: this tool was removed in version 3.0.0.
 
 Since version 4.2.0 there are some dashboard widgets available too.

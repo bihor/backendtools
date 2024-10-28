@@ -190,7 +190,6 @@ class SessionController extends ActionController
             $this->sessionRepository->update($default);
         }
 
-        $gridelements_loaded = ExtensionManagementUtility::isLoaded('gridelements');
         $pages = $this->sessionRepository->getPagesWithExtensions(
             $my_c,
             $my_p,
@@ -199,8 +198,7 @@ class SessionController extends ActionController
             $my_flexform,
             $my_exclude,
             $my_orderby,
-            $my_direction,
-            $gridelements_loaded,
+            $my_direction
         );
         $types = $this->sessionRepository->getAllTypes();
         if ($my_recursive > 0) {
@@ -496,123 +494,6 @@ class SessionController extends ActionController
         $this->moduleTemplate->assign('action', 'layouts');
         $this->addDocHeaderDropDown('layouts');
         return $this->moduleTemplate->renderResponse('Session/Layouts');
-    }
-
-    /**
-     * action filedeletion
-     *
-     * @return ResponseInterface
-     */
-    public function filedeletionAction(): ResponseInterface
-    {
-        $beuser_id = $GLOBALS['BE_USER']->user['uid'];
-        $result = $this->sessionRepository->findByAction('filedeletion', $beuser_id);
-        if ($result->count() == 0) {
-            $new = true;
-            $default = GeneralUtility::makeInstance(Session::class);
-            $default->setAction('filedeletion');
-            $default->setValue1(0);
-            $default->setValue2(0);
-            $default->setValue3(0);
-            $default->setValue4('');
-            $default->setValue5('0');
-        } else {
-            $new = false;
-            $default = $result[0];
-        }
-
-        if ($this->request->hasArgument('method')) {
-            $method = (int)($this->request->getArgument('method'));
-            $default->setValue1($method);
-        } else {
-            $method = $default->getValue1();
-        }
-        if ($this->request->hasArgument('bytes')) {
-            $bytes = (int)($this->request->getArgument('bytes'));
-            $default->setValue2($bytes);
-        } else {
-            $bytes = $default->getValue2();
-        }
-        if ($this->request->hasArgument('convert')) {
-            $convert = $this->request->getArgument('convert');
-            $default->setValue5($convert);
-        } else {
-            $convert = $default->getValue5();
-        }
-        if ($this->request->hasArgument('delfile')) {
-            $delfile = $this->request->getArgument('delfile');
-            //	$default->setValue4($delfile);
-        } else {
-            $delfile = '';
-        } // $default->getValue4();
-
-        if ($new) {
-            $user = $this->backendUserRepository->findByUid($beuser_id);
-            $default->setBeuser($user);
-            $this->sessionRepository->add($default);
-            $persistenceManager = GeneralUtility::makeInstance(PersistenceManager::class);
-            $persistenceManager->persistAll();
-        } else {
-            $this->sessionRepository->update($default);
-        }
-
-        $groesse = 0;
-        $groesse_total = 0;
-        $content = '';
-
-        if ($delfile) {
-            $total = 0;
-            $success = 0;
-            $filename = Environment::getPublicPath() . '/' . 'fileadmin/' . $delfile;
-            if (is_file($filename) && file_exists($filename)) {
-                if (!$method) {
-                    $content .= "This is the file content:<br />\n";
-                }
-                $filecontent = fopen($filename, 'r');
-                while (!feof($filecontent)) {
-                    $row = trim(fgets($filecontent));
-                    if ($convert == 'iso') {
-                        $row = utf8_decode($row);
-                    }
-                    if ($convert == 'utf8') {
-                        $row = utf8_encode($row);
-                    }
-                    if (is_file($row) && file_exists($row)) {
-                        if ($bytes) {
-                            $groesse = filesize($row);
-                            $groesse_total += $groesse;
-                        }
-                        if ($method && strpos($row, '/uploads/') > 0) {
-                            if (unlink($row)) {
-                                $success++;
-                            } else {
-                                $content .= "$row could not be deleted!<br />\n";
-                            }
-                        } else {
-                            $content .= ($bytes) ? "$row ($groesse bytes)<br />\n" : "$row<br />\n";
-                        }
-                    } else {
-                        $content .= "$row not found!<br />\n";
-                    }
-                    $total++;
-                }
-                fclose($filecontent);
-                if ($bytes) {
-                    $content .= "<br />That are $groesse_total bytes (" . $this->formatBytes($groesse_total) . ').';
-                }
-                $content .= "<br />$success/$total files deleted.";
-            } else {
-                $content .= 'Note: file not found!!!';
-            }
-        }
-        $this->moduleTemplate->assign('method', $method);
-        $this->moduleTemplate->assign('bytes', $bytes);
-        $this->moduleTemplate->assign('convert', $convert);
-        $this->moduleTemplate->assign('delfile', $delfile);
-        $this->moduleTemplate->assign('message', $content);
-        $this->moduleTemplate->assign('action', 'filedeletion');
-        $this->addDocHeaderDropDown('filedeletion');
-        return $this->moduleTemplate->renderResponse('Session/Filedeletion');
     }
 
     /**
@@ -1404,7 +1285,7 @@ class SessionController extends ActionController
         $languageService = $this->getLanguageService();
         $actionMenu = $this->moduleTemplate->getDocHeaderComponent()->getMenuRegistry()->makeMenu();
         $actionMenu->setIdentifier('backendtoolsSelector');
-        $actions = ['list', 'latest', 'pagesearch', 'layouts', 'images', 'missing', 'filedeletion', 'redirects', 'redirectscheck'];
+        $actions = ['list', 'latest', 'pagesearch', 'layouts', 'images', 'missing', 'redirects', 'redirectscheck'];
         foreach ($actions as $action) {
             $actionMenu->addMenuItem(
                 $actionMenu->makeMenuItem()

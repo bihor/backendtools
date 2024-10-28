@@ -36,12 +36,6 @@
 			<trans-unit id="tx_backendtools_domain_model_session.beuser">
 				<source>Beuser</source>
 			</trans-unit>
-			<trans-unit id="number_with_icon_widget.title">
-				<source>No. of extensions in typo3conf/ext</source>
-			</trans-unit>
-			<trans-unit id="number_with_icon_widget.subtitle">
-				<source>Not every of them must be installed.</source>
-			</trans-unit>
 			<trans-unit id="number_of_files_widget.title">
 				<source>Missing files</source>
 			</trans-unit>

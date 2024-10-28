@@ -117,10 +117,9 @@ class SessionRepository extends Repository
      * @param	string	$my_exclude		exclude type
      * @param	int		$my_orderby		order by
      * @param	int		$my_direction	order direction
-     * @param	boolen  $gridelements_loaded	Extension gridelements loaded?
      * @return array
      */
-    public function getPagesWithExtensions($my_c, $my_p, $my_type, $my_value, $my_flexform, $my_exclude, $my_orderby, $my_direction, $gridelements_loaded)
+    public function getPagesWithExtensions($my_c, $my_p, $my_type, $my_value, $my_flexform, $my_exclude, $my_orderby, $my_direction)
     {
         $pages = [];
         //$PageRepository = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
@@ -134,7 +133,6 @@ class SessionRepository extends Repository
         if ($my_exclude) {
             $exclude_ctypes = array_merge($exclude_ctypes, explode(' ', $my_exclude));
         }
-        $more = ($gridelements_loaded) ? 'tt_content.tx_gridelements_backend_layout' : 'tt_content.l18n_parent';
 
         // Query aufbauen
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('tt_content')->createQueryBuilder();
@@ -149,7 +147,6 @@ class SessionRepository extends Repository
             'tt_content.CType',
             'tt_content.list_type',
             'tt_content.pi_flexform',
-            $more,
             'pages.title',
             'pages.slug',
             'pages.deleted AS pdeleted',
@@ -228,19 +225,9 @@ class SessionRepository extends Repository
         }
 
         if ($my_flexform) {
-            if ($my_value == 'gridelements_pi1' && $my_type == 2) {
-                // wir suchen auch in tx_gridelements_backend_layout
-                $res -> andWhere(...[
-                    $queryBuilder->expr()->or(
-                        $queryBuilder->expr()->like('tt_content.pi_flexform', $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($my_flexform) . '%')),
-                        $queryBuilder->expr()->like('tt_content.tx_gridelements_backend_layout', $queryBuilder->createNamedParameter($queryBuilder->escapeLikeWildcards($my_flexform))),
-                    ),
-                ]);
-            } else {
-                $res->andWhere(
-                    $queryBuilder->expr()->like('tt_content.pi_flexform', $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($my_flexform) . '%')),
-                );
-            }
+            $res->andWhere(
+                $queryBuilder->expr()->like('tt_content.pi_flexform', $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($my_flexform) . '%')),
+            );
         }
 
         $asc = ($my_direction == 1) ? 'DESC' : 'ASC';
@@ -305,24 +292,6 @@ class SessionRepository extends Repository
             }
             $row['csvheader'] = str_replace('"', '\'', (string)$row['header']);
             $row['csvtitle'] = str_replace('"', '\'', (string)$row['title']);
-            if (isset($row['tx_gridelements_backend_layout'])) {
-                $row['misc'] = $row['tx_gridelements_backend_layout'];
-                if ($row['misc'] == '2cols' || $row['misc'] == '3cols' || $row['misc'] == '4cols' || $row['misc'] == '6cols') {
-                    $pattern = '/<field index="xsCol1">([\n|\r|\t| ]*)<value index="vDEF">(.*)</';
-                    $matches = [];
-                    preg_match($pattern, (string)$subject, $matches);
-                    if (isset($matches[2])) {
-                        $row['misc'] .= ' # xs=' . $matches[2];
-                    } else {
-                        $pattern = '/<field index="smCol1">([\n|\r|\t| ]*)<value index="vDEF">(.*)</';
-                        $matches = [];
-                        preg_match($pattern, (string)$subject, $matches);
-                        if (isset($matches[2])) {
-                            $row['misc'] .= ' # SM=' . $matches[2];
-                        }
-                    }
-                }
-            }
             $pages[] = $row;
         }
         return $pages;
