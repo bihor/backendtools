@@ -30,6 +30,6 @@ Widget "No. of extensions" deleted. Widget "Statistic about image meta tags" add
 Version 6.0.0:
 Version for TYPO3 12 and 13 LTS.
 Refactored with the rector-extension.
-Support for the gridelements-extension dropped.
+Support for the gridelements-extension and switchableControllerActions dropped.
 Tool file-deletion (in uploads folder) deleted.
 "Flush TYPO3 and PHP Cache" must be clicked before first use.

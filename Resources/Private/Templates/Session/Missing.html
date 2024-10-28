@@ -2,7 +2,6 @@
 <html
         xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
         xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
-        xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers"
         data-namespace-typo3-fluid="true">
 <f:layout name="Module"/>
 <f:section name="Content">
@@ -73,8 +72,7 @@
                     </thead>
                     <tbody>
                     <f:for each="{paginator.paginatedItems}" as="image" iteration="iterator">
-                        <tr
-                        {f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
+                        <tr {f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
                         <td>
                             <f:form.radio name="delimg" value="{image.file.uid}"/>
                         </td>
@@ -124,8 +122,7 @@
                 </thead>
                 <tbody>
                 <f:for each="{fileArray}" as="image" iteration="iterator">
-                    <tr
-                    {f:if(condition:iterator.isOdd, then: 'style="background-color:#fff;"')}>
+                    <tr {f:if(condition:iterator.isOdd, then: 'style="background-color:#fff;"')}>
                     <td>
                         <f:form.radio name="delimg" value="{image.uid}"/>
                     </td>

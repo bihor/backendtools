@@ -253,22 +253,15 @@ class SessionRepository extends Repository
         foreach ($result as $row) {
             $subject = $row['pi_flexform'];
             if ($subject) {
-                $pattern = '/<field index="switchableControllerActions">([\n|\r|\t| ]*)<value index="vDEF">(.*)</';
+                $pattern = '/<field index="what_to_display">([\n|\r|\t| ]*)<value index="vDEF">(.*)</';
                 $matches = [];
                 preg_match($pattern, (string)$subject, $matches);
                 if (isset($matches[2])) {
-                    $row['actions'] = str_replace('###', '&gt;', str_replace(';', ', ', str_replace('&gt;', '###', $matches[2])));
-                } else {
-                    $pattern = '/<field index="what_to_display">([\n|\r|\t| ]*)<value index="vDEF">(.*)</';
-                    $matches = [];
-                    preg_match($pattern, (string)$subject, $matches);
-                    if (isset($matches[2])) {
-                        $row['actions'] = $matches[2];
-                    } elseif ($row['CType'] == 'wst3bootstrap_fluidrow') {
-                        $sections = substr_count((string)$subject, '<section index');
-                        if ($sections > 0) {
-                            $row['actions'] = $sections . ' cols';
-                        }
+                    $row['actions'] = $matches[2];
+                } elseif ($row['CType'] == 'wst3bootstrap_fluidrow') {
+                    $sections = substr_count((string)$subject, '<section index');
+                    if ($sections > 0) {
+                        $row['actions'] = $sections . ' cols';
                     }
                 }
             }
