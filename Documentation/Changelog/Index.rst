@@ -15,6 +15,7 @@ Version for TYPO3 12 and 13 LTS.
 Refactored with the rector-extension.
 Support for the gridelements-extension and switchableControllerActions dropped.
 Tool file-deletion (in uploads folder) deleted.
+Bugfix: replace-button for empty alt/title-tags fixed.
 "Flush TYPO3 and PHP Cache" must be clicked before first use.
 
 Version 5.3.3:
