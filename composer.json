@@ -8,9 +8,9 @@
 		}
 	],
 	"require" : {
-		"typo3/cms-core" : "~12.5.0 || ~13.4.0",
-        "typo3/cms-dashboard" : "~12.5.0 || ~13.4.0",
-        "typo3/cms-extbase" : "~12.5.0 || ~13.4.0"
+		"typo3/cms-core" : "~12.4.0 || ~13.4.0",
+        "typo3/cms-dashboard" : "~12.4.0 || ~13.4.0",
+        "typo3/cms-extbase" : "~12.4.0 || ~13.4.0"
 	},
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",
