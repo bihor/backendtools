@@ -10,7 +10,11 @@
 
 Changelog
 =========
-Version 6.0.0:
+Version 6.0.2:
+Source=target check added to redirects-check.
+Bugfix: styles added again.
+
+Version 6.0:
 Version for TYPO3 12 and 13 LTS.
 Refactored with the rector-extension.
 Support for the gridelements-extension and switchableControllerActions dropped.
@@ -33,7 +37,7 @@ Version 5.1.0/2:
 New tool: show where missing files are used.
 Bugfix: show meta-data again in "Show images without title- or alt-text".
 
-Version 5.0.0:
+Version 5.0:
 Version for TYPO3 12 LTS.
 
 Version 4.3.0/1:

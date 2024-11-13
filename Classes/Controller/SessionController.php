@@ -1164,6 +1164,10 @@ class SessionController extends ActionController
                 } elseif ((str_starts_with((string)$target, 't3:')) && ($my_error < 2)) {
                     $parts = explode('=', (string)$target);
                     [$pre, $rowid] = $parts;
+                    $targetHash = strpos((string)$rowid, '#');
+                    if ($targetHash) {
+                        $rowid = substr($rowid, 0, $targetHash);
+                    }
                     $rowid = (int)$rowid;
                     $parts = explode('?', $pre);
                     [$pre, $after] = $parts;
@@ -1179,6 +1183,8 @@ class SessionController extends ActionController
                         } elseif (is_int($row['uid'])) {
                             if (isset($row['doktype']) && ($row['doktype'] == 254 || $row['doktype'] == 255 || $row['doktype'] == 198 || $row['doktype'] == 199)) {
                                 $status = 'doktype=' . $row['doktype'] . ' !';
+                            } elseif (($table == 'page') && ($redirect['source_path'] == $row['slug'])) {
+                                $status = 'source=target!';
                             } else {
                                 $status = 'OK';
                             }

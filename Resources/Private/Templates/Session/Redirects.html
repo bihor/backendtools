@@ -5,33 +5,34 @@
 		data-namespace-typo3-fluid="true">
 <f:layout name="Module" />
 <f:section name="Content">
-<h1>Add simple .htaccess-redirects to the table sys_redirect</h1>
-<f:flashMessages />
-<f:form action="redirects">
-	<div style="margin: 10px 0;">
-		<p><strong>Choose a file...</strong> ... from here (relative path and file name):</p>
-		 fileadmin/ <f:form.textfield name="impfile" value="{impfile}" size="50" /><br><br>
-		 default status code <f:form.textfield name="defaultstatuscode" value="{defaultstatuscode}" size="5" /><br>
-		 <f:form.radio name="convert" value="0" checked="{convert} == '0'" id="convert_no" /> <label for="convert_no">do not convert data</label> &nbsp; &nbsp;
-		 <f:form.radio name="convert" value="iso" checked="{convert} == 'iso'" id="convert_iso" /> <label for="convert_iso">convert data to ISO-8859-1</label> &nbsp; &nbsp;
-		 <f:form.radio name="convert" value="utf8" checked="{convert} == 'utf8'" id="convert_utf8" /> <label for="convert_utf8">convert data to UTF-8</label><br /><br />
-		 <f:form.radio name="regex" value="0" checked="{regex} == 0" id="regex_no" /> <label for="regex_no">I don´t use regular expressions</label> &nbsp; &nbsp;
-		 <f:form.radio name="regex" value="1" checked="{regex} == 1" id="regex_yes" /> <label for="regex_yes">yes, I use regular expressions in redirects</label><br /><br />
-		 <f:form.radio name="method" value="0" checked="{method} == 0" id="method_no" /> <label for="method_no">show only the content of this file</label> &nbsp; &nbsp;
-		 <f:form.radio name="method" value="1" checked="{method} == 1" id="method_yes" /> <label for="method_yes">import the redirects to sys_redirects</label><br /><br />
-	</div>
-	<f:form.submit name="import" value="Show / import redirects" class="btn btn-primary" />
-</f:form>
-<div>&nbsp;</div>
-<f:if condition="{message}">
-<f:then>
-	<p><f:format.raw>{message}</f:format.raw></p>
-</f:then>
-<f:else>
-	<p>Note: the file should contain (only) redirect rules from your .htaccess! E.g.<br />
-	RewriteRule ^engagieren/klimawandel(/?)$ https://www.mydomain.de/engagieren-fuer-den-klimawandel/ [R=301,L]<br /><br />
-	Copy that rules from your .htaccess and place the new file in your fileadmin-folder (e.g. redirects.txt).</p>
-</f:else>
-</f:if>
+	<f:asset.css identifier="backendtools" href="EXT:backendtools/Resources/Public/Css/Backend.css"/>
+	<h1>Add simple .htaccess-redirects to the table sys_redirect</h1>
+	<f:flashMessages />
+	<f:form action="redirects">
+		<div style="margin: 10px 0;">
+			<p><strong>Choose a file...</strong> ... from here (relative path and file name):</p>
+			 fileadmin/ <f:form.textfield name="impfile" value="{impfile}" size="50" /><br><br>
+			 default status code <f:form.textfield name="defaultstatuscode" value="{defaultstatuscode}" size="5" /><br>
+			 <f:form.radio name="convert" value="0" checked="{convert} == '0'" id="convert_no" /> <label for="convert_no">do not convert data</label> &nbsp; &nbsp;
+			 <f:form.radio name="convert" value="iso" checked="{convert} == 'iso'" id="convert_iso" /> <label for="convert_iso">convert data to ISO-8859-1</label> &nbsp; &nbsp;
+			 <f:form.radio name="convert" value="utf8" checked="{convert} == 'utf8'" id="convert_utf8" /> <label for="convert_utf8">convert data to UTF-8</label><br /><br />
+			 <f:form.radio name="regex" value="0" checked="{regex} == 0" id="regex_no" /> <label for="regex_no">I don´t use regular expressions</label> &nbsp; &nbsp;
+			 <f:form.radio name="regex" value="1" checked="{regex} == 1" id="regex_yes" /> <label for="regex_yes">yes, I use regular expressions in redirects</label><br /><br />
+			 <f:form.radio name="method" value="0" checked="{method} == 0" id="method_no" /> <label for="method_no">show only the content of this file</label> &nbsp; &nbsp;
+			 <f:form.radio name="method" value="1" checked="{method} == 1" id="method_yes" /> <label for="method_yes">import the redirects to sys_redirects</label><br /><br />
+		</div>
+		<f:form.submit name="import" value="Show / import redirects" class="btn btn-primary" />
+	</f:form>
+	<div>&nbsp;</div>
+	<f:if condition="{message}">
+	<f:then>
+		<p><f:format.raw>{message}</f:format.raw></p>
+	</f:then>
+	<f:else>
+		<p>Note: the file should contain (only) redirect rules from your .htaccess! E.g.<br />
+		RewriteRule ^engagieren/klimawandel(/?)$ https://www.mydomain.de/engagieren-fuer-den-klimawandel/ [R=301,L]<br /><br />
+		Copy that rules from your .htaccess and place the new file in your fileadmin-folder (e.g. redirects.txt).</p>
+	</f:else>
+	</f:if>
 </f:section>
 </html>
