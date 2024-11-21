@@ -17,10 +17,10 @@ $EM_CONF[$_EXTKEY] = [
     'author' => 'Kurt Gusbeth',
     'author_company' => 'fixpunkt für digitales GmbH',
     'state' => 'stable',
-    'version' => '6.0.2',
+    'version' => '6.0.3',
     'constraints' => [
         'depends' => [
-            'typo3' => '12.5.0-13.4.99',
+            'typo3' => '12.4.0-13.4.99',
         ],
     ],
 ];

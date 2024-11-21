@@ -1,6 +1,6 @@
 # backendtools
 
-Version 6.0.2
+Version 6.0.3
 
 8 admin tools for extensions, pages, (backend) layouts, slug, redirects, files, images and links:
 extension-list, recent pages and content elements, used (backend) layouts, import redirects, check redirects, 
@@ -38,3 +38,7 @@ Version 6.0:
 Version 6.0.2:
 - Source=target check added to redirects-check.
 - Bugfix: styles added again.
+
+Version 6.0.3:
+- Access of the module changed from invalid value to "admin".
+- Dashboard requirement removed. TYPO3 requirement changed from 12.5 to 12.4.

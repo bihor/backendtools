@@ -9,7 +9,7 @@ return [
     'backendtools' => [
         'parent' => 'tools',
         'position' => ['after' => '*'],
-        'access' => 'user,group',
+        'access' => 'admin',
         'workspaces' => 'live',
         'iconIdentifier' => 'extension-backendtools-module',
         'path' => '/module/tools/mod1',

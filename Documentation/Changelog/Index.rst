@@ -10,6 +10,10 @@
 
 Changelog
 =========
+Version 6.0.3:
+Access of the module changed from invalid value to "admin".
+Dashboard requirement removed. TYPO3 requirement changed from 12.5 to 12.4.
+
 Version 6.0.2:
 Source=target check added to redirects-check.
 Bugfix: styles added again.
