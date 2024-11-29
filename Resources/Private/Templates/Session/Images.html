@@ -1,11 +1,6 @@
 {namespace ex=Fixpunkt\Backendtools\ViewHelpers}
-<html
-		xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
-		xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
-		xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers"
-		data-namespace-typo3-fluid="true">
 <f:layout name="Default" />
-<f:section name="Content">
+<f:section name="content">
 <style>
 	:root {
 		--shadow: 0.3rem 0.3rem 0.6rem #aaddff,
@@ -61,9 +56,7 @@
 
 <f:if condition="{images -> f:count()} > 0">
 <f:then>
-	<f:if condition="{settings.pagebrowser.insertAbove} && ({paginator.numberOfPages} > 1)">
-		<f:render partial="Paginator" arguments="{_all}" />
-	</f:if>
+<f:widget.paginate objects="{images}" as="paginatedimages" configuration="{settings.pagebrowser}">
 <table class="table">
 <thead>
 	<tr>
@@ -91,20 +84,17 @@
 	</tr>
 </thead>
 <tbody>
-	<f:for each="{paginator.paginatedItems}" as="image" iteration="iterator">
+	<f:for each="{paginatedimages}" as="image" iteration="iterator">
 		<tr{f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
 			<f:render partial="Image" arguments="{image: image}" />
 		</tr>
 	</f:for>
 </tbody>
 </table>
+</f:widget.paginate>
 
-	<f:if condition="{settings.pagebrowser.insertBelow} && ({paginator.numberOfPages} > 1)">
-		<f:render partial="Paginator" arguments="{_all}" />
-		<p>Element {pagination.startRecordNumber} - {pagination.endRecordNumber}.</p>
-	</f:if>
-	<p>{images -> f:count()} image(s) found.</p>
-	<br>
+<p>{images -> f:count()} image(s) found.</p>
+<br>
 
 <f:if condition="{img_without} == 1">
 	<f:form.submit value="Replace empty alt-tag (with the title-tag or image name) in sys_file_reference" name="replace_empty_alt" class="btn btn-primary" />
@@ -160,4 +150,3 @@
 
 </f:form>
 </f:section>
-</html>

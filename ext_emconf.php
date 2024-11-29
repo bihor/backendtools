@@ -12,17 +12,20 @@
 
 $EM_CONF[$_EXTKEY] = array (
   'title' => 'Backend tools',
-  'description' => '9 admin tools: extension-list, recent pages & elements, backend layouts, redirects import & check, file-deletion, missing files, images with no alt or title and link-list.',
+  'description' => '7 admin tools: extension-list, slug vs. RealURL, redirects import & check, file-deletion, images with no alt or title and link-list.',
   'category' => 'module',
   'author' => 'Kurt Gusbeth',
-  'author_company' => 'fixpunkt für digitales GmbH',
+  'author_company' => 'fixpunkt werbeagentur gmbh',
+  'author_email' => 'info@quizpalme.de',
   'state' => 'stable',
+  'uploadfolder' => false,
   'createDirs' => '',
   'clearCacheOnLoad' => false,
-  'version' => '4.4.2',
-  'constraints' => array (
+  'version' => '3.1.0',
+  'constraints' => 
+  array (
     'depends' => array (
-        'typo3' => '10.4.6-11.5.99',
+        'typo3' => '9.5.20-10.4.99',
     ),
   ),
 );

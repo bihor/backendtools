@@ -1,0 +1,104 @@
+{namespace ex=Fixpunkt\Backendtools\ViewHelpers}
+<f:layout name="Default" />
+<f:section name="content">
+<style>
+	:root {
+		--shadow: 0.3rem 0.3rem 0.6rem #aaddff,
+		-0.2rem -0.2rem 0.5rem #ffffff;
+	}
+	.f3-widget-paginator { padding-left:0; }
+	.f3-widget-paginator li { display:inline-block; }
+	.f3-widget-paginator li.current { font-weight: bold; }
+	#typo3-inner-docbody {padding-top: 4px;}
+	input,select,table.table {
+		-webkit-box-shadow: var(--shadow);
+		box-shadow: var(--shadow);
+	}
+</style>
+<h1>RealURL vs. Slug</h1>
+<f:flashMessages />
+<f:form action="realurl" class="form-inline">
+<p>Differences between RealURL-pagepath (in tx_realurl_pathdata) and Slug (in pages):</p>
+<div class="row"><div class="col-md-6">
+
+<div style="margin: 10px 0;">Show only entries with
+  <label class="checkbox-inline">
+	<f:form.radio name="my_e" value="1" checked="{my_e} == 1" /> empty &nbsp; or
+  </label>
+  <label class="checkbox-inline">
+	<f:form.radio name="my_e" value="2" checked="{my_e} == 2" /> available &nbsp; or
+  </label>
+  <label class="checkbox-inline">
+	<f:form.radio name="my_e" value="0" checked="{my_e} == 0" /> whatever ... RealURL-pagepath.
+  </label>
+</div>
+
+</div><div class="col-md-3">
+<div style="margin: 10px 0;">Site Configuration check:
+	<label class="checkbox-inline">
+	<f:form.radio name="my_s" value="0" checked="{my_s} == 0" /> no &nbsp; or
+  </label>
+  <label class="checkbox-inline">
+	<f:form.radio name="my_s" value="1" checked="{my_s} == 1" /> yes
+  </label>
+</div>
+
+</div><div class="col-md-3">
+<div style="margin: 10px 0;">Entries per page:
+	<f:form.textfield name="my_page" value="{my_page}" size="5" /> &nbsp;
+</div>
+</div></div>
+
+<f:form.submit value="search" name="search" class="btn btn-default" />
+</f:form>
+
+<f:if condition="{pages -> f:count()} > 0">
+<f:then>
+<f:widget.paginate objects="{pages}" as="paginatedpages" configuration="{settings.pagebrowser}">
+<table class="table">
+<thead>
+	<tr>
+		<th colspan="4" style="text-align:center;background-color:#cfc;">Page</th>
+		<th colspan="1" style="text-align:center;background-color:#fcc;">RealURL</th>
+		<th colspan="2" style="text-align:center;background-color:#ccf;">Slug</th>
+	</tr>
+	<tr>
+		<th>uid</th>
+		<th>lang.</th>
+		<th>hidden</th>
+		<th>title</th>
+		<th>Path</th>
+		<th>Slug</th>
+		<th>Locked</th>
+	</tr>
+</thead>
+<tbody>
+	<f:for each="{paginatedpages}" as="page" iteration="iterator">
+		<tr{f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
+			<td>
+				<ex:editLink action="edit" table="pages" uid="{page.pl10n}" language="{page.sys_language_uid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=realurl">
+      				<core:icon identifier="actions-open" size="small" />
+      			</ex:editLink>
+      			<a href="{page.domain}/index.php?id={page.uid}&no_cache=1" target="extern">
+      				<core:icon identifier="actions-document-view" size="small" />
+      			</a>
+      			{page.uid}
+      		</td>
+			<td>{page.sys_language_uid}</td>
+			<td><f:if condition="{page.hidden} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
+			<td><a href="{page.domain}{page.slug}" target="extern">{page.title}</a></td>
+			<td>{page.realurl}</td>
+			<td>{page.slug2}</td>
+			<td><f:if condition="{page.slug_locked} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
+		</tr>
+	</f:for>
+</tbody>
+</table>
+</f:widget.paginate>
+	<p>{pages -> f:count()} pages found.</p>
+</f:then>
+<f:else>
+	<p>0 pages found!</p>
+</f:else>
+</f:if>
+</f:section>

@@ -1,14 +1,14 @@
 {
 	"name" : "fixpunkt/backendtools",
 	"type" : "typo3-cms-extension",
-	"description" : "9 admin tools for extension listing, recent pages, pages with layouts, redirects, unused files, missing files, images with no alt- or title-tag and links.",
+	"description" : "8 admin tools for extension listing, redirects, Slugs vs. RealURL, unused files, images with no alt- or title-tag and links.",
 	"authors" : [{
 			"name" : "Kurt Gusbeth",
 			"role" : "Developer"
 		}
 	],
 	"require" : {
-		"typo3/cms-core" : "~10.4.6 || ~11.5.0"
+		"typo3/cms-core" : "~9.5.20 || ~10.4.6"
 	},
 	"autoload" : {
 		"psr-4" : {
@@ -24,6 +24,9 @@
 		"typo3-ter/backendtools" : "self.version"
 	},
 	"homepage" : "https://www.fixpunkt.com/webentwicklung/typo3/typo3-extensions/",
+	"support" : {
+		"email" : "info@quizpalme.de"
+	},
 	"license" : "GPL-3.0-or-later",
 	"extra": {
 		"typo3/cms": {

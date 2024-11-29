@@ -1,17 +1,14 @@
 {namespace ex=Fixpunkt\Backendtools\ViewHelpers}
-<html
-		xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
-		xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
-		xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers"
-		data-namespace-typo3-fluid="true">
-
 <f:layout name="Default" />
-<f:section name="Content">
+<f:section name="content">
 	<style>
 		:root {
 			--shadow: 0.3rem 0.3rem 0.6rem #aaddff,
 			-0.2rem -0.2rem 0.5rem #ffffff;
 		}
+		.f3-widget-paginator { padding-left:0; }
+		.f3-widget-paginator li { display:inline-block; }
+		.f3-widget-paginator li.current { font-weight: bold; }
 		#mytype3001 {margin-bottom: 10px;}
 		#typo3-inner-docbody {padding-top: 4px;}
 		input,select,table.table {
@@ -67,7 +64,7 @@
 		<f:form.radio name="my_p" value="0" checked="{my_p} == 0" /> all &nbsp; or
 	  </label>
 	  <label class="checkbox-inline">
-		<f:form.radio name="my_p" value="1" checked="{my_p} == 1" /> only not visible &nbsp; or
+		<f:form.radio name="my_p" value="1" checked="{my_p} == 1" /> only hidden &nbsp; or
 	  </label>
 	  <label class="checkbox-inline">
 		<f:form.radio name="my_p" value="2" checked="{my_p} == 2" /> only visible ... pages
@@ -78,7 +75,7 @@
 		<f:form.radio name="my_c" value="0" checked="{my_c} == 0" /> all &nbsp; or
 	  </label>
 	  <label class="checkbox-inline">
-		<f:form.radio name="my_c" value="1" checked="{my_c} == 1" /> only not visible &nbsp; or
+		<f:form.radio name="my_c" value="1" checked="{my_c} == 1" /> only hidden &nbsp; or
 	  </label>
 	  <label class="checkbox-inline">
 		<f:form.radio name="my_c" value="2" checked="{my_c} == 2" /> only visible ... content-elements
@@ -102,7 +99,6 @@
 
 	<f:form.submit value="search" class="btn btn-default" />
 </f:form>
-<br>
 
 <f:if condition="{rows} > 0">
 <f:then>
@@ -115,9 +111,7 @@ uid;lang.;colPos;deleted;hidden;header;CType;list_type;FlexForm actions;uid;dele
 </f:for></textarea>
 	</f:then>
 	<f:else>
-		<f:if condition="{settings.pagebrowser.insertAbove} && ({paginator.numberOfPages} > 1)">
-			<f:render partial="Paginator" arguments="{_all}" />
-		</f:if>
+		<f:widget.paginate objects="{pages}" as="paginatedpages" configuration="{settings.pagebrowser}">
 		<table class="table">
 		<thead>
 			<tr>
@@ -139,7 +133,7 @@ uid;lang.;colPos;deleted;hidden;header;CType;list_type;FlexForm actions;uid;dele
 			</tr>
 		</thead>
 		<tbody>
-			<f:for each="{paginator.paginatedItems}" as="page" iteration="iterator">
+			<f:for each="{paginatedpages}" as="page" iteration="iterator">
 				<tr style="background-color:{f:if(condition:iterator.isOdd, then: '#fff', else: '#e7e7e7')};">
 					<td>
 						<ex:editLink action="edit" table="tt_content" uid="{page.uid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=list">
@@ -171,22 +165,17 @@ uid;lang.;colPos;deleted;hidden;header;CType;list_type;FlexForm actions;uid;dele
 			</f:for>
 		</tbody>
 		</table>
-		<f:if condition="{settings.pagebrowser.insertBelow} && ({paginator.numberOfPages} > 1)">
-			<f:render partial="Paginator" arguments="{_all}" />
-			<!-- p>Element {pagination.startRecordNumber} - {pagination.endRecordNumber}.</p -->
-		</f:if>
+		</f:widget.paginate>
 	</f:else>
 	</f:if>
-	<p>{pages -> f:count()} element(s) found.</p>
+	<p>{pages -> f:count()} element(s) found!</p>
 </f:then>
 <f:else>
 	<p>0 elements found!</p>
 </f:else>
 </f:if>
-<p><i>*: this is a LIKE 'sword%' search.<br>
-	**: this is a LIKE '%sword%' search or if CTYPE=gridelements_pi1 a search in the field tx_gridelements_backend_layout will be performed too.<br>
-	***: you can use more values, separated by a space.<br>
+<p><i>*: this is a LIKE 'sword%' search.
+	**: this is a LIKE '%sword%' search.
+	***: you can use more values, separated by a space.
 	****: this fields are not working with the pagination, because they are not stored in the database.</i></p>
 </f:section>
-
-</html>

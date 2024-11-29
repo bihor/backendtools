@@ -1,16 +1,14 @@
 {namespace ex=Fixpunkt\Backendtools\ViewHelpers}
-<html
-		xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
-		xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
-		xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers"
-		data-namespace-typo3-fluid="true">
 <f:layout name="Default" />
-<f:section name="Content">
+<f:section name="content">
 <style>
 	:root {
 		--shadow: 0.3rem 0.3rem 0.6rem #aaddff,
 		-0.2rem -0.2rem 0.5rem #ffffff;
 	}
+	.f3-widget-paginator { padding-left:0; }
+	.f3-widget-paginator li { display:inline-block; }
+	.f3-widget-paginator li.current { font-weight: bold; }
 	#typo3-inner-docbody {padding-top: 4px;}
 	input,select,table.table {
 		-webkit-box-shadow: var(--shadow);
@@ -64,13 +62,10 @@
 
 <f:form.submit value="search" name="search" class="btn btn-default" />
 </f:form>
-<br>
 
 <f:if condition="{pages -> f:count()} > 0">
 <f:then>
-	<f:if condition="{settings.pagebrowser.insertAbove} && ({paginator.numberOfPages} > 1)">
-		<f:render partial="Paginator" arguments="{_all}" />
-	</f:if>
+<f:widget.paginate objects="{pages}" as="paginatedpages" configuration="{settings.pagebrowser}">
 <table class="table">
 <thead>
 	<tr>
@@ -89,7 +84,7 @@
 	</tr>
 </thead>
 <tbody>
-	<f:for each="{paginator.paginatedItems}" as="page" iteration="iterator">
+	<f:for each="{paginatedpages}" as="page" iteration="iterator">
 		<tr{f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
 			<td>
 				<ex:editLink action="edit" table="tt_content" uid="{page.uid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=pagesearch">
@@ -118,10 +113,7 @@
 	</f:for>
 </tbody>
 </table>
-	<f:if condition="{settings.pagebrowser.insertBelow} && ({paginator.numberOfPages} > 1)">
-		<f:render partial="Paginator" arguments="{_all}" />
-		<p>Element {pagination.startRecordNumber} - {pagination.endRecordNumber}.</p>
-	</f:if>
+</f:widget.paginate>
 	<p>{pages -> f:count()} content element(s) with links to the pages UID {linksto} found.</p>
 </f:then>
 <f:else>
@@ -203,4 +195,3 @@
 	</f:if>
 </f:if>
 </f:section>
-</html>

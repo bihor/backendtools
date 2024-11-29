@@ -1,11 +1,6 @@
 {namespace ex=Fixpunkt\Backendtools\ViewHelpers}
-<html
-		xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
-		xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
-		xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers"
-		data-namespace-typo3-fluid="true">
 <f:layout name="Default" />
-<f:section name="Content">
+<f:section name="content">
 	<h1>Check sys_redirect entries for error targets</h1>
 	<f:flashMessages />
 	<style>
@@ -13,6 +8,9 @@
 			--shadow: 0.3rem 0.3rem 0.6rem #aaddff,
 			-0.2rem -0.2rem 0.5rem #ffffff;
 		}
+		.f3-widget-paginator { padding-left:0; }
+		.f3-widget-paginator li { display:inline-block; }
+		.f3-widget-paginator li.current { font-weight: bold; }
 		#typo3-inner-docbody {padding-top: 4px;}
 		input,select,table.table {
 			-webkit-box-shadow: var(--shadow);
@@ -54,50 +52,45 @@
 	</f:form>
 	<br>
 	<f:form action="redirectscheck">
-		<f:form.hidden name="currentPage" value="{page}" />
+		<f:form.hidden name="@widget_0[currentPage]" value="{page}" />
 		<f:if condition="{redirects -> f:count()} > 0">
 			<f:then>
 				<p>{redirects -> f:count()} redirects found:</p>
-				<f:if condition="{settings.pagebrowser.insertAbove} && ({paginator.numberOfPages} > 1)">
-					<f:render partial="Paginator" arguments="{_all}" />
-				</f:if>
-				<table class="table">
-					<thead>
-					<tr>
-						<th>uid</th><th>Host</th><th>Source</th><th>Target</th><th>Status</th>
-					</tr>
-					</thead>
-					<tbody>
-					<f:for each="{paginator.paginatedItems}" as="redirect" iteration="iterator">
-						<f:if condition="{redirect.status} != '-'">
-						<f:then>
-							<tr{f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
-								<td>
-									<ex:editLink action="edit" table="sys_redirect" uid="{redirect.uid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=redirectscheck">
-										<core:icon identifier="actions-open" size="small" />
-									</ex:editLink> &nbsp;
-									<f:form.checkbox name="delete[]" value="{redirect.uid}" /> &nbsp; {redirect.uid}
-								</td>
-								<td>{redirect.host}</td>
-								<td>{redirect.source -> f:format.crop(maxCharacters:100)}</td>
-								<td>{redirect.target}</td>
-								<td>
-									<f:if condition="{redirect.status} == 'OK'"><f:then>
-										<span class="isok">OK</span>
-									</f:then><f:else>
-										{redirect.status}
-									</f:else></f:if>
-								</td>
-							</tr>
-						</f:then>
-						</f:if>
-					</f:for>
-					</tbody>
-				</table>
-				<f:if condition="{settings.pagebrowser.insertBelow} && ({paginator.numberOfPages} > 1)">
-					<f:render partial="Paginator" arguments="{_all}" />
-					<p>Element {pagination.startRecordNumber} - {pagination.endRecordNumber}.</p>
-				</f:if>
+				<f:widget.paginate objects="{redirects}" as="paginatedRedirects" configuration="{settings.pagebrowser}">
+					<table class="table">
+						<thead>
+						<tr>
+							<th>uid</th><th>Host</th><th>Source</th><th>Target</th><th>Status</th>
+						</tr>
+						</thead>
+						<tbody>
+						<f:for each="{paginatedRedirects}" as="redirect" iteration="iterator">
+							<f:if condition="{redirect.status} != '-'">
+							<f:then>
+								<tr{f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
+									<td>
+										<ex:editLink action="edit" table="sys_redirect" uid="{redirect.uid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=redirectscheck">
+											<core:icon identifier="actions-open" size="small" />
+										</ex:editLink> &nbsp;
+										<f:form.checkbox name="delete[]" value="{redirect.uid}" /> &nbsp; {redirect.uid}
+									</td>
+									<td>{redirect.host}</td>
+									<td>{redirect.source -> f:format.crop(maxCharacters:100)}</td>
+									<td>{redirect.target}</td>
+									<td>
+										<f:if condition="{redirect.status} == 'OK'"><f:then>
+											<span class="isok">OK</span>
+										</f:then><f:else>
+											{redirect.status}
+										</f:else></f:if>
+									</td>
+								</tr>
+							</f:then>
+							</f:if>
+						</f:for>
+						</tbody>
+					</table>
+				</f:widget.paginate>
 				<br>
 				<f:form.submit name="import" value="Delete selected redirects" class="btn btn-primary" />
 			</f:then>
@@ -108,9 +101,7 @@
 	</f:form>
 	<f:if condition="{message}">
 	<f:then>
-		<br/>
 		<p><f:format.raw>{message}</f:format.raw></p>
 	</f:then>
 	</f:if>
 </f:section>
-</html>

@@ -17,38 +17,21 @@ Introduction
 What does it do?
 ----------------
 
-This extension provides some useful tools in the “Admin tools” section of the backend of TYPO3.
-It contains up to 11 tools for extensions, pages, slugs, redirects, files, images and links.
+This extension provides some usefull tools in the “Admin tools” section of the backend of TYPO3. Currently it contains 7 tools for extensions, slugs, redirects, files, images and links.
 
-Tool 1: shows you all pages where you use extensions. You can see where you use which extension.
-You can search for non-extensions too, e.g. if you set Ctype='mailform'.
+Tool 1: shows you all pages where you use extensions. You can see where you use which extension. You can search for non-extensions too, e.g. if you set Ctype='mailform'.
 
-Tool 2: shows recently modified pages and content elements.
+Tool 2: shows differences between RealURL-pagepath (in tx_realurl_pathdata) and Slug (in pages). Note: the old RealURL-tables must be present!
 
-Tool 3: helps you to delete unused files. Go to “Admin tools” → DB check” → “Database Relations” to find files which you can delete.
-This tool helps you to delete these files.
+Tool 3: helps you to delete unused files. Go to “Admin tools” → DB check” → “Database Relations” to find files which you can delete. This tool helps you to delete these files.
 
-Tool 4: helps you to find pages where layouts or backend layouts are in use.
+Tool 4: helps you to find pages that link to another page. You can find any content element with a link to a specific page.
 
-Tool 5: helps you to find pages that link to another page. You can find any content element with a link to a specific page.
+Tool 5: helps you to find images with no title- oder alternative-text. This tool can set that values for you too.
 
-Tool 6: helps you to find images with no title- oder alternative-text. This tool can set that values for you too.
+Tool 6: you can import simple redirect rules form your .htaccess to the table sys_redirect.
 
-Tool 7: helps you to find content-elements where missing files are used.
-
-Tool 8: you can import simple redirect rules form your .htaccess to the table sys_redirect.
-
-Tool 9: you can check all your entries of sys_redirect, if the target links are reachable.
-
-Tool 10: shows differences between RealURL-pagepath (in tx_realurl_pathdata) and Slug (in pages).
-Note: the old RealURL-tables must be present!
-Note: this tool was removed in version 4.0.0.
-
-Tool 11: unzip a zip file in the fileadmin-folder.
-Note: this tool was removed in version 3.0.0.
-
-Since version 4.2.0 there are some dashboard widgets available too.
-
+Tool 7: you can check all your entries of sys_redirect, if the target links are reachable.
 
 .. _screenshots:
 
@@ -83,3 +66,9 @@ Thanks to the
 for giving me the possibility to realize
 `this extension <https://www.fixpunkt.com/webentwicklung/typo3/typo3-extensions/>`_
 and share it with the TYPO3 community.
+
+
+TODOs
+-----
+
+nothing.

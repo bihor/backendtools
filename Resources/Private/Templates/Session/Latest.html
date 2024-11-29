@@ -1,164 +1,163 @@
 {namespace ex=Fixpunkt\Backendtools\ViewHelpers}
 <html
-		xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
-		xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
-		xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers"
-		data-namespace-typo3-fluid="true">
+        xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+        xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+        xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers"
+        data-namespace-typo3-fluid="true">
 
 <f:layout name="Default" />
-<f:section name="Content">
-	<style>
-		:root {
-			--shadow: 0.3rem 0.3rem 0.6rem #aaddff,
-			-0.2rem -0.2rem 0.5rem #ffffff;
-		}
-		#typo3-inner-docbody {padding-top: 4px;}
-		input,select,table.table {
-			-webkit-box-shadow: var(--shadow);
-			box-shadow: var(--shadow);
-		}
-	</style>
-<h1>Latest (changed) pages and content elements</h1>
-<f:flashMessages />
-<f:form action="latest" class="form-inline">
-<div class="row"><div class="col-md-6">
+<f:section name="content">
+    <style>
+        :root {
+            --shadow: 0.3rem 0.3rem 0.6rem #aaddff,
+            -0.2rem -0.2rem 0.5rem #ffffff;
+        }
+        .f3-widget-paginator { padding-left:0; }
+        .f3-widget-paginator li { display:inline-block; }
+        .f3-widget-paginator li.current { font-weight: bold; }
+        #mytype3001 {margin-bottom: 10px;}
+        #typo3-inner-docbody {padding-top: 4px;}
+        input,select,table.table {
+            -webkit-box-shadow: var(--shadow);
+            box-shadow: var(--shadow);
+        }
+    </style>
+    <h1>Latest (changed) pages and content elements</h1>
+    <f:flashMessages />
+    <f:form action="latest" class="form-inline">
+        <div class="row"><div class="col-md-6">
 
-	<div style="margin: 10px 0;">Show modified pages/elements since
-		<f:form.textfield name="my_value" value="{my_value}" size="19" id="mydateval" />
-	</div>
-	<div style="margin: 10px 0;">Time zone:
-		<f:form.textfield name="my_zone" value="{my_zone}" size="5" /> &nbsp;
-	</div>
-	<div style="margin: 10px 0;">Elements per page:
-		<f:form.textfield name="my_page" value="{my_page}" size="5" /> &nbsp;
-	</div>
+            <div style="margin: 10px 0;">Show modified pages/elements since
+                <f:form.textfield name="my_value" value="{my_value}" size="19" id="mydateval" />
+            </div>
+            <div style="margin: 10px 0;">Time zone:
+                <f:form.textfield name="my_zone" value="{my_zone}" size="5" /> &nbsp;
+            </div>
+            <div style="margin: 10px 0;">Elements per page:
+                <f:form.textfield name="my_page" value="{my_page}" size="5" /> &nbsp;
+            </div>
 
-</div><div class="col-md-6">
+        </div><div class="col-md-6">
 
-	<div style="margin: 10px 0;">Show
-	  <label class="checkbox-inline">
-		<f:form.radio name="my_p" value="0" checked="{my_p} == 0" /> all &nbsp; or
-	  </label>
-	  <label class="checkbox-inline">
-		<f:form.radio name="my_p" value="1" checked="{my_p} == 1" /> only not visible &nbsp; or
-	  </label>
-	  <label class="checkbox-inline">
-		<f:form.radio name="my_p" value="2" checked="{my_p} == 2" /> only visible ... pages
-	  </label>
-	</div>
-	<div style="margin: 10px 0;">Show
-	  <label class="checkbox-inline">
-		<f:form.radio name="my_c" value="0" checked="{my_c} == 0" /> all &nbsp; or
-	  </label>
-	  <label class="checkbox-inline">
-		<f:form.radio name="my_c" value="1" checked="{my_c} == 1" /> only not visible &nbsp; or
-	  </label>
-	  <label class="checkbox-inline">
-		<f:form.radio name="my_c" value="2" checked="{my_c} == 2" /> only visible ... content-elements
-	  </label>
-	</div>
-	<div style="margin: 10px 0;"><f:translate key="LLL:EXT:backendtools/Resources/Private/Language/locallang.xlf:tx_backendtools_domain_model_session.pagestart" />:
-		<f:form.textfield name="my_recursive" value="{my_recursive}" size="5" /> &nbsp;
-	</div>
-	<div style="margin: 10px 0;">Output:
-	  <label class="checkbox-inline">
-		<f:form.radio name="my_outp" value="0" checked="{my_outp} == 0" /> HTML &nbsp; or
-	  </label>
-	  <label class="checkbox-inline">
-		<f:form.radio name="my_outp" value="1" checked="{my_outp} == 1" /> CSV
-	  </label>
-	</div>
-</div></div>
+            <div style="margin: 10px 0;">Show
+                <label class="checkbox-inline">
+                    <f:form.radio name="my_p" value="0" checked="{my_p} == 0" /> all &nbsp; or
+                </label>
+                <label class="checkbox-inline">
+                    <f:form.radio name="my_p" value="1" checked="{my_p} == 1" /> only not visible &nbsp; or
+                </label>
+                <label class="checkbox-inline">
+                    <f:form.radio name="my_p" value="2" checked="{my_p} == 2" /> only visible ... pages
+                </label>
+            </div>
+            <div style="margin: 10px 0;">Show
+                <label class="checkbox-inline">
+                    <f:form.radio name="my_c" value="0" checked="{my_c} == 0" /> all &nbsp; or
+                </label>
+                <label class="checkbox-inline">
+                    <f:form.radio name="my_c" value="1" checked="{my_c} == 1" /> only not visible &nbsp; or
+                </label>
+                <label class="checkbox-inline">
+                    <f:form.radio name="my_c" value="2" checked="{my_c} == 2" /> only visible ... content-elements
+                </label>
+            </div>
+            <div style="margin: 10px 0;"><f:translate key="LLL:EXT:backendtools/Resources/Private/Language/locallang.xlf:tx_backendtools_domain_model_session.pagestart" />:
+                <f:form.textfield name="my_recursive" value="{my_recursive}" size="5" /> &nbsp;
+            </div>
+            <div style="margin: 10px 0;">Output:
+                <label class="checkbox-inline">
+                    <f:form.radio name="my_outp" value="0" checked="{my_outp} == 0" /> HTML &nbsp; or
+                </label>
+                <label class="checkbox-inline">
+                    <f:form.radio name="my_outp" value="1" checked="{my_outp} == 1" /> CSV
+                </label>
+            </div>
+        </div></div>
 
-	<f:form.submit value="search" class="btn btn-default" />
-</f:form>
-<br>
+        <f:form.submit value="search" class="btn btn-default" />
+    </f:form>
+    <br>
 
-<f:if condition="{rows} > 0">
-<f:then>
-	<f:if condition="{my_outp} == 1">
-	<f:then>
+    <f:if condition="{rows} > 0">
+        <f:then>
+            <f:if condition="{my_outp} == 1">
+                <f:then>
 		<textarea name="dummy" rows="12" cols="120">
 Content element;;;;;;;;;Page;;;
 uid;tstamp;lang.;colPos;deleted;hidden;header;CType;list_type;uid;tstamp;deleted;hidden;title;link
 <f:for each="{pages}" as="page" iteration="iterator"><f:if condition="{page.uid}"><f:then>{page.uid};"<f:format.date format='d.m.Y H:i:s'>{page.ttstamp}</f:format.date>";{page.sys_language_uid};{page.colPos};{page.ttdeleted};{page.tthidden};"{page.csvheader}";{page.CType};{page.list_type}</f:then><f:else>;;;;;;;;</f:else></f:if>;{page.pid};"<f:format.date format='d.m.Y H:i:s'>{page.ptstamp}</f:format.date>";{page.pdeleted};{page.phidden};"{page.csvtitle}";{page.domain}{page.slug}
 </f:for></textarea>
-	</f:then>
-	<f:else>
-		<f:if condition="{settings.pagebrowser.insertAbove} && ({paginator.numberOfPages} > 1)">
-			<f:render partial="Paginator" arguments="{_all}" />
-		</f:if>
-		<table class="table">
-		<thead>
-			<tr>
-				<th colspan="8" style="text-align:center;background-color:#cfc;">Content element</th>
-				<th colspan="5" style="text-align:center;background-color:#ccf;">Page</th>
-			</tr>
-			<tr>
-				<th>uid</th>
-				<th>tstamp</th>
-				<th>lang.</th>
-				<th>colPos</th>
-				<th>deleted / hidden</th>
-				<th>header</th>
-				<th>CType</th>
-				<th>list_type</th>
-				<th>uid</th>
-				<th>tstamp</th>
-				<th>deleted / hidden</th>
-				<th>title</th>
-			</tr>
-		</thead>
-		<tbody>
-			<f:for each="{paginator.paginatedItems}" as="page" iteration="iterator">
-				<tr style="background-color:{f:if(condition: iterator.isOdd, then: '#fff', else: '#e7e7e7')};">
-					<f:if condition="{page.uid}"><f:then>
-						<td>
-							<ex:editLink action="edit" table="tt_content" uid="{page.uid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=latest">
-								<core:icon identifier="actions-open" size="small" />
-							</ex:editLink>
-							{page.uid}
-						</td>
-						<td><f:format.date format="d.m.Y">{page.ttstamp}</f:format.date></td>
-						<td>{page.sys_language_uid}</td>
-						<td>{page.colPos}</td>
-						<td><f:if condition="{page.ttdeleted} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if> /
-							<f:if condition="{page.tthidden} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
-						<td>{page.header}</td>
-						<td>{page.CType}</td>
-						<td>{page.list_type}</td>
-					</f:then><f:else>
-						<td colspan="8"></td>
-					</f:else></f:if>
-					<td>
-						<ex:editLink action="edit" table="pages" uid="{page.pl10n}" language="{page.sys_language_uid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=latest">
-		      				<core:icon identifier="actions-open" size="small" />
-		      			</ex:editLink>
-		      			<a href="{page.domain}/index.php?id={page.pid}&no_cache=1" target="extern">
-		      				<core:icon identifier="actions-document-view" size="small" />
-		      			</a>
-						{page.pid}
-					</td>
-					<td><f:format.date format="d.m.Y">{page.ptstamp}</f:format.date></td>
-					<td><f:if condition="{page.pdeleted} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if> / 
-						<f:if condition="{page.phidden} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
-					<td><a href="{page.domain}{page.slug}" target="extern">{page.title}</a></td>
-				</tr>
-			</f:for>
-		</tbody>
-		</table>
-		<f:if condition="{settings.pagebrowser.insertBelow} && ({paginator.numberOfPages} > 1)">
-			<f:render partial="Paginator" arguments="{_all}" />
-			<!-- p>Element {pagination.startRecordNumber} - {pagination.endRecordNumber}.</p -->
-		</f:if>
-	</f:else>
-	</f:if>
-	<p>{pages -> f:count()} element(s) found.</p>
-</f:then>
-<f:else>
-	<p>0 elements found!</p>
-</f:else>
-</f:if>
+                </f:then>
+                <f:else>
+                    <f:widget.paginate objects="{pages}" as="paginatedpages" configuration="{settings.pagebrowser}">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th colspan="8" style="text-align:center;background-color:#cfc;">Content element</th>
+                            <th colspan="5" style="text-align:center;background-color:#ccf;">Page</th>
+                        </tr>
+                        <tr>
+                            <th>uid</th>
+                            <th>tstamp</th>
+                            <th>lang.</th>
+                            <th>colPos</th>
+                            <th>deleted / hidden</th>
+                            <th>header</th>
+                            <th>CType</th>
+                            <th>list_type</th>
+                            <th>uid</th>
+                            <th>tstamp</th>
+                            <th>deleted / hidden</th>
+                            <th>title</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <f:for each="{paginatedpages}" as="page" iteration="iterator">
+                            <tr style="background-color:{f:if(condition: iterator.isOdd, then: '#fff', else: '#e7e7e7')};">
+                                <f:if condition="{page.uid}"><f:then>
+                                    <td>
+                                        <ex:editLink action="edit" table="tt_content" uid="{page.uid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=latest">
+                                            <core:icon identifier="actions-open" size="small" />
+                                        </ex:editLink>
+                                        {page.uid}
+                                    </td>
+                                    <td><f:format.date format="d.m.Y">{page.ttstamp}</f:format.date></td>
+                                    <td>{page.sys_language_uid}</td>
+                                    <td>{page.colPos}</td>
+                                    <td><f:if condition="{page.ttdeleted} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if> /
+                                        <f:if condition="{page.tthidden} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
+                                    <td>{page.header}</td>
+                                    <td>{page.CType}</td>
+                                    <td>{page.list_type}</td>
+                                </f:then><f:else>
+                                    <td colspan="8"></td>
+                                </f:else></f:if>
+                                <td>
+                                    <ex:editLink action="edit" table="pages" uid="{page.pl10n}" language="{page.sys_language_uid}" returnUrl="mod.php?M=tools_BackendtoolsMod1&tx_backendtools_tools_backendtoolsmod1[action]=latest">
+                                        <core:icon identifier="actions-open" size="small" />
+                                    </ex:editLink>
+                                    <a href="{page.domain}/index.php?id={page.pid}&no_cache=1" target="extern">
+                                        <core:icon identifier="actions-document-view" size="small" />
+                                    </a>
+                                    {page.pid}
+                                </td>
+                                <td><f:format.date format="d.m.Y">{page.ptstamp}</f:format.date></td>
+                                <td><f:if condition="{page.pdeleted} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if> /
+                                    <f:if condition="{page.phidden} == 1"><f:then><span style="color:#bb0000;font-weight:bold;">yes</span></f:then><f:else>no</f:else></f:if></td>
+                                <td><a href="{page.domain}{page.slug}" target="extern">{page.title}</a></td>
+                            </tr>
+                        </f:for>
+                        </tbody>
+                    </table>
+                    </f:widget.paginate>
+                </f:else>
+            </f:if>
+            <p>{pages -> f:count()} element(s) found.</p>
+        </f:then>
+        <f:else>
+            <p>0 elements found!</p>
+        </f:else>
+    </f:if>
 </f:section>
 
 </html>
