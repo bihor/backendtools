@@ -15,7 +15,9 @@
 
 namespace Fixpunkt\Backendtools\Domain\Model;
 
+use TYPO3\CMS\Backend\Authentication\PasswordReset;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Annotation as Extbase;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
@@ -28,8 +30,8 @@ class BackendUser extends AbstractEntity
 {
     /**
      * @var string
+     * @Extbase\Validate("NotEmpty")
      */
-    #[Extbase\Validate(['validator' => 'NotEmpty'])]
     protected $userName = '';
 
     /**
@@ -98,7 +100,7 @@ class BackendUser extends AbstractEntity
     /**
      * @param string $allowedLanguages
      */
-    public function setAllowedLanguages($allowedLanguages): void
+    public function setAllowedLanguages($allowedLanguages)
     {
         $this->allowedLanguages = $allowedLanguages;
     }
@@ -114,7 +116,7 @@ class BackendUser extends AbstractEntity
     /**
      * @param string $dbMountPoints
      */
-    public function setDbMountPoints($dbMountPoints): void
+    public function setDbMountPoints($dbMountPoints)
     {
         $this->dbMountPoints = $dbMountPoints;
     }
@@ -130,7 +132,7 @@ class BackendUser extends AbstractEntity
     /**
      * @param string $fileMountPoints
      */
-    public function setFileMountPoints($fileMountPoints): void
+    public function setFileMountPoints($fileMountPoints)
     {
         $this->fileMountPoints = $fileMountPoints;
     }
@@ -160,7 +162,7 @@ class BackendUser extends AbstractEntity
     /**
      * @param ObjectStorage<BackendUserGroup> $backendUserGroups
      */
-    public function setBackendUserGroups($backendUserGroups): void
+    public function setBackendUserGroups($backendUserGroups)
     {
         $this->backendUserGroups = $backendUserGroups;
     }
@@ -184,6 +186,21 @@ class BackendUser extends AbstractEntity
     }
 
     /**
+     * Check if the user is allowed to trigger a password reset
+     *
+     * Requirements:
+     * 1. The user for which the password reset should be triggered is not the currently logged in user
+     * 2. Password reset is enabled for the user (Email+Password are set)
+     * 3. The currently logged in user is allowed to reset passwords in the backend (Enabled in user TSconfig)
+     */
+    public function isPasswordResetEnabled(): bool
+    {
+        return !$this->isCurrentlyLoggedIn()
+            && GeneralUtility::makeInstance(PasswordReset::class)->isEnabledForUser((int)$this->getUid())
+            && ($this->getBackendUser()->getTSConfig()['options.']['passwordReset'] ?? true);
+    }
+
+    /**
      * Gets the user name.
      *
      * @return string the user name, will not be empty
@@ -198,7 +215,7 @@ class BackendUser extends AbstractEntity
      *
      * @param string $userName the user name to set, must not be empty
      */
-    public function setUserName($userName): void
+    public function setUserName($userName)
     {
         $this->userName = $userName;
     }
@@ -214,7 +231,7 @@ class BackendUser extends AbstractEntity
     /**
      * @param string $description
      */
-    public function setDescription($description): void
+    public function setDescription($description)
     {
         $this->description = $description;
     }
@@ -234,7 +251,7 @@ class BackendUser extends AbstractEntity
      *
      * @param bool $isAdministrator whether this user should be an administrator
      */
-    public function setIsAdministrator($isAdministrator): void
+    public function setIsAdministrator($isAdministrator)
     {
         $this->isAdministrator = $isAdministrator;
     }
@@ -254,7 +271,7 @@ class BackendUser extends AbstractEntity
      *
      * @param bool $isDisabled whether this user is disabled
      */
-    public function setIsDisabled($isDisabled): void
+    public function setIsDisabled($isDisabled)
     {
         $this->isDisabled = $isDisabled;
     }
@@ -274,7 +291,7 @@ class BackendUser extends AbstractEntity
      *
      * @param \DateTime|null $dateAndTime the start date and time
      */
-    public function setStartDateAndTime(\DateTime $dateAndTime = null): void
+    public function setStartDateAndTime(?\DateTime $dateAndTime = null)
     {
         $this->startDateAndTime = $dateAndTime;
     }
@@ -294,7 +311,7 @@ class BackendUser extends AbstractEntity
      *
      * @param \DateTime|null $dateAndTime the end date and time
      */
-    public function setEndDateAndTime(\DateTime $dateAndTime = null): void
+    public function setEndDateAndTime(?\DateTime $dateAndTime = null)
     {
         $this->endDateAndTime = $dateAndTime;
     }
@@ -314,7 +331,7 @@ class BackendUser extends AbstractEntity
      *
      * @param string $email the e-mail address, may be empty
      */
-    public function setEmail($email): void
+    public function setEmail($email)
     {
         $this->email = $email;
     }
@@ -334,7 +351,7 @@ class BackendUser extends AbstractEntity
      *
      * @param string $name the user's real name, may be empty.
      */
-    public function setRealName($name): void
+    public function setRealName($name)
     {
         $this->realName = $name;
     }
@@ -394,7 +411,7 @@ class BackendUser extends AbstractEntity
      *
      * @param \DateTime|null $dateAndTime this user's last login date and time
      */
-    public function setLastLoginDateAndTime(\DateTime $dateAndTime = null): void
+    public function setLastLoginDateAndTime(?\DateTime $dateAndTime = null)
     {
         $this->lastLoginDateAndTime = $dateAndTime;
     }
