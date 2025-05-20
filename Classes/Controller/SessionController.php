@@ -1305,14 +1305,8 @@ class SessionController extends ActionController
         $this->moduleTemplate->getDocHeaderComponent()->getMenuRegistry()->addMenu($actionMenu);
     }
 
-    protected function getModuleUri(string $action = null, array $additionalPramaters = []): string
+    protected function getModuleUri(?string $action = null): string
     {
-        $parameters = [
-            'id' => $this->id,
-        ];
-        if ($action !== null) {
-            $parameters['action'] = $action;
-        }
         return $this->uriBuilder->uriFor($action, null, 'Session', 'mod1');
     }
 }

@@ -43,12 +43,12 @@ class SessionTest extends UnitTestCase
   */
     protected $subject;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->subject = new Session();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->subject);
     }
@@ -56,7 +56,7 @@ class SessionTest extends UnitTestCase
     /**
      * @test
      */
-    public function getActionReturnsInitialValueForString()
+    public function getActionReturnsInitialValueForString(): void
     {
         self::assertSame(
             '',
@@ -67,7 +67,7 @@ class SessionTest extends UnitTestCase
     /**
      * @test
      */
-    public function setActionForStringSetsAction()
+    public function setActionForStringSetsAction(): void
     {
         $this->subject->setAction('Conceived at T3CON10');
 
@@ -111,7 +111,7 @@ class SessionTest extends UnitTestCase
     /**
      * @test
      */
-    public function getValue4ReturnsInitialValueForString()
+    public function getValue4ReturnsInitialValueForString(): void
     {
         self::assertSame(
             '',
@@ -122,7 +122,7 @@ class SessionTest extends UnitTestCase
     /**
      * @test
      */
-    public function setValue4ForStringSetsValue4()
+    public function setValue4ForStringSetsValue4(): void
     {
         $this->subject->setValue4('Conceived at T3CON10');
 
@@ -136,7 +136,7 @@ class SessionTest extends UnitTestCase
     /**
      * @test
      */
-    public function getValue5ReturnsInitialValueForString()
+    public function getValue5ReturnsInitialValueForString(): void
     {
         self::assertSame(
             '',
@@ -147,7 +147,7 @@ class SessionTest extends UnitTestCase
     /**
      * @test
      */
-    public function setValue5ForStringSetsValue5()
+    public function setValue5ForStringSetsValue5(): void
     {
         $this->subject->setValue5('Conceived at T3CON10');
 
@@ -161,7 +161,7 @@ class SessionTest extends UnitTestCase
     /**
      * @test
      */
-    public function getValue6ReturnsInitialValueForString()
+    public function getValue6ReturnsInitialValueForString(): void
     {
         self::assertSame(
             '',
@@ -172,7 +172,7 @@ class SessionTest extends UnitTestCase
     /**
      * @test
      */
-    public function setValue6ForStringSetsValue6()
+    public function setValue6ForStringSetsValue6(): void
     {
         $this->subject->setValue6('Conceived at T3CON10');
 

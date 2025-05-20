@@ -1,15 +1,12 @@
-﻿.. ==================================================
-.. FOR YOUR INFORMATION
-.. --------------------------------------------------
-.. -*- coding: utf-8 -*- with BOM.
-
-.. include:: ../Includes.txt
-
+﻿.. include:: /Includes.rst.txt
 
 .. _changelog:
 
 Changelog
 =========
+Version 6.0.5:
+Refactoring, Documentation.
+
 Version 6.0.3:
 Access of the module changed from invalid value to "admin".
 Dashboard requirement removed. TYPO3 requirement changed from 12.5 to 12.4.

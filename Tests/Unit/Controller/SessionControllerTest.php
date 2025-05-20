@@ -41,12 +41,12 @@ class SessionControllerTest extends UnitTestCase
   */
     protected $subject;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->subject = $this->getMock(SessionController::class, ['redirect', 'forward', 'addFlashMessage'], [], '', false);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->subject);
     }
@@ -54,7 +54,7 @@ class SessionControllerTest extends UnitTestCase
     /**
      * @test
      */
-    public function listActionFetchesAllSessionsFromRepositoryAndAssignsThemToView()
+    public function listActionFetchesAllSessionsFromRepositoryAndAssignsThemToView(): void
     {
 
         $allSessions = $this->getMock(ObjectStorage::class, [], [], '', false);

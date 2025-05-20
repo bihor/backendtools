@@ -1,14 +1,9 @@
-﻿.. ==================================================
-.. FOR YOUR INFORMATION
-.. --------------------------------------------------
-.. -*- coding: utf-8 -*- with BOM.
-
-.. include:: Includes.txt
+﻿.. include:: /Includes.rst.txt
 
 .. _start:
 
 =============================================================
-Backend tools
+Newsletter subscriber management
 =============================================================
 
 .. only:: html
@@ -29,17 +24,20 @@ Backend tools
 		backend,tools,extensions
 
 	:Copyright:
-		2024
+		2025
 
 	:Author:
 		Kurt Gusbeth
 
 	:License:
 		This document is published under the Open Content License
-		available from https://www.opencontent.org/opl.shtml
+		available from http://www.opencontent.org/opl.shtml
 
 	:Rendered:
 		|today|
+
+    :Documentation:
+        `english Version <https://docs.typo3.org/p/fixpunkt/backendtools/main/en-us/>`_
 
 	The content of this document is related to TYPO3,
 	a GNU/GPL CMS/Framework available from `www.typo3.org <https://www.typo3.org/>`_.

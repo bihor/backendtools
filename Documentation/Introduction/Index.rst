@@ -1,10 +1,4 @@
-﻿.. ==================================================
-.. FOR YOUR INFORMATION
-.. --------------------------------------------------
-.. -*- coding: utf-8 -*- with BOM.
-
-.. include:: ../Includes.txt
-
+﻿.. include:: /Includes.rst.txt
 
 .. _introduction:
 
@@ -58,19 +52,19 @@ Screenshots
 
 Some screenshots from the backend module.
 
-.. figure:: ../Images/backendtools1.jpg
+.. figure:: /Images/backendtools1.jpg
    :width: 712px
    :alt: Resized Screenshot 1 of the Backendtools
 
-.. figure:: ../Images/backendtools2.jpg
+.. figure:: /Images/backendtools2.jpg
    :width: 700px
    :alt: Resized Screenshot 2 of the Backendtools
 
-.. figure:: ../Images/backendtools3.jpg
+.. figure:: /Images/backendtools3.jpg
    :width: 712px
    :alt: Resized Screenshot 3 of the Backendtools
 
-.. figure:: ../Images/backendtools4.jpg
+.. figure:: /Images/backendtools4.jpg
    :width: 654px
    :alt: Screenshot 4 of the Backendtools
 
