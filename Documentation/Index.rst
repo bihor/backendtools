@@ -3,7 +3,7 @@
 .. _start:
 
 =============================================================
-Newsletter subscriber management
+TYPO3 Backendtools for Admins
 =============================================================
 
 .. only:: html
