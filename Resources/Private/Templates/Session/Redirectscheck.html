@@ -42,14 +42,14 @@
 		<f:form.submit value="Set defaults" name="setting" class="btn btn-default" />
 	</f:form>
 	<div>&nbsp;</div>
+    <f:if condition="{settings.pagebrowser.insertAbove} && ({paginator.numberOfPages} > 1)">
+        <f:render partial="Paginator" arguments="{_all}" />
+    </f:if>
 	<f:form action="redirectscheck">
 		<f:form.hidden name="currentPage" value="{page}" />
 		<f:if condition="{redirects -> f:count()} > 0">
 			<f:then>
 				<p>{redirects -> f:count()} redirects found:</p>
-				<f:if condition="{settings.pagebrowser.insertAbove} && ({paginator.numberOfPages} > 1)">
-					<f:render partial="Paginator" arguments="{_all}" />
-				</f:if>
 				<table class="table">
 					<thead>
 					<tr>
@@ -83,18 +83,21 @@
 					</f:for>
 					</tbody>
 				</table>
-				<f:if condition="{settings.pagebrowser.insertBelow} && ({paginator.numberOfPages} > 1)">
-					<f:render partial="Paginator" arguments="{_all}" />
-					<p>Element {pagination.startRecordNumber} - {pagination.endRecordNumber}.</p>
-				</f:if>
-				<br>
-				<f:form.submit name="import" value="Delete selected redirects" class="btn btn-primary" />
+                <br>
+                <p>
+                <f:form.submit name="import" value="Delete selected redirects" class="btn btn-primary" />
+                </p>
 			</f:then>
 			<f:else>
 				<p>0 redirects found!</p>
 			</f:else>
 		</f:if>
 	</f:form>
+    <f:if condition="{settings.pagebrowser.insertBelow} && ({paginator.numberOfPages} > 1)">
+        <br>
+        <f:render partial="Paginator" arguments="{_all}" />
+        <!-- p>Element {pagination.startRecordNumber} - {pagination.endRecordNumber}.</p -->
+    </f:if>
 	<f:if condition="{message}">
 	<f:then>
 		<div>&nbsp;</div>

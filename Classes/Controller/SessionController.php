@@ -766,6 +766,7 @@ class SessionController extends ActionController
         $this->moduleTemplate->assign('pagination', $pagination);
         $this->moduleTemplate->assign('no_pages', range(1, $pagination->getLastPageNumber()));
         $this->moduleTemplate->assign('my_page', $my_page);
+        $this->moduleTemplate->assign('page', $currentPage);
         $this->moduleTemplate->assign('my_recursive', $my_recursive);
         $this->moduleTemplate->assign('settings', $this->settings);
         $this->moduleTemplate->assign('action', 'missing');

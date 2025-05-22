@@ -1,11 +1,11 @@
 {namespace ex=Fixpunkt\Backendtools\ViewHelpers}
 <html
-        xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
-        xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
-        data-namespace-typo3-fluid="true">
+    data-namespace-typo3-fluid="true"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">
 <f:layout name="Module"/>
 <f:section name="Content">
-    <f:asset.css identifier="backendtools" href="EXT:backendtools/Resources/Public/Css/Backend.css"/>
+    <f:asset.css href="EXT:backendtools/Resources/Public/Css/Backend.css" identifier="backendtools"/>
     <h1>Find missing files/images and show where they are used</h1>
     <f:flashMessages/>
     <f:form action="missing" class="form-inline">
@@ -13,44 +13,51 @@
             <div class="col-md-8">
                 <div style="margin: 10px 0;">Show images used only in tt_content:
                     <label class="checkbox-inline">
-                        <f:form.radio name="img_other" value="0" checked="{img_other} == 0"/>
+                        <f:form.radio checked="{img_other} == 0" name="img_other" value="0"/>
                         yes or
                     </label>
                     <label class="checkbox-inline">
-                        <f:form.radio name="img_other" value="1" checked="{img_other} == 1"/>
+                        <f:form.radio checked="{img_other} == 1" name="img_other" value="1"/>
                         no.
                     </label>
                 </div>
                 <div style="margin: 10px 0;">
                     <f:translate
-                            key="LLL:EXT:backendtools/Resources/Private/Language/locallang.xlf:tx_backendtools_domain_model_session.pagestart"/>
+                        key="LLL:EXT:backendtools/Resources/Private/Language/locallang.xlf:tx_backendtools_domain_model_session.pagestart"/>
                     :
-                    <f:form.textfield name="my_recursive" value="{my_recursive}" size="5"/> &nbsp;
+                    <f:form.textfield name="my_recursive" size="5" value="{my_recursive}"/> &nbsp;
                 </div>
             </div>
             <div class="col-md-4">
 
                 <div style="margin: 10px 0;">Elements per page:
-                    <f:form.textfield name="my_page" value="{my_page}" size="5"/> &nbsp;
+                    <f:form.textfield name="my_page" size="5" value="{my_page}"/> &nbsp;
                 </div>
 
             </div>
         </div>
-        <f:form.submit value="search" name="search" class="btn btn-default"/>
+        <f:form.submit class="btn btn-default" name="search" value="search"/>
         <div>&nbsp;</div>
+    </f:form>
+    <f:if condition="{images -> f:count()} > 0">
+        <f:then>
+            <f:if condition="{settings.pagebrowser.insertAbove} && ({paginator.numberOfPages} > 1)">
+                <f:render arguments="{_all}" partial="Paginator"/>
+            </f:if>
 
-        <f:if condition="{images -> f:count()} > 0">
-            <f:then>
-                <f:if condition="{settings.pagebrowser.insertAbove} && ({paginator.numberOfPages} > 1)">
-                    <f:render partial="Paginator" arguments="{_all}"/>
-                </f:if>
+            <f:form action="missing" class="form-inline">
+                <f:form.hidden name="currentPage" value="{page}" />
                 <table class="table">
                     <thead>
                     <tr>
                         <th colspan="4" style="color:#000;text-align:center;background-color:#cfc;">sys_file</th>
-                        <th colspan="5" style="color:#000;text-align:center;background-color:#ccf;">sys_file_metadata</th>
-                        <th colspan="3" style="color:#000;text-align:center;background-color:#fcc;">sys_file_reference</th>
-                        <th colspan="4" style="color:#000;text-align:center;background-color:#fcf;">tt_content or other</th>
+                        <th colspan="5" style="color:#000;text-align:center;background-color:#ccf;">sys_file_metadata
+                        </th>
+                        <th colspan="3" style="color:#000;text-align:center;background-color:#fcc;">sys_file_reference
+                        </th>
+                        <th colspan="4" style="color:#000;text-align:center;background-color:#fcf;">tt_content or
+                            other
+                        </th>
                     </tr>
                     <tr>
                         <th>-</th>
@@ -72,32 +79,33 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <f:for each="{paginator.paginatedItems}" as="image" iteration="iterator">
-                        <tr {f:if(condition:iterator.isOdd, then: ' style="background-color:#fff;"')}>
+                    <f:for as="image" each="{paginator.paginatedItems}" iteration="iterator">
+                        <tr>
                         <td>
                             <f:form.radio name="delimg" value="{image.file.uid}"/>
                         </td>
-                        <f:render partial="Image" arguments="{image: image}"/>
+                        <f:render arguments="{image: image}" partial="Image"/>
                         </tr>
                     </f:for>
                     </tbody>
                 </table>
 
-                <f:if condition="{settings.pagebrowser.insertBelow} && ({paginator.numberOfPages} > 1)">
-                    <f:render partial="Paginator" arguments="{_all}"/>
-                    <p>Element {pagination.startRecordNumber} - {pagination.endRecordNumber}.</p>
-                </f:if>
                 <p>{images -> f:count()} image(s)/file(s) found, that are used.</p>
 
-                <f:form.submit value="Delete selected entry in sys_file, sys_file_metadata and sys_file_reference"
-                               name="delthatimage1" class="btn btn-primary"/>
+                <f:form.submit class="btn btn-primary"
+                               name="delthatimage1" value="Delete selected entry in sys_file, sys_file_metadata and sys_file_reference"/>
                 <br><br>
-            </f:then>
-            <f:else>
-                <p>0 images/files found, that are used.</p>
-            </f:else>
-        </f:if>
-    </f:form>
+            </f:form>
+
+            <f:if condition="{settings.pagebrowser.insertBelow} && ({paginator.numberOfPages} > 1)">
+                <f:render arguments="{_all}" partial="Paginator"/>
+                <!-- p>Element {pagination.startRecordNumber} - {pagination.endRecordNumber}.</p -->
+            </f:if>
+        </f:then>
+        <f:else>
+            <p>0 images/files found, that are used.</p>
+        </f:else>
+    </f:if>
 
     <f:if condition="{count} > 0">
         <f:form action="missing" class="form-inline">
@@ -106,8 +114,8 @@
             <table class="table">
                 <thead>
                 <tr>
-                    <th colspan="4" style="text-align:center;background-color:#cfc;">sys_file</th>
-                    <th colspan="5" style="text-align:center;background-color:#ccf;">sys_file_metadata</th>
+                    <th colspan="4" style="color:#000;text-align:center;background-color:#cfc;">sys_file</th>
+                    <th colspan="5" style="color:#000;text-align:center;background-color:#ccf;">sys_file_metadata</th>
                 </tr>
                 <tr>
                     <th>-</th>
@@ -122,8 +130,8 @@
                 </tr>
                 </thead>
                 <tbody>
-                <f:for each="{fileArray}" as="image" iteration="iterator">
-                    <tr {f:if(condition:iterator.isOdd, then: 'style="background-color:#fff;"')}>
+                <f:for as="image" each="{fileArray}" iteration="iterator">
+                    <tr>
                     <td>
                         <f:form.radio name="delimg" value="{image.uid}"/>
                     </td>
@@ -142,11 +150,11 @@
                 </tbody>
             </table>
 
-            <f:form.submit value="Delete selected entry in sys_file, sys_file_metadata and sys_file_reference"
-                           name="delthatimage2" class="btn btn-primary"/>
+            <f:form.submit class="btn btn-primary"
+                           name="delthatimage2" value="Delete selected entry in sys_file, sys_file_metadata and sys_file_reference"/>
             <f:form.submit
-                    value="Delete all not used (in tt_content) image-entries in sys_file, sys_file_metadata and sys_file_reference"
-                    name="delallimages" class="btn btn-secondary"/>
+                class="btn btn-secondary"
+                name="delallimages" value="Delete all not used (in tt_content) image-entries in sys_file, sys_file_metadata and sys_file_reference"/>
         </f:form>
     </f:if>
 </f:section>

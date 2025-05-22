@@ -4,6 +4,9 @@
 
 Changelog
 =========
+Version 6.0.6:
+Bugfix: bottom-buttons are now working again.
+
 Version 6.0.5:
 Refactoring, Documentation.
 

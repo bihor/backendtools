@@ -1,6 +1,6 @@
 # backendtools
 
-Version 6.0.5
+Version 6.0.6
 
 8 admin tools for extensions, pages, (backend) layouts, slug, redirects, files, images and links:
 extension-list, recent pages and content elements, used (backend) layouts, import redirects, check redirects,
@@ -31,3 +31,6 @@ Version 6.0.4:
 
 Version 6.0.5:
 - Refactoring again.
+
+Version 6.0.6:
+- Bugfix: bottom-buttons are now working again.
