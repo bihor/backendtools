@@ -7,10 +7,10 @@
     <extension class="\T3Docs\Typo3DocsTheme\DependencyInjection\Typo3DocsThemeExtension"
                project-home="https://extensions.typo3.org/extension/backendtools"
                project-contact="https://www.fixpunkt.com/webentwicklung/typo3/typo3-extensions/"
-               project-repository="https://github.com/bihor/backendtools"
-               project-issues="https://github.com/bihor/backendtools/issues"
+               project-repository="https://github.com/fixpunkt-com/backendtools"
+               project-issues="https://github.com/fixpunkt-com/backendtools/issues"
                edit-on-github-branch="master"
-               edit-on-github="bihor/backendtools"
+               edit-on-github="fixpunkt-com/backendtools"
                interlink-shortcode="fixpunkt/backendtools"
                typo3-core-preferred="13.4"
     />
