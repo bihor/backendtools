@@ -1,0 +1,21 @@
+settings:
+  module.tx_backendtools_mod1.view.templateRootPath:
+    label: 'Path to template root (BE)'
+    description: 'Default path'
+    type: string
+    default: 'EXT:backendtools/Resources/Private/Templates/'
+  module.tx_backendtools_mod1.view.partialRootPath:
+    label: 'Path to template partials (BE)'
+    description: 'Default path'
+    type: string
+    default: 'EXT:backendtools/Resources/Private/Partials/'
+  module.tx_backendtools_mod1.view.layoutRootPath:
+    label: 'Path to template layouts (BE)'
+    description: 'Default path'
+    type: string
+    default: 'EXT:backendtools/Resources/Private/Layouts/'
+  module.tx_backendtools_mod1.persistence.storagePid:
+    label: 'Default storage PID'
+    description: 'Default storage PID'
+    type: string
+    default: ''
